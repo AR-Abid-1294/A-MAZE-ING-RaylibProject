@@ -2,7 +2,12 @@
 1. Ball ta maze er vetore thakte hobe [Not needed if we can accomplish 2]<br>
 2. Ball ta faka jaigai thakte hobe, deyale jaite ditam nah<br>
 3. In dead end - ye fas giya sala<br>
-4.in the code (x,y) =(pos.x,pos.y) [khali jegulo sobuj deyal hoyeche]<br>
+4. Time lagamu upore [tar age start game kore nibo] <br>
+
+
+
+
+in the code (x,y) =(pos.x,pos.y) [khali jegulo sobuj deyal hoyeche]<br>
 (0, 0) = (15.00,15.00)
 (1, 0) = (30.00,15.00)
 (2, 0) = (45.00,15.00)
