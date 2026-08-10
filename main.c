@@ -15,6 +15,10 @@ int maze[MAZEHEIGHT][MAZEWIDTH];
 #define MAZE_MARGIN_X 15
 #define MAZE_MARGIN_Y 15
 
+//for time sector
+int framescount = 0;
+int net_time = 100; //seconds
+
 void initializeMaze()
 {
     for (int y = 0; y < MAZEHEIGHT; y++)
@@ -46,11 +50,12 @@ void shuffleDirections(int directions[4][2])
     }
 }
 
+
 void generateMaze(int x, int y)
 {
     maze[y][x] = 0;
 
-    int directions[4][2] = {{0, 2}, {0, -2}, {2, 0}, {-2, 0}};
+    int directions[4][2] = {{0, 2}, {0, -2}, {2, 0}, {-2, 0}}; // (y,x) for maze (array)
     shuffleDirections(directions);
 
     for (int i = 0; i < 4; i++)
@@ -77,11 +82,6 @@ void drawMaze(Vector2 pos, float block_side_len)
         {
             if (maze[y][x] == 1)
             {
-                if (false)
-                {
-                    /* code */
-                }
-
                 Rectangle block = {pos.x, pos.y, block_side_len, block_side_len};
                 DrawRectangleRec(block, DARKGREEN);
             }
@@ -245,6 +245,8 @@ int main()
             generateMaze(1, 1);
             ballPos = ballPos0;
         }
+        //framescount increasing to determine time
+        framescount++;
 
         // Drawing Part
         BeginDrawing();
@@ -254,6 +256,9 @@ int main()
 
         DrawCircleV(ballPos, ballRadius, RED);
         DrawCircleLinesV(ballPos, ballRadius, BLACK);
+
+        //Time sector
+        DrawText(TextFormat("Time : %2d:%3.1f    Remaining : %2d:%3.1f", framescount/3600,(framescount%3600)/60.0, (net_time*60- framescount)/3600,((net_time*60- framescount)%3600)/60.0), 5, 5, 15, BLACK);
 
         EndDrawing();
     }
