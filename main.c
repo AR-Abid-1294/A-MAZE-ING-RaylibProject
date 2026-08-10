@@ -158,7 +158,10 @@ int isPostionFree(Vector2 pos)
     int cellIndex3 = (pos.y - MAZE_MARGIN_Y + CELLSIZE / 2) / CELLSIZE;
     int cellIndex4 = (pos.x - MAZE_MARGIN_X + CELLSIZE / 2) / CELLSIZE;
 
-    if (maze[cellIndex1][cellIndex2] == 0 && maze[cellIndex3][cellIndex4] == 0)
+    if (maze[cellIndex1][cellIndex2] == 0 &&
+        maze[cellIndex3][cellIndex4] == 0 &&
+        maze[cellIndex1][cellIndex4] == 0 &&
+        maze[cellIndex3][cellIndex2] == 0)
         return 1;
     else
         return 0;
