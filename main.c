@@ -8,8 +8,12 @@
 #define SCREENHEIGHT 600
 
 #define MAZEWIDTH 51
-#define MAZEHEIGHT 37
+#define MAZEHEIGHT 25
+#define CELLSIZE 15
 int maze[MAZEHEIGHT][MAZEWIDTH];
+
+#define MAZE_MARGIN_X 15
+#define MAZE_MARGIN_Y 15
 
 void initializeMaze()
 {
@@ -41,21 +45,6 @@ void shuffleDirections(int directions[4][2])
         directions[r][1] = temp2;
     }
 }
-
-// void printMaze()
-// {
-//     for (int y = 0; y < MAZEHEIGHT; y++)
-//     {
-//         for (int x = 0; x < MAZEWIDTH; x++)
-//         {
-//             if (maze[y][x] == 1)
-//                 printf("# ");
-//             else if (maze[y][x] == 0)
-//                 printf("  ");
-//         }
-//         printf("\n");
-//     }
-// }
 
 void generateMaze(int x, int y)
 {
@@ -92,11 +81,12 @@ void drawMaze(Vector2 pos, float block_side_len)
                 {
                     /* code */
                 }
-                
+
                 Rectangle block = {pos.x, pos.y, block_side_len, block_side_len};
                 DrawRectangleRec(block, DARKGREEN);
             }
-            else if(y == MAZEHEIGHT - 2 && x == MAZEWIDTH - 2){
+            else if (y == MAZEHEIGHT - 2 && x == MAZEWIDTH - 2)
+            {
                 Rectangle block = {pos.x, pos.y, block_side_len, block_side_len};
                 DrawRectangleRec(block, DARKBLUE);
                 DrawRectangleLinesEx(block, 5, ORANGE);
@@ -108,14 +98,109 @@ void drawMaze(Vector2 pos, float block_side_len)
     }
 }
 
+int willGoRight(Vector2 ballPos)
+{
+    float cellPosX = ballPos.x + CELLSIZE;
+    float cellPosY = ballPos.y;
+    int cellIndex1 = (cellPosY - MAZE_MARGIN_Y) / CELLSIZE;
+    int cellIndex2 = (cellPosX - MAZE_MARGIN_X) / CELLSIZE;
+
+    if (maze[cellIndex1][cellIndex2] == 0)
+        return 1;
+    else
+        return 0;
+}
+
+int willGoLeft(Vector2 ballPos)
+{
+    float cellPosX = ballPos.x - CELLSIZE;
+    float cellPosY = ballPos.y;
+    int cellIndex1 = (cellPosY - MAZE_MARGIN_Y) / CELLSIZE;
+    int cellIndex2 = (cellPosX - MAZE_MARGIN_X) / CELLSIZE;
+
+    if (maze[cellIndex1][cellIndex2] == 0)
+        return 1;
+    else
+        return 0;
+}
+
+int willGoUp(Vector2 ballPos)
+{
+    float cellPosX = ballPos.x;
+    float cellPosY = ballPos.y - CELLSIZE;
+    int cellIndex1 = (cellPosY - MAZE_MARGIN_Y) / CELLSIZE;
+    int cellIndex2 = (cellPosX - MAZE_MARGIN_X) / CELLSIZE;
+
+    if (maze[cellIndex1][cellIndex2] == 0)
+        return 1;
+    else
+        return 0;
+}
+
+int willGoDown(Vector2 ballPos)
+{
+    float cellPosX = ballPos.x;
+    float cellPosY = ballPos.y + CELLSIZE;
+    int cellIndex1 = (cellPosY - MAZE_MARGIN_Y) / CELLSIZE;
+    int cellIndex2 = (cellPosX - MAZE_MARGIN_X) / CELLSIZE;
+
+    if (maze[cellIndex1][cellIndex2] == 0)
+        return 1;
+    else
+        return 0;
+}
+
+int isPostionFree(Vector2 pos)
+{
+    int cellIndex1 = (pos.y - MAZE_MARGIN_Y - CELLSIZE / 2) / CELLSIZE;
+    int cellIndex2 = (pos.x - MAZE_MARGIN_X - CELLSIZE / 2) / CELLSIZE;
+
+    int cellIndex3 = (pos.y - MAZE_MARGIN_Y + CELLSIZE / 2) / CELLSIZE;
+    int cellIndex4 = (pos.x - MAZE_MARGIN_X + CELLSIZE / 2) / CELLSIZE;
+
+    if (maze[cellIndex1][cellIndex2] == 0 && maze[cellIndex3][cellIndex4] == 0)
+        return 1;
+    else
+        return 0;
+}
+
+// int canGoTo(Vector2 pos)
+// {
+//     float directions[9][2] = {
+//         {0, 0},
+//         {0, 1},
+//         {0, -1},
+//         {1, 0},
+//         {1, 1},
+//         {1, -1},
+//         {-1, 0},
+//         {-1, 1},
+//         {-1, -1},
+//     };
+
+//     float cellPosX = MAZE_MARGIN_X + ((pos.x - MAZE_MARGIN_X) / CELLSIZE) * CELLSIZE;
+//     float cellPosY = MAZE_MARGIN_Y + ((pos.y - MAZE_MARGIN_Y) / CELLSIZE) * CELLSIZE;
+
+//     int isAllowed = 1;
+//     for (int i = 0; i < 9; i++)
+//     {
+
+//         Vector2 targetCellPos = {cellPosX + directions[i][0] * CELLSIZE, cellPosY + directions[i][1] * CELLSIZE};
+//     }
+// }
+
 int main()
 {
     InitWindow(SCREENWIDTH, SCREENHEIGHT, "Demo Game");
     SetTargetFPS(60);
 
-    Vector2 ballPos0 = {37.5, 37.5};
+    // calculate inital position of the ball
+    float init_pos_x = MAZE_MARGIN_X + CELLSIZE * (3.0 / 2);
+    float init_pos_y = MAZE_MARGIN_Y + CELLSIZE * (3.0 / 2);
+
+    Vector2 ballPos0 = {init_pos_x, init_pos_y};
     Vector2 ballPos = ballPos0;
-    int ballRadius = 6;
+    float ballRadius = CELLSIZE / 2;
 
     srand(time(NULL));
     initializeMaze();
@@ -125,14 +210,30 @@ int main()
     while (!WindowShouldClose())
     {
         // Logic Part
-        if (IsKeyDown(KEY_RIGHT) && ballPos.x < SCREENWIDTH - ballRadius)
-            ballPos.x += 2;
-        if (IsKeyDown(KEY_LEFT) && ballPos.x > ballRadius)
-            ballPos.x -= 2;
-        if (IsKeyDown(KEY_UP) && ballPos.y > ballRadius)
-            ballPos.y -= 2;
-        if (IsKeyDown(KEY_DOWN) && ballPos.y < SCREENHEIGHT - ballRadius)
-            ballPos.y += 2;
+
+        // movement logic with willGoRight, willGoLeft etc
+        // if (IsKeyDown(KEY_RIGHT) && willGoRight(ballPos))
+        //     ballPos.x += 2;
+        // if (IsKeyDown(KEY_LEFT) && willGoLeft(ballPos))
+        //     ballPos.x -= 2;
+        // if (IsKeyDown(KEY_UP) && willGoUp(ballPos))
+        //     ballPos.y -= 2;
+        // if (IsKeyDown(KEY_DOWN) && willGoDown(ballPos))
+        //     ballPos.y += 2;
+
+        // movement logic with isPositionFree
+        Vector2 ballPosNew = ballPos;
+        if (IsKeyDown(KEY_RIGHT))
+            ballPosNew.x += 2;
+        if (IsKeyDown(KEY_LEFT))
+            ballPosNew.x -= 2;
+        if (IsKeyDown(KEY_UP))
+            ballPosNew.y -= 2;
+        if (IsKeyDown(KEY_DOWN))
+            ballPosNew.y += 2;
+
+        if (isPostionFree(ballPosNew))
+            ballPos = ballPosNew;
 
         // Generate New Maze
         if (IsKeyPressed(KEY_SPACE))
@@ -146,10 +247,19 @@ int main()
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        drawMaze((Vector2){15, 15}, 15);
+        drawMaze((Vector2){MAZE_MARGIN_X, MAZE_MARGIN_Y}, CELLSIZE);
 
         DrawCircleV(ballPos, ballRadius, RED);
         DrawCircleLinesV(ballPos, ballRadius, BLACK);
+
+        // display position
+        DrawText(TextFormat("X: %.1f  Y: %.1f", ballPos.x, ballPos.y), MAZE_MARGIN_X, MAZE_MARGIN_Y + MAZEHEIGHT * CELLSIZE, 20, BLACK);
+
+        DrawText(TextFormat("Right Cell: %.1f, %.1f", ballPos.x + CELLSIZE, ballPos.y),
+                 MAZE_MARGIN_X, MAZE_MARGIN_Y + MAZEHEIGHT * CELLSIZE + 20, 20, BLACK);
+
+        DrawText(TextFormat("Index1: %d Index2: %d", (int)(ballPos.y - MAZE_MARGIN_Y) / CELLSIZE, (int)(ballPos.x + CELLSIZE - MAZE_MARGIN_X) / CELLSIZE),
+                 MAZE_MARGIN_X, MAZE_MARGIN_Y + MAZEHEIGHT * CELLSIZE + 40, 20, BLACK);
 
         EndDrawing();
     }
