@@ -11,6 +11,10 @@
 #define MAZEHEIGHT 37
 int maze[MAZEHEIGHT][MAZEWIDTH];
 
+//for time sector
+int framescount = 0;
+int net_time = 100; //seconds
+
 void initializeMaze()
 {
     for (int y = 0; y < MAZEHEIGHT; y++)
@@ -42,26 +46,12 @@ void shuffleDirections(int directions[4][2])
     }
 }
 
-// void printMaze()
-// {
-//     for (int y = 0; y < MAZEHEIGHT; y++)
-//     {
-//         for (int x = 0; x < MAZEWIDTH; x++)
-//         {
-//             if (maze[y][x] == 1)
-//                 printf("# ");
-//             else if (maze[y][x] == 0)
-//                 printf("  ");
-//         }
-//         printf("\n");
-//     }
-// }
 
 void generateMaze(int x, int y)
 {
     maze[y][x] = 0;
 
-    int directions[4][2] = {{0, 2}, {0, -2}, {2, 0}, {-2, 0}};
+    int directions[4][2] = {{0, 2}, {0, -2}, {2, 0}, {-2, 0}}; // (y,x) for maze (array)
     shuffleDirections(directions);
 
     for (int i = 0; i < 4; i++)
@@ -88,11 +78,6 @@ void drawMaze(Vector2 pos, float block_side_len)
         {
             if (maze[y][x] == 1)
             {
-                if (false)
-                {
-                    /* code */
-                }
-                
                 Rectangle block = {pos.x, pos.y, block_side_len, block_side_len};
                 DrawRectangleRec(block, DARKGREEN);
             }
@@ -113,7 +98,7 @@ int main()
     InitWindow(SCREENWIDTH, SCREENHEIGHT, "Demo Game");
     SetTargetFPS(60);
 
-    Vector2 ballPos0 = {37.5, 37.5};
+    Vector2 ballPos0 = {37.5, 47.5};
     Vector2 ballPos = ballPos0;
     int ballRadius = 6;
 
@@ -125,8 +110,8 @@ int main()
     while (!WindowShouldClose())
     {
         // Logic Part
-        if (IsKeyDown(KEY_RIGHT) && ballPos.x < SCREENWIDTH - ballRadius)
-            ballPos.x += 2;
+        if (IsKeyDown(KEY_RIGHT) && ballPos.x < SCREENWIDTH - ballRadius) // ekhane willgoright? (1/0)   
+        ballPos.x += 2;
         if (IsKeyDown(KEY_LEFT) && ballPos.x > ballRadius)
             ballPos.x -= 2;
         if (IsKeyDown(KEY_UP) && ballPos.y > ballRadius)
@@ -141,15 +126,20 @@ int main()
             generateMaze(1, 1);
             ballPos = ballPos0;
         }
+        //framescount increasing to determine time
+        framescount++;
 
         // Drawing Part
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        drawMaze((Vector2){15, 15}, 15);
+        drawMaze((Vector2){15, 25}, 15);
 
         DrawCircleV(ballPos, ballRadius, RED);
         DrawCircleLinesV(ballPos, ballRadius, BLACK);
+
+        //Time sector
+        DrawText(TextFormat("Time : %2d:%3.1f    Remaining : %2d:%3.1f", framescount/3600,(framescount%3600)/60.0, (net_time*60- framescount)/3600,((net_time*60- framescount)%3600)/60.0), 5, 5, 15, BLACK);
 
         EndDrawing();
     }
