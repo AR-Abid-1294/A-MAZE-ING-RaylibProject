@@ -8,7 +8,7 @@
 #define SCREENHEIGHT 600
 
 #define MAZEWIDTH 51
-#define MAZEHEIGHT 25
+#define MAZEHEIGHT 35
 #define CELLSIZE 15
 int maze[MAZEHEIGHT][MAZEWIDTH];
 
@@ -251,15 +251,6 @@ int main()
 
         DrawCircleV(ballPos, ballRadius, RED);
         DrawCircleLinesV(ballPos, ballRadius, BLACK);
-
-        // display position
-        DrawText(TextFormat("X: %.1f  Y: %.1f", ballPos.x, ballPos.y), MAZE_MARGIN_X, MAZE_MARGIN_Y + MAZEHEIGHT * CELLSIZE, 20, BLACK);
-
-        DrawText(TextFormat("Right Cell: %.1f, %.1f", ballPos.x + CELLSIZE, ballPos.y),
-                 MAZE_MARGIN_X, MAZE_MARGIN_Y + MAZEHEIGHT * CELLSIZE + 20, 20, BLACK);
-
-        DrawText(TextFormat("Index1: %d Index2: %d", (int)(ballPos.y - MAZE_MARGIN_Y) / CELLSIZE, (int)(ballPos.x + CELLSIZE - MAZE_MARGIN_X) / CELLSIZE),
-                 MAZE_MARGIN_X, MAZE_MARGIN_Y + MAZEHEIGHT * CELLSIZE + 40, 20, BLACK);
 
         EndDrawing();
     }
