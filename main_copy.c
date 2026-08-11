@@ -15,7 +15,7 @@ int maze[MAZEHEIGHT][MAZEWIDTH];
 #define MAZE_MARGIN_X 15
 #define MAZE_MARGIN_Y 15
 
-#define SPEED_MAX 120.0f
+#define SPPED_MAX 120
 
 // for time sector
 int framescount = 0;
@@ -153,13 +153,11 @@ int willGoDown(Vector2 ballPos)
 
 int isPostionFree(Vector2 pos)
 {
-    float margin = (CELLSIZE / 2) * 0.9f;
+    int cellIndex1 = (pos.y - MAZE_MARGIN_Y - CELLSIZE / 2) / CELLSIZE;
+    int cellIndex2 = (pos.x - MAZE_MARGIN_X - CELLSIZE / 2) / CELLSIZE;
 
-    int cellIndex1 = (pos.y - MAZE_MARGIN_Y - margin) / CELLSIZE;
-    int cellIndex2 = (pos.x - MAZE_MARGIN_X - margin) / CELLSIZE;
-
-    int cellIndex3 = (pos.y - MAZE_MARGIN_Y + margin) / CELLSIZE;
-    int cellIndex4 = (pos.x - MAZE_MARGIN_X + margin) / CELLSIZE;
+    int cellIndex3 = (pos.y - MAZE_MARGIN_Y + CELLSIZE / 2) / CELLSIZE;
+    int cellIndex4 = (pos.x - MAZE_MARGIN_X + CELLSIZE / 2) / CELLSIZE;
 
     if (maze[cellIndex1][cellIndex2] == 0 &&
         maze[cellIndex3][cellIndex4] == 0 &&
@@ -227,19 +225,16 @@ int main()
         // if (IsKeyDown(KEY_DOWN) && willGoDown(ballPos))
         //     ballPos.y += 2;
 
-        // Delta Time
-        float dt = GetFrameTime();
-
         // movement logic with isPositionFree
         Vector2 ballPosNew = ballPos;
         if (IsKeyDown(KEY_RIGHT))
-            ballPosNew.x += SPEED_MAX * dt;
+            ballPosNew.x += 2;
         if (IsKeyDown(KEY_LEFT))
-            ballPosNew.x -= SPEED_MAX * dt;
+            ballPosNew.x -= 2;
         if (IsKeyDown(KEY_UP))
-            ballPosNew.y -= SPEED_MAX * dt;
+            ballPosNew.y -= 2;
         if (IsKeyDown(KEY_DOWN))
-            ballPosNew.y += SPEED_MAX * dt;
+            ballPosNew.y += 2;
 
         if (isPostionFree(ballPosNew))
             ballPos = ballPosNew;
