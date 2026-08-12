@@ -100,58 +100,6 @@ void drawMaze(Vector2 pos, float block_side_len)
     }
 }
 
-int willGoRight(Vector2 ballPos)
-{
-    float cellPosX = ballPos.x + CELLSIZE;
-    float cellPosY = ballPos.y;
-    int cellIndex1 = (cellPosY - MAZE_MARGIN_Y) / CELLSIZE;
-    int cellIndex2 = (cellPosX - MAZE_MARGIN_X) / CELLSIZE;
-
-    if (maze[cellIndex1][cellIndex2] == 0)
-        return 1;
-    else
-        return 0;
-}
-
-int willGoLeft(Vector2 ballPos)
-{
-    float cellPosX = ballPos.x - CELLSIZE;
-    float cellPosY = ballPos.y;
-    int cellIndex1 = (cellPosY - MAZE_MARGIN_Y) / CELLSIZE;
-    int cellIndex2 = (cellPosX - MAZE_MARGIN_X) / CELLSIZE;
-
-    if (maze[cellIndex1][cellIndex2] == 0)
-        return 1;
-    else
-        return 0;
-}
-
-int willGoUp(Vector2 ballPos)
-{
-    float cellPosX = ballPos.x;
-    float cellPosY = ballPos.y - CELLSIZE;
-    int cellIndex1 = (cellPosY - MAZE_MARGIN_Y) / CELLSIZE;
-    int cellIndex2 = (cellPosX - MAZE_MARGIN_X) / CELLSIZE;
-
-    if (maze[cellIndex1][cellIndex2] == 0)
-        return 1;
-    else
-        return 0;
-}
-
-int willGoDown(Vector2 ballPos)
-{
-    float cellPosX = ballPos.x;
-    float cellPosY = ballPos.y + CELLSIZE;
-    int cellIndex1 = (cellPosY - MAZE_MARGIN_Y) / CELLSIZE;
-    int cellIndex2 = (cellPosX - MAZE_MARGIN_X) / CELLSIZE;
-
-    if (maze[cellIndex1][cellIndex2] == 0)
-        return 1;
-    else
-        return 0;
-}
-
 int isPostionFree(Vector2 pos)
 {
     float margin = (CELLSIZE / 2) * 0.9f;
@@ -170,31 +118,6 @@ int isPostionFree(Vector2 pos)
     else
         return 0;
 }
-
-// int canGoTo(Vector2 pos)
-// {
-//     float directions[9][2] = {
-//         {0, 0},
-//         {0, 1},
-//         {0, -1},
-//         {1, 0},
-//         {1, 1},
-//         {1, -1},
-//         {-1, 0},
-//         {-1, 1},
-//         {-1, -1},
-//     };
-
-//     float cellPosX = MAZE_MARGIN_X + ((pos.x - MAZE_MARGIN_X) / CELLSIZE) * CELLSIZE;
-//     float cellPosY = MAZE_MARGIN_Y + ((pos.y - MAZE_MARGIN_Y) / CELLSIZE) * CELLSIZE;
-
-//     int isAllowed = 1;
-//     for (int i = 0; i < 9; i++)
-//     {
-
-//         Vector2 targetCellPos = {cellPosX + directions[i][0] * CELLSIZE, cellPosY + directions[i][1] * CELLSIZE};
-//     }
-// }
 
 int main()
 {
@@ -219,28 +142,18 @@ int main()
     {
         // Logic Part
 
-        // movement logic with willGoRight, willGoLeft etc
-        // if (IsKeyDown(KEY_RIGHT) && willGoRight(ballPos))
-        //     ballPos.x += 2;
-        // if (IsKeyDown(KEY_LEFT) && willGoLeft(ballPos))
-        //     ballPos.x -= 2;
-        // if (IsKeyDown(KEY_UP) && willGoUp(ballPos))
-        //     ballPos.y -= 2;
-        // if (IsKeyDown(KEY_DOWN) && willGoDown(ballPos))
-        //     ballPos.y += 2;
-
         // Delta Time
         float dt = GetFrameTime();
 
         // movement logic with isPositionFree
         Vector2 ballPosNew = ballPos;
-        if (IsKeyDown(KEY_RIGHT))
+        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
             ballSpeed.x = SPEED_MAX;
-        else if (IsKeyDown(KEY_LEFT))
+        else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
             ballSpeed.x = -SPEED_MAX;
-        else if (IsKeyDown(KEY_UP))
+        else if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
             ballSpeed.y = -SPEED_MAX;
-        else if (IsKeyDown(KEY_DOWN))
+        else if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
             ballSpeed.y = SPEED_MAX;
         else
             ballSpeed = Vector2Zero();
