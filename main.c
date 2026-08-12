@@ -3,6 +3,7 @@
 #include <time.h>
 
 #include "raylib.h"
+#include "raymath.h"
 
 #define SCREENWIDTH 800
 #define SCREENHEIGHT 600
@@ -207,6 +208,7 @@ int main()
     Vector2 ballPos0 = {init_pos_x, init_pos_y};
     Vector2 ballPos = ballPos0;
     float ballRadius = CELLSIZE / 2;
+    Vector2 ballSpeed = Vector2Zero();
 
     srand(time(NULL));
     initializeMaze();
@@ -233,13 +235,17 @@ int main()
         // movement logic with isPositionFree
         Vector2 ballPosNew = ballPos;
         if (IsKeyDown(KEY_RIGHT))
-            ballPosNew.x += SPEED_MAX * dt;
-        if (IsKeyDown(KEY_LEFT))
-            ballPosNew.x -= SPEED_MAX * dt;
-        if (IsKeyDown(KEY_UP))
-            ballPosNew.y -= SPEED_MAX * dt;
-        if (IsKeyDown(KEY_DOWN))
-            ballPosNew.y += SPEED_MAX * dt;
+            ballSpeed.x = SPEED_MAX;
+        else if (IsKeyDown(KEY_LEFT))
+            ballSpeed.x = -SPEED_MAX;
+        else if (IsKeyDown(KEY_UP))
+            ballSpeed.y = -SPEED_MAX;
+        else if (IsKeyDown(KEY_DOWN))
+            ballSpeed.y = SPEED_MAX;
+        else
+            ballSpeed = Vector2Zero();
+
+        ballPosNew = Vector2Add(ballPosNew, Vector2Scale(ballSpeed, dt));
 
         if (isPostionFree(ballPosNew))
             ballPos = ballPosNew;
