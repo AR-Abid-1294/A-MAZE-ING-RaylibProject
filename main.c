@@ -5,6 +5,8 @@
 #include "raylib.h"
 #include "raymath.h"
 
+#define LENGTH(arr) (sizeof(arr) / sizeof(arr[0]))
+
 #define SCREENWIDTH 800
 #define SCREENHEIGHT 600
 
@@ -75,7 +77,7 @@ void generateMaze(int x, int y)
     }
 }
 
-void drawMaze(Vector2 pos, float block_side_len)
+void drawMaze(Vector2 pos, float block_side_len, Texture2D block)
 {
     for (int y = 0; y < MAZEHEIGHT; y++)
     {
@@ -84,8 +86,12 @@ void drawMaze(Vector2 pos, float block_side_len)
         {
             if (maze[y][x] == 1)
             {
-                Rectangle block = {pos.x, pos.y, block_side_len, block_side_len};
-                DrawRectangleRec(block, DARKGREEN);
+                // Rectangle block = {pos.x, pos.y, block_side_len, block_side_len};
+                // DrawRectangleRec(block, DARKGREEN);
+                DrawTexturePro(block,
+                               (Rectangle){0, 0, block.width, block.height},
+                               (Rectangle){pos.x, pos.y, block_side_len, block_side_len},
+                               Vector2Zero(), 0, WHITE);
             }
             else if (y == MAZEHEIGHT - 2 && x == MAZEWIDTH - 2)
             {
@@ -124,6 +130,20 @@ int main()
     InitWindow(SCREENWIDTH, SCREENHEIGHT, "Demo Game");
     SetTargetFPS(60);
 
+    // Load Sprites and Textures
+    Texture2D wallTexture = LoadTexture("Assets/brick2.png");
+    // Texture2D playerIdle[12];
+    // for (int i = 0; i < LENGTH(playerIdle); i++)
+    // {
+    //     char path[100];
+    //     if (i < 10)
+    //         sprintf(path, "Assets/player-sprites/player-idle/Wraith_03_Idle Blinking_00%d.png", i);
+    //     else
+    //         sprintf(path, "Assets/player-sprites/player-idle/Wraith_03_Idle Blinking_0%d.png", i);
+    //     playerIdle[i] = LoadTexture(path);
+    // }
+    // int spriteIndex = 0;
+
     // calculate inital position of the ball
     float init_pos_x = MAZE_MARGIN_X + CELLSIZE * (3.0 / 2);
     float init_pos_y = MAZE_MARGIN_Y + CELLSIZE * (3.0 / 2);
@@ -131,6 +151,7 @@ int main()
     Vector2 ballPos0 = {init_pos_x, init_pos_y};
     Vector2 ballPos = ballPos0;
     float ballRadius = CELLSIZE / 2;
+    float spriteSide = CELLSIZE;
     Vector2 ballSpeed = Vector2Zero();
 
     srand(time(NULL));
@@ -178,10 +199,15 @@ int main()
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        drawMaze((Vector2){MAZE_MARGIN_X, MAZE_MARGIN_Y}, CELLSIZE);
+        drawMaze((Vector2){MAZE_MARGIN_X, MAZE_MARGIN_Y}, CELLSIZE, wallTexture);
 
         DrawCircleV(ballPos, ballRadius, RED);
         DrawCircleLinesV(ballPos, ballRadius, BLACK);
+        // Texture2D sprite = playerIdle[spriteIndex];
+        // DrawTexturePro(sprite,
+        //                (Rectangle){138, 26, sprite.width, sprite.height},
+        //                (Rectangle){ballPos.x, ballPos.y, spriteSide, spriteSide},
+        //                Vector2Zero(), 0, WHITE);
 
         // Time sector
         DrawText(TextFormat("Time : %2d:%3.1f    Remaining : %2d:%3.1f",
@@ -191,8 +217,11 @@ int main()
                  5, 5, 15, BLACK);
 
         EndDrawing();
+
+        // spriteIndex = (int)(GetTime() / 0.1) % LENGTH(playerIdle);
     }
 
+    UnloadTexture(wallTexture);
     CloseWindow();
 
     return 0;
