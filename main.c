@@ -39,7 +39,7 @@ typedef struct Button
 
 void drawButton(Button btn)
 {
-    DrawRectangleRec(btn.buttonRec, btn.buttonColor);
+    DrawRectangleRounded(btn.buttonRec, 2, 100, btn.buttonColor);
     DrawRectangleLinesEx(btn.buttonRec, btn.stroke, btn.strokeColor);
     int textWidth = MeasureText(btn.text, btn.textFontSize);
     Vector2 textPos = (Vector2){btn.buttonRec.x + btn.buttonRec.width / 2 - textWidth / 2,
@@ -68,8 +68,30 @@ void drawShadow(Button btn)
                         btn.buttonRec.y + 5,
                         btn.buttonRec.width,
                         btn.buttonRec.height};
-    DrawRectangleRec(shadow, GetColor(0x00000050));
+    // DrawRectangleRec(shadow, GetColor(0x00000050));
+    DrawRectangleRounded(shadow, 2, 100, GetColor(0x00000050));
     drawButton(btn);
+}
+
+typedef struct Card
+{
+    Rectangle cardRec;
+    Color cardColor;
+    float stroke;
+    Color strokeColor;
+    char text[1000];
+    Color textColor;
+    int textFontSize;
+} Card;
+
+void drawCard(Card card)
+{
+    DrawRectangleRounded(card.cardRec, 2, 100, card.cardColor);
+    DrawRectangleLinesEx(card.cardRec, card.stroke, card.strokeColor);
+    int textWidth = MeasureText(card.text, card.textFontSize);
+    Vector2 textPos = (Vector2){card.cardRec.x + card.cardRec.width / 2 - textWidth / 2,
+                                card.cardRec.y + card.cardRec.height / 2 - card.textFontSize / 2};
+    DrawText(card.text, textPos.x, textPos.y, card.textFontSize, card.textColor);
 }
 
 void initializeMaze()
@@ -228,42 +250,56 @@ int main()
             {
                 play_btn.buttonColor = GetColor(0x7a35ffff);
                 drawShadow(play_btn);
-                SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-            }
-            else
-            {
-                SetMouseCursor(MOUSE_CURSOR_DEFAULT);
             }
             if (clicked(play_btn))
                 page = 1;
 
             // CREDIT BUTTON
-            Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5, SCREENWIDTH / 5, 35},
+            Button credit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5 + 50, SCREENWIDTH / 5, 35},
+                                 BLUE,
+                                 0, WHITE, "CREDIT", RAYWHITE, 25};
+            drawButton(credit_btn);
+            if (hovered(credit_btn))
+            {
+                credit_btn.buttonColor = GetColor(0x7a35ffff);
+                drawShadow(credit_btn);
+            }
+            if (clicked(credit_btn))
+                page = 0;
+
+            // QUIT BUTTON
+            Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5 + 50 * 2, SCREENWIDTH / 5, 35},
                                BLUE,
-                               0, WHITE, "CREDIT", RAYWHITE, 25};
-            drawButton(play_btn);
-            if (hovered(play_btn))
+                               0, WHITE, "QUIT", RAYWHITE, 25};
+            drawButton(quit_btn);
+            if (hovered(quit_btn))
             {
-                play_btn.buttonColor = GetColor(0x7a35ffff);
-                drawShadow(play_btn);
+                quit_btn.buttonColor = GetColor(0x7a35ffff);
+                drawShadow(quit_btn);
+            }
+            if (clicked(quit_btn))
+                break;
+
+            if (hovered(play_btn) || hovered(credit_btn) || hovered(quit_btn))
                 SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-            }
             else
-            {
                 SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-            }
-            if (clicked(play_btn))
-                page = 2;
 
             EndDrawing();
         }
 
-
         // --------------- CREDIT PAGE ---------------
-        
+        if(page == 2){
+            // Afif Part
+
+            Card afif = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5 + 50, SCREENWIDTH / 5, 35},
+                                 BLUE,
+                                 0, WHITE, "CREDIT", RAYWHITE, 25};
 
 
 
+
+        }
 
         // --------------- GAME PAGE ---------------
         if (page == 1)
