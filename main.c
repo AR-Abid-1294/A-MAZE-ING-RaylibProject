@@ -33,15 +33,18 @@ typedef struct Button
     float stroke;
     Color strokeColor;
     char text[50];
-    int textFontSize;
     Color textColor;
+    int textFontSize;
 } Button;
 
 void drawButton(Button btn)
 {
     DrawRectangleRec(btn.buttonRec, btn.buttonColor);
     DrawRectangleLinesEx(btn.buttonRec, btn.stroke, btn.strokeColor);
-    DrawText(btn.text, btn.buttonRec.width/2 - )
+    int textWidth = MeasureText(btn.text, btn.textFontSize);
+    Vector2 textPos = (Vector2){btn.buttonRec.x + btn.buttonRec.width / 2 - textWidth / 2,
+                                btn.buttonRec.y + btn.buttonRec.height / 2 - btn.textFontSize / 2};
+    DrawText(btn.text, textPos.x, textPos.y, btn.textFontSize, btn.textColor);
 }
 
 bool hovered(Button btn)
@@ -57,6 +60,16 @@ bool clicked(Button btn)
     if (hovered(btn) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         return true;
     return false;
+}
+
+void drawShadow(Button btn)
+{
+    Rectangle shadow = {btn.buttonRec.x + 5,
+                        btn.buttonRec.y + 5,
+                        btn.buttonRec.width,
+                        btn.buttonRec.height};
+    DrawRectangleRec(shadow, GetColor(0x00000050));
+    drawButton(btn);
 }
 
 void initializeMaze()
@@ -204,16 +217,53 @@ int main()
         if (page == 0)
         {
             BeginDrawing();
-            ClearBackground(GetColor(0xffefb3ff));
+            ClearBackground(GetColor(0xf0f2f5ff));
 
+            // PLAY BUTTON
             Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5, SCREENWIDTH / 5, 35},
-                               GetColor(0x013e37ff),
-                               0, WHITE};
-
+                               BLUE,
+                               0, WHITE, "PLAY", RAYWHITE, 25};
             drawButton(play_btn);
+            if (hovered(play_btn))
+            {
+                play_btn.buttonColor = GetColor(0x7a35ffff);
+                drawShadow(play_btn);
+                SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+            }
+            else
+            {
+                SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+            }
+            if (clicked(play_btn))
+                page = 1;
+
+            // CREDIT BUTTON
+            Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5, SCREENWIDTH / 5, 35},
+                               BLUE,
+                               0, WHITE, "CREDIT", RAYWHITE, 25};
+            drawButton(play_btn);
+            if (hovered(play_btn))
+            {
+                play_btn.buttonColor = GetColor(0x7a35ffff);
+                drawShadow(play_btn);
+                SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+            }
+            else
+            {
+                SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+            }
+            if (clicked(play_btn))
+                page = 2;
 
             EndDrawing();
         }
+
+
+        // --------------- CREDIT PAGE ---------------
+        
+
+
+
 
         // --------------- GAME PAGE ---------------
         if (page == 1)
@@ -272,6 +322,24 @@ int main()
                                 (net_time * 60 - framescount) / 3600,
                                 ((net_time * 60 - framescount) % 3600) / 60.0),
                      5, 5, 15, BLACK);
+
+            Button menu_btn = {(Rectangle){10, SCREENHEIGHT - 30 - 10, 70, 30}, DARKGRAY,
+                               0, WHITE,
+                               "MENU", RAYWHITE, 20};
+            drawButton(menu_btn);
+            if (hovered(menu_btn))
+            {
+                menu_btn.buttonColor = GRAY;
+                drawShadow(menu_btn);
+                SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+            }
+            else
+            {
+                SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+            }
+
+            if (clicked(menu_btn))
+                page = 0;
 
             EndDrawing();
 
