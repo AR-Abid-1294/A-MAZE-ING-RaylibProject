@@ -24,6 +24,41 @@ int maze[MAZEHEIGHT][MAZEWIDTH];
 int framescount = 0;
 int net_time = 100; // seconds
 
+// ---------- Menu Page Functions and Structures ----------
+
+typedef struct Button
+{
+    Rectangle buttonRec;
+    Color buttonColor;
+    float stroke;
+    Color strokeColor;
+    char text[50];
+    int textFontSize;
+    Color textColor;
+} Button;
+
+void drawButton(Button btn)
+{
+    DrawRectangleRec(btn.buttonRec, btn.buttonColor);
+    DrawRectangleLinesEx(btn.buttonRec, btn.stroke, btn.strokeColor);
+    DrawText(btn.text, btn.buttonRec.width/2 - )
+}
+
+bool hovered(Button btn)
+{
+    Vector2 mouse = GetMousePosition();
+    if (CheckCollisionPointRec(mouse, btn.buttonRec))
+        return true;
+    return false;
+}
+
+bool clicked(Button btn)
+{
+    if (hovered(btn) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        return true;
+    return false;
+}
+
 void initializeMaze()
 {
     for (int y = 0; y < MAZEHEIGHT; y++)
@@ -154,6 +189,9 @@ int main()
     float spriteSide = CELLSIZE;
     Vector2 ballSpeed = Vector2Zero();
 
+    // page
+    int page = 0;
+
     srand(time(NULL));
     initializeMaze();
     generateMaze(1, 1);
@@ -161,64 +199,84 @@ int main()
     // Game Loop
     while (!WindowShouldClose())
     {
-        // Logic Part
 
-        // Delta Time
-        float dt = GetFrameTime();
-
-        // movement logic with isPositionFree
-        Vector2 ballPosNew = ballPos;
-        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
-            ballSpeed.x = SPEED_MAX;
-        else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
-            ballSpeed.x = -SPEED_MAX;
-        else if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
-            ballSpeed.y = -SPEED_MAX;
-        else if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
-            ballSpeed.y = SPEED_MAX;
-        else
-            ballSpeed = Vector2Zero();
-
-        ballPosNew = Vector2Add(ballPosNew, Vector2Scale(ballSpeed, dt));
-
-        if (isPostionFree(ballPosNew))
-            ballPos = ballPosNew;
-
-        // Generate New Maze
-        if (IsKeyPressed(KEY_SPACE))
+        // --------------- MENU PAGE ---------------
+        if (page == 0)
         {
-            initializeMaze();
-            generateMaze(1, 1);
-            ballPos = ballPos0;
+            BeginDrawing();
+            ClearBackground(GetColor(0xffefb3ff));
+
+            Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5, SCREENWIDTH / 5, 35},
+                               GetColor(0x013e37ff),
+                               0, WHITE};
+
+            drawButton(play_btn);
+
+            EndDrawing();
         }
 
-        // framescount increasing to determine time
-        framescount++;
+        // --------------- GAME PAGE ---------------
+        if (page == 1)
+        {
+            // Logic Part
 
-        // Drawing Part
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
+            // Delta Time
+            float dt = GetFrameTime();
 
-        drawMaze((Vector2){MAZE_MARGIN_X, MAZE_MARGIN_Y}, CELLSIZE, wallTexture);
+            // movement logic with isPositionFree
+            Vector2 ballPosNew = ballPos;
+            if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
+                ballSpeed.x = SPEED_MAX;
+            else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
+                ballSpeed.x = -SPEED_MAX;
+            else if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
+                ballSpeed.y = -SPEED_MAX;
+            else if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
+                ballSpeed.y = SPEED_MAX;
+            else
+                ballSpeed = Vector2Zero();
 
-        DrawCircleV(ballPos, ballRadius, RED);
-        DrawCircleLinesV(ballPos, ballRadius, BLACK);
-        // Texture2D sprite = playerIdle[spriteIndex];
-        // DrawTexturePro(sprite,
-        //                (Rectangle){138, 26, sprite.width, sprite.height},
-        //                (Rectangle){ballPos.x, ballPos.y, spriteSide, spriteSide},
-        //                Vector2Zero(), 0, WHITE);
+            ballPosNew = Vector2Add(ballPosNew, Vector2Scale(ballSpeed, dt));
 
-        // Time sector
-        DrawText(TextFormat("Time : %2d:%3.1f    Remaining : %2d:%3.1f",
-                            framescount / 3600, (framescount % 3600) / 60.0,
-                            (net_time * 60 - framescount) / 3600,
-                            ((net_time * 60 - framescount) % 3600) / 60.0),
-                 5, 5, 15, BLACK);
+            if (isPostionFree(ballPosNew))
+                ballPos = ballPosNew;
 
-        EndDrawing();
+            // Generate New Maze
+            if (IsKeyPressed(KEY_SPACE))
+            {
+                initializeMaze();
+                generateMaze(1, 1);
+                ballPos = ballPos0;
+            }
 
-        // spriteIndex = (int)(GetTime() / 0.1) % LENGTH(playerIdle);
+            // framescount increasing to determine time
+            framescount++;
+
+            // Drawing Part
+            BeginDrawing();
+            ClearBackground(RAYWHITE);
+
+            drawMaze((Vector2){MAZE_MARGIN_X, MAZE_MARGIN_Y}, CELLSIZE, wallTexture);
+
+            DrawCircleV(ballPos, ballRadius, RED);
+            DrawCircleLinesV(ballPos, ballRadius, BLACK);
+            // Texture2D sprite = playerIdle[spriteIndex];
+            // DrawTexturePro(sprite,
+            //                (Rectangle){138, 26, sprite.width, sprite.height},
+            //                (Rectangle){ballPos.x, ballPos.y, spriteSide, spriteSide},
+            //                Vector2Zero(), 0, WHITE);
+
+            // Time sector
+            DrawText(TextFormat("Time : %2d:%3.1f    Remaining : %2d:%3.1f",
+                                framescount / 3600, (framescount % 3600) / 60.0,
+                                (net_time * 60 - framescount) / 3600,
+                                ((net_time * 60 - framescount) % 3600) / 60.0),
+                     5, 5, 15, BLACK);
+
+            EndDrawing();
+
+            // spriteIndex = (int)(GetTime() / 0.1) % LENGTH(playerIdle);
+        }
     }
 
     UnloadTexture(wallTexture);
