@@ -1,199 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
-#include "raylib.h"
-#include "raymath.h"
-
-#define LENGTH(arr) (sizeof(arr) / sizeof(arr[0]))
-
-#define SCREENWIDTH 800
-#define SCREENHEIGHT 600
-
-#define MAZEWIDTH 51
-#define MAZEHEIGHT 35
-#define CELLSIZE 15
-int maze[MAZEHEIGHT][MAZEWIDTH];
-
-#define MAZE_MARGIN_X 15
-#define MAZE_MARGIN_Y 15
-
-#define SPEED_MAX 120.0f
-
-// for time sector
-int framescount = 0;
-int net_time = 100; // seconds
-
-// ---------- Menu Page Functions and Structures ----------
-
-typedef struct Button
-{
-    Rectangle buttonRec;
-    Color buttonColor;
-    float stroke;
-    Color strokeColor;
-    char text[50];
-    Color textColor;
-    int textFontSize;
-} Button;
-
-void drawButton(Button btn)
-{
-    DrawRectangleRounded(btn.buttonRec, 2, 100, btn.buttonColor);
-    DrawRectangleLinesEx(btn.buttonRec, btn.stroke, btn.strokeColor);
-    int textWidth = MeasureText(btn.text, btn.textFontSize);
-    Vector2 textPos = (Vector2){btn.buttonRec.x + btn.buttonRec.width / 2 - textWidth / 2,
-                                btn.buttonRec.y + btn.buttonRec.height / 2 - btn.textFontSize / 2};
-    DrawText(btn.text, textPos.x, textPos.y, btn.textFontSize, btn.textColor);
-}
-
-bool hovered(Button btn)
-{
-    Vector2 mouse = GetMousePosition();
-    if (CheckCollisionPointRec(mouse, btn.buttonRec))
-        return true;
-    return false;
-}
-
-bool clicked(Button btn)
-{
-    if (hovered(btn) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        return true;
-    return false;
-}
-
-void drawShadow(Button btn)
-{
-    Rectangle shadow = {btn.buttonRec.x + 5,
-                        btn.buttonRec.y + 5,
-                        btn.buttonRec.width,
-                        btn.buttonRec.height};
-    // DrawRectangleRec(shadow, GetColor(0x00000050));
-    DrawRectangleRounded(shadow, 2, 100, GetColor(0x00000050));
-    drawButton(btn);
-}
-
-typedef struct Card
-{
-    Rectangle cardRec;
-    Color cardColor;
-    float stroke;
-    Color strokeColor;
-    char text[1000];
-    Color textColor;
-    int textFontSize;
-} Card;
-
-void drawCard(Card card)
-{
-    DrawRectangleRounded(card.cardRec, 2, 100, card.cardColor);
-    DrawRectangleLinesEx(card.cardRec, card.stroke, card.strokeColor);
-    int textWidth = MeasureText(card.text, card.textFontSize);
-    Vector2 textPos = (Vector2){card.cardRec.x + card.cardRec.width / 2 - textWidth / 2,
-                                card.cardRec.y + card.cardRec.height / 2 - card.textFontSize / 2};
-    DrawText(card.text, textPos.x, textPos.y, card.textFontSize, card.textColor);
-}
-
-void initializeMaze()
-{
-    for (int y = 0; y < MAZEHEIGHT; y++)
-    {
-        for (int x = 0; x < MAZEWIDTH; x++)
-        {
-            maze[y][x] = 1; // start with everything solid
-        }
-    }
-}
-
-// Check if a cell is inside the maze
-int isCellValid(int x, int y)
-{
-    return ((x > 0 && x < MAZEWIDTH - 1) && (y > 0 && y < MAZEHEIGHT - 1));
-}
-
-void shuffleDirections(int directions[4][2])
-{
-    for (int i = 0; i < 4; i++)
-    {
-        int r = rand() % 4;
-        int temp1 = directions[i][0];
-        int temp2 = directions[i][1];
-        directions[i][0] = directions[r][0];
-        directions[i][1] = directions[r][1];
-        directions[r][0] = temp1;
-        directions[r][1] = temp2;
-    }
-}
-
-void generateMaze(int x, int y)
-{
-    maze[y][x] = 0;
-
-    int directions[4][2] = {{0, 2}, {0, -2}, {2, 0}, {-2, 0}}; // (y,x) for maze (array)
-    shuffleDirections(directions);
-
-    for (int i = 0; i < 4; i++)
-    {
-        int delx = directions[i][0];
-        int dely = directions[i][1];
-        int x_ = x + delx;
-        int y_ = y + dely;
-
-        if (isCellValid(x_, y_) && maze[y_][x_] == 1)
-        {
-            maze[y + dely / 2][x + delx / 2] = 0;
-            generateMaze(x_, y_);
-        }
-    }
-}
-
-void drawMaze(Vector2 pos, float block_side_len, Texture2D block)
-{
-    for (int y = 0; y < MAZEHEIGHT; y++)
-    {
-        float startx = pos.x;
-        for (int x = 0; x < MAZEWIDTH; x++)
-        {
-            if (maze[y][x] == 1)
-            {
-                // Rectangle block = {pos.x, pos.y, block_side_len, block_side_len};
-                // DrawRectangleRec(block, DARKGREEN);
-                DrawTexturePro(block,
-                               (Rectangle){0, 0, block.width, block.height},
-                               (Rectangle){pos.x, pos.y, block_side_len, block_side_len},
-                               Vector2Zero(), 0, WHITE);
-            }
-            else if (y == MAZEHEIGHT - 2 && x == MAZEWIDTH - 2)
-            {
-                Rectangle block = {pos.x, pos.y, block_side_len, block_side_len};
-                DrawRectangleRec(block, DARKBLUE);
-                DrawRectangleLinesEx(block, 5, ORANGE);
-            }
-            pos.x += block_side_len;
-        }
-        pos.x = startx;
-        pos.y += block_side_len;
-    }
-}
-
-int isPostionFree(Vector2 pos)
-{
-    float margin = (CELLSIZE / 2) * 0.9f;
-
-    int cellIndex1 = (pos.y - MAZE_MARGIN_Y - margin) / CELLSIZE;
-    int cellIndex2 = (pos.x - MAZE_MARGIN_X - margin) / CELLSIZE;
-
-    int cellIndex3 = (pos.y - MAZE_MARGIN_Y + margin) / CELLSIZE;
-    int cellIndex4 = (pos.x - MAZE_MARGIN_X + margin) / CELLSIZE;
-
-    if (maze[cellIndex1][cellIndex2] == 0 &&
-        maze[cellIndex3][cellIndex4] == 0 &&
-        maze[cellIndex1][cellIndex4] == 0 &&
-        maze[cellIndex3][cellIndex2] == 0)
-        return 1;
-    else
-        return 0;
-}
+#include "maze.h"
+#include "ui.h"
 
 int main()
 {
@@ -265,7 +71,7 @@ int main()
                 drawShadow(credit_btn);
             }
             if (clicked(credit_btn))
-                page = 0;
+                page = 2;
 
             // QUIT BUTTON
             Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5 + 50 * 2, SCREENWIDTH / 5, 35},
@@ -290,11 +96,14 @@ int main()
 
         // --------------- CREDIT PAGE ---------------
         if(page == 2){
-            // Afif Part
+            BeginDrawing();
+            ClearBackground(GetColor(0xffefb3ff));
 
-            Card afif = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5 + 50, SCREENWIDTH / 5, 35},
+            // Afif Part
+            char afif_credit[1000] = "S.M. Afif Iqbal\n2505004";
+            Card afif = {(Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT / 5, SCREENWIDTH * (3.0/10), 35},
                                  BLUE,
-                                 0, WHITE, "CREDIT", RAYWHITE, 25};
+                                 0, WHITE, "S.M. Afif Iqbal\n2505004", RAYWHITE, 25};
 
 
 
