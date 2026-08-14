@@ -55,7 +55,7 @@ int main()
             if (hovered(play_btn))
             {
                 play_btn.buttonColor = GetColor(0x7a35ffff);
-                drawShadow(play_btn);
+                drawButtonShadow(play_btn);
             }
             if (clicked(play_btn))
                 page = 1;
@@ -68,7 +68,7 @@ int main()
             if (hovered(credit_btn))
             {
                 credit_btn.buttonColor = GetColor(0x7a35ffff);
-                drawShadow(credit_btn);
+                drawButtonShadow(credit_btn);
             }
             if (clicked(credit_btn))
                 page = 2;
@@ -81,7 +81,7 @@ int main()
             if (hovered(quit_btn))
             {
                 quit_btn.buttonColor = GetColor(0x7a35ffff);
-                drawShadow(quit_btn);
+                drawButtonShadow(quit_btn);
             }
             if (clicked(quit_btn))
                 break;
@@ -95,19 +95,48 @@ int main()
         }
 
         // --------------- CREDIT PAGE ---------------
-        if(page == 2){
+        if (page == 2)
+        {
             BeginDrawing();
             ClearBackground(GetColor(0xffefb3ff));
+            SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 
             // Afif Part
             char afif_credit[1000] = "S.M. Afif Iqbal\n2505004";
-            Card afif = {(Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT / 5, SCREENWIDTH * (3.0/10), 35},
-                                 BLUE,
-                                 0, WHITE, "S.M. Afif Iqbal\n2505004", RAYWHITE, 25};
+            Card afif_card = {(Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT / 5, SCREENWIDTH * (3.0 / 10), 100},
+                         GetColor(0x013e37ff),
+                         0, WHITE, "S.M. Afif Iqbal\n2505004", RAYWHITE, 25};
+            drawCard(afif_card);
+            drawCardShadow(afif_card);
+
+            // Abid Part
+            char abid_credit[1000] = "Md Abidur Rahman\n2505019";
+            Card abid_card = {(Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT / 5, SCREENWIDTH * (3.0 / 10), 100},
+                         GetColor(0x013e37ff),
+                         0, WHITE, "Md Abidur Rahman\n2505019", RAYWHITE, 25};
+            drawCard(abid_card);
+            drawCardShadow(abid_card);
 
 
+            // MENU BUTTON
+            Button menu_btn = {(Rectangle){10, SCREENHEIGHT - 30 - 10, 70, 30}, DARKGRAY,
+                               0, WHITE,
+                               "MENU", RAYWHITE, 20};
+            drawButton(menu_btn);
+            if (hovered(menu_btn))
+            {
+                menu_btn.buttonColor = GRAY;
+                drawButtonShadow(menu_btn);
+                SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+            }
+            else
+            {
+                SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+            }
+            if (clicked(menu_btn))
+                page = 0;
 
-
+            EndDrawing();
         }
 
         // --------------- GAME PAGE ---------------
@@ -175,7 +204,7 @@ int main()
             if (hovered(menu_btn))
             {
                 menu_btn.buttonColor = GRAY;
-                drawShadow(menu_btn);
+                drawButtonShadow(menu_btn);
                 SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
             }
             else

@@ -1,6 +1,5 @@
 #include "raylib.h"
 
-
 // ---------- Menu Page Functions and Structures ----------
 
 typedef struct Button
@@ -39,7 +38,7 @@ bool clicked(Button btn)
     return false;
 }
 
-void drawShadow(Button btn)
+void drawButtonShadow(Button btn)
 {
     Rectangle shadow = {btn.buttonRec.x + 5,
                         btn.buttonRec.y + 5,
@@ -63,10 +62,21 @@ typedef struct Card
 
 void drawCard(Card card)
 {
-    DrawRectangleRounded(card.cardRec, 2, 100, card.cardColor);
+    DrawRectangleRec(card.cardRec, card.cardColor);
     DrawRectangleLinesEx(card.cardRec, card.stroke, card.strokeColor);
     int textWidth = MeasureText(card.text, card.textFontSize);
     Vector2 textPos = (Vector2){card.cardRec.x + card.cardRec.width / 2 - textWidth / 2,
-                                card.cardRec.y + card.cardRec.height / 2 - card.textFontSize / 2};
+                                card.cardRec.y + card.cardRec.height / 2 - card.textFontSize};
     DrawText(card.text, textPos.x, textPos.y, card.textFontSize, card.textColor);
+}
+
+void drawCardShadow(Card card)
+{
+    Rectangle shadow = {card.cardRec.x + 10,
+                        card.cardRec.y + 10,
+                        card.cardRec.width,
+                        card.cardRec.height};
+    // DrawRectangleRec(shadow, GetColor(0x00000050));
+    DrawRectangleRec(shadow, GetColor(0x00000050));
+    drawCard(card);
 }

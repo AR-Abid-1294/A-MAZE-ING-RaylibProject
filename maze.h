@@ -24,7 +24,6 @@ int maze[MAZEHEIGHT][MAZEWIDTH];
 int framescount = 0;
 int net_time = 100; // seconds
 
-
 void initializeMaze()
 {
     for (int y = 0; y < MAZEHEIGHT; y++)
