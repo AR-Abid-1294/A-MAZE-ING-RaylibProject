@@ -21,7 +21,7 @@ int maze[MAZEHEIGHT][MAZEWIDTH];
 #define SPEED_MAX 120.0f
 
 // for time sector
-int framescount = 0;
+int frames_count = 0;
 int net_time = 100; // seconds
 
 void initializeMaze()

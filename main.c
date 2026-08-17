@@ -24,10 +24,10 @@ int main()
     float init_pos_x = MAZE_MARGIN_X + CELLSIZE * (3.0 / 2);
     float init_pos_y = MAZE_MARGIN_Y + CELLSIZE * (3.0 / 2);
 
-    Vector2 ballPos0 = {init_pos_x, init_pos_y};
-    Vector2 ballPos = ballPos0;
-    float ballRadius = CELLSIZE / 2;
-    float spriteSide = CELLSIZE;
+    Vector2 ball_pos0 = {init_pos_x, init_pos_y};
+    Vector2 ball_pos = ball_pos0;
+    float ball_radius = CELLSIZE / 2;
+    float sprite_side = CELLSIZE;
     Vector2 ballSpeed = Vector2Zero();
 
     // page
@@ -148,7 +148,7 @@ int main()
             float dt = GetFrameTime();
 
             // movement logic with isPositionFree
-            Vector2 ballPosNew = ballPos;
+            Vector2 ball_posNew = ball_pos;
             if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
                 ballSpeed.x = SPEED_MAX;
             else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
@@ -160,21 +160,21 @@ int main()
             else
                 ballSpeed = Vector2Zero();
 
-            ballPosNew = Vector2Add(ballPosNew, Vector2Scale(ballSpeed, dt));
+            ball_posNew = Vector2Add(ball_posNew, Vector2Scale(ballSpeed, dt));
 
-            if (isPostionFree(ballPosNew))
-                ballPos = ballPosNew;
+            if (isPostionFree(ball_posNew))
+                ball_pos = ball_posNew;
 
             // Generate New Maze
             if (IsKeyPressed(KEY_SPACE))
             {
                 initializeMaze();
                 generateMaze(1, 1);
-                ballPos = ballPos0;
+                ball_pos = ball_pos0;
             }
 
-            // framescount increasing to determine time
-            framescount++;
+            // frames_count increasing to determine time
+            frames_count++;
 
             // Drawing Part
             BeginDrawing();
@@ -182,19 +182,19 @@ int main()
 
             drawMaze((Vector2){MAZE_MARGIN_X, MAZE_MARGIN_Y}, CELLSIZE, wallTexture);
 
-            DrawCircleV(ballPos, ballRadius, RED);
-            DrawCircleLinesV(ballPos, ballRadius, BLACK);
+            DrawCircleV(ball_pos, ball_radius, RED);
+            DrawCircleLinesV(ball_pos, ball_radius, BLACK);
             // Texture2D sprite = playerIdle[spriteIndex];
             // DrawTexturePro(sprite,
             //                (Rectangle){138, 26, sprite.width, sprite.height},
-            //                (Rectangle){ballPos.x, ballPos.y, spriteSide, spriteSide},
+            //                (Rectangle){ball_pos.x, ball_pos.y, sprite_side, sprite_side},
             //                Vector2Zero(), 0, WHITE);
 
             // Time sector
             DrawText(TextFormat("Time : %2d:%3.1f    Remaining : %2d:%3.1f",
-                                framescount / 3600, (framescount % 3600) / 60.0,
-                                (net_time * 60 - framescount) / 3600,
-                                ((net_time * 60 - framescount) % 3600) / 60.0),
+                                frames_count / 3600, (frames_count % 3600) / 60.0,
+                                (net_time * 60 - frames_count) / 3600,
+                                ((net_time * 60 - frames_count) % 3600) / 60.0),
                      5, 5, 15, BLACK);
 
             Button menu_btn = {(Rectangle){10, SCREENHEIGHT - 30 - 10, 70, 30}, DARKGRAY,
