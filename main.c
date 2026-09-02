@@ -8,17 +8,6 @@ int main()
 
     // Load Sprites and Textures
     Texture2D wallTexture = LoadTexture("Assets/brick2.png");
-    // Texture2D playerIdle[12];
-    // for (int i = 0; i < LENGTH(playerIdle); i++)
-    // {
-    //     char path[100];
-    //     if (i < 10)
-    //         sprintf(path, "Assets/player-sprites/player-idle/Wraith_03_Idle Blinking_00%d.png", i);
-    //     else
-    //         sprintf(path, "Assets/player-sprites/player-idle/Wraith_03_Idle Blinking_0%d.png", i);
-    //     playerIdle[i] = LoadTexture(path);
-    // }
-    // int spriteIndex = 0;
 
     // calculate inital position of the ball
     float init_pos_x = MAZE_MARGIN_X + CELLSIZE * (3.0 / 2);
@@ -104,19 +93,18 @@ int main()
             // Afif Part
             char afif_credit[1000] = "S.M. Afif Iqbal\n2505004";
             Card afif_card = {(Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT / 5, SCREENWIDTH * (3.0 / 10), 100},
-                         GetColor(0x013e37ff),
-                         0, WHITE, "S.M. Afif Iqbal\n2505004", RAYWHITE, 25};
+                              GetColor(0x013e37ff),
+                              0, WHITE, "S.M. Afif Iqbal\n2505004", RAYWHITE, 25};
             drawCard(afif_card);
             drawCardShadow(afif_card);
 
             // Abid Part
             char abid_credit[1000] = "Md Abidur Rahman\n2505019";
             Card abid_card = {(Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT / 5, SCREENWIDTH * (3.0 / 10), 100},
-                         GetColor(0x013e37ff),
-                         0, WHITE, "Md Abidur Rahman\n2505019", RAYWHITE, 25};
+                              GetColor(0x013e37ff),
+                              0, WHITE, "Md Abidur Rahman\n2505019", RAYWHITE, 25};
             drawCard(abid_card);
             drawCardShadow(abid_card);
-
 
             // MENU BUTTON
             Button menu_btn = {(Rectangle){10, SCREENHEIGHT - 30 - 10, 70, 30}, DARKGRAY,
@@ -184,11 +172,6 @@ int main()
 
             DrawCircleV(ball_pos, ball_radius, RED);
             DrawCircleLinesV(ball_pos, ball_radius, BLACK);
-            // Texture2D sprite = playerIdle[spriteIndex];
-            // DrawTexturePro(sprite,
-            //                (Rectangle){138, 26, sprite.width, sprite.height},
-            //                (Rectangle){ball_pos.x, ball_pos.y, sprite_side, sprite_side},
-            //                Vector2Zero(), 0, WHITE);
 
             // Time sector
             DrawText(TextFormat("Time : %2d:%3.1f    Remaining : %2d:%3.1f",
@@ -216,8 +199,6 @@ int main()
                 page = 0;
 
             EndDrawing();
-
-            // spriteIndex = (int)(GetTime() / 0.1) % LENGTH(playerIdle);
         }
     }
 
