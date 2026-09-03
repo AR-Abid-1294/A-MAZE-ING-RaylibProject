@@ -7,8 +7,8 @@
 
 #define LENGTH(arr) (sizeof(arr) / sizeof(arr[0]))
 
-#define SCREENWIDTH 800
-#define SCREENHEIGHT 600
+#define SCREENWIDTH 1400
+#define SCREENHEIGHT 800
 
 #define MAZEWIDTH 51
 #define MAZEHEIGHT 35
@@ -64,30 +64,21 @@ typedef struct Maze
     Texture2D cell_texture;
 } Maze;
 
-void initializeMaze();
-
 // Check if a cell is inside the maze
-int isCellValid(int x, int y);
-
 void shuffleDirections(int directions[4][2]);
-
-void generateMaze(int x, int y);
-
-void drawMaze(Vector2 pos, float block_side_len, Texture2D block);
 
 int isPostionFree(Vector2 pos);
 
-// new (2) approach
-void initializeMaze2(Maze *maze, int height, int width);
+void initializeMaze(Maze *maze, int height, int width);
 
-bool isCellValid2(int x, int y, Maze maze);
+bool isCellValid(int x, int y, Maze maze);
 
 void breakWall(Maze *maze, Cell *cell1, Cell *cell2);
 
-void generateMaze2(Maze *maze, Cell *cell);
+void generateMaze(Maze *maze, Cell *cell);
 
-void drawMaze2(Maze *maze, Vector2 pos, float tile_side_len, Player player);
+void drawMaze(Maze *maze, Vector2 pos, float tile_side_len, Player player);
 
-void destroyMaze2(Maze *maze);
+void destroyMaze(Maze *maze);
 
 #endif

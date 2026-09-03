@@ -13,7 +13,6 @@ void initGameState(GameState *gs)
     gs->shouldQuit = false;
 
     // Load Sprites and Textures
-    gs->wall_texture = LoadTexture("Assets/brick2.png");
     gs->maze.cell_texture = LoadTexture("Assets/plaster1.png");
     gs->player.player_texture = LoadTexture("Assets/stone1.png");
 
@@ -21,108 +20,20 @@ void initGameState(GameState *gs)
     float init_pos_x = MAZE_MARGIN_X + CELLSIZE * (3.0 / 2);
     float init_pos_y = MAZE_MARGIN_Y + CELLSIZE * (3.0 / 2);
 
-    gs->ball_pos0 = (Vector2){init_pos_x, init_pos_y};
-    gs->ball_pos = gs->ball_pos0;
-    gs->ball_radius = CELLSIZE / 2;
-    gs->sprite_side = CELLSIZE;
-    gs->ball_speed = Vector2Zero();
-
     gs->player.x = 0;
     gs->player.y = 0;
 
     srand(time(NULL));
-    initializeMaze();
-    generateMaze(1, 1);
-
-    initializeMaze2(&gs->maze, MAZEHEIGHT, MAZEWIDTH);
-    generateMaze2(&gs->maze, &gs->maze.cells[0][0]);
+    initializeMaze(&gs->maze, MAZEHEIGHT, MAZEWIDTH);
+    generateMaze(&gs->maze, &gs->maze.cells[0][0]);
 }
 
 // unload textures
 void unloadGameState(GameState *gs)
 {
-    UnloadTexture(gs->wall_texture);
     UnloadTexture(gs->maze.cell_texture);
     UnloadTexture(gs->player.player_texture);
-    destroyMaze2(&gs->maze);
-}
-
-// update game logic
-void updateGameplay(GameState *gs)
-{
-
-    // Logic Part
-
-    // Delta Time
-    float dt = GetFrameTime();
-
-    // movement logic with isPositionFree
-    Vector2 ball_posNew = gs->ball_pos;
-    if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
-        gs->ball_speed.x = SPEED_MAX;
-    else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
-        gs->ball_speed.x = -SPEED_MAX;
-    else if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
-        gs->ball_speed.y = -SPEED_MAX;
-    else if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
-        gs->ball_speed.y = SPEED_MAX;
-    else
-        gs->ball_speed = Vector2Zero();
-
-    ball_posNew = Vector2Add(ball_posNew, Vector2Scale(gs->ball_speed, dt));
-
-    if (isPostionFree(ball_posNew))
-        gs->ball_pos = ball_posNew;
-
-    // Generate New Maze
-    if (IsKeyPressed(KEY_SPACE))
-    {
-        initializeMaze();
-        generateMaze(1, 1);
-        gs->ball_pos = gs->ball_pos0;
-    }
-
-    // frames_count increasing to determine time
-    frames_count++;
-}
-
-// draw main game
-void drawGame(GameState *gs)
-{
-    BeginDrawing();
-    ClearBackground(RAYWHITE);
-
-    drawMaze((Vector2){MAZE_MARGIN_X, MAZE_MARGIN_Y}, CELLSIZE, gs->wall_texture);
-
-    DrawCircleV(gs->ball_pos, gs->ball_radius, RED);
-    DrawCircleLinesV(gs->ball_pos, gs->ball_radius, BLACK);
-
-    // Time sector
-    DrawText(TextFormat("Time : %2d:%3.1f    Remaining : %2d:%3.1f",
-                        frames_count / 3600, (frames_count % 3600) / 60.0,
-                        (net_time * 60 - frames_count) / 3600,
-                        ((net_time * 60 - frames_count) % 3600) / 60.0),
-             5, 5, 15, BLACK);
-
-    Button menu_btn = {(Rectangle){10, SCREENHEIGHT - 30 - 10, 70, 30}, DARKGRAY,
-                       0, WHITE,
-                       "MENU", RAYWHITE, 20};
-    drawButton(menu_btn);
-    if (hovered(menu_btn))
-    {
-        menu_btn.buttonColor = GRAY;
-        drawButtonShadow(menu_btn);
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    }
-    else
-    {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
-
-    if (clicked(menu_btn))
-        gs->page = 0;
-
-    EndDrawing();
+    destroyMaze(&gs->maze);
 }
 
 // draw and update different pages
@@ -250,7 +161,7 @@ bool isCellAllowed(Cell cell1, Cell cell2)
     return true;
 }
 
-void updateGameplay2(GameState *gs)
+void updateGameplay(GameState *gs)
 {
 
     // Logic Part
@@ -280,7 +191,7 @@ void updateGameplay2(GameState *gs)
         x--;
     }
 
-    if (isCellValid2(x, y, gs->maze))
+    if (isCellValid(x, y, gs->maze))
     {
         Cell cell_new = gs->maze.cells[y][x];
         if (isCellAllowed(cell_old, cell_new))
@@ -293,9 +204,9 @@ void updateGameplay2(GameState *gs)
     // Generate New Maze
     if (IsKeyPressed(KEY_SPACE))
     {
-        destroyMaze2(&gs->maze);
-        initializeMaze2(&gs->maze, MAZEHEIGHT, MAZEWIDTH);
-        generateMaze2(&gs->maze, &gs->maze.cells[0][0]);
+        destroyMaze(&gs->maze);
+        initializeMaze(&gs->maze, MAZEHEIGHT, MAZEWIDTH);
+        generateMaze(&gs->maze, &gs->maze.cells[0][0]);
         gs->player.x = 0;
         gs->player.y = 0;
     }
@@ -304,12 +215,12 @@ void updateGameplay2(GameState *gs)
     frames_count++;
 }
 
-void drawGame2(GameState *gs)
+void drawGame(GameState *gs)
 {
     BeginDrawing();
     ClearBackground(RAYWHITE);
 
-    drawMaze2(&gs->maze, (Vector2){MAZE_MARGIN_X, MAZE_MARGIN_Y}, CELLSIZE, gs->player);
+    drawMaze(&gs->maze, (Vector2){MAZE_MARGIN_X, MAZE_MARGIN_Y}, CELLSIZE, gs->player);
 
     // Time sector
     DrawText(TextFormat("Time : %2d:%3.1f    Remaining : %2d:%3.1f",
@@ -348,8 +259,8 @@ void updateGame(GameState *gs)
         break;
 
     case PLAYING:
-        updateGameplay2(gs);
-        drawGame2(gs);
+        updateGameplay(gs);
+        drawGame(gs);
         break;
 
     case CREDIT:

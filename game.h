@@ -53,7 +53,7 @@ void drawGame(GameState *gs);
 void updateMenu(GameState *gs);
 void updateCredit(GameState *gs);
 
-void updateGameplay2(GameState *gs);
-void drawGame2(GameState *gs);
+void updateGameplay(GameState *gs);
+void drawGame(GameState *gs);
 
 #endif
