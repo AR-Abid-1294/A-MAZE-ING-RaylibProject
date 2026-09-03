@@ -13,8 +13,18 @@ void initGameState(GameState *gs)
     gs->shouldQuit = false;
 
     // Load Sprites and Textures
-    gs->maze.cell_texture = LoadTexture("Assets/plaster1.png");
-    gs->player.player_texture = LoadTexture("Assets/stone1.png");
+    gs->maze.cell_texture = LoadTexture("Assets/Textures/plaster1.png");
+    gs->player.player_texture = LoadTexture("Assets/Textures/stone1.png");
+
+    // Load Fonts
+    gs->font1 = LoadFont("Assets/Fonts/Font3.otf");
+    gs->font2 = LoadFont("Assets/Fonts/Font2.TTF");
+
+    // Load Sound Effects
+    gs->hover_sound = LoadSound("Assets/Sound Effects/pop_1.wav");
+    gs->click_sound = LoadSound("Assets/Sound Effects/click_double_on.wav");
+    gs->movement_sound = LoadSound("Assets/Sound Effects/water_drop_synthetic.wav");
+    gs->movement_blocked_sound = LoadSound("Assets/Sound Effects/cardboard_hit.wav");
 
     // calculate inital position of the ball
     float init_pos_x = MAZE_MARGIN_X + CELLSIZE * (3.0 / 2);
@@ -41,50 +51,62 @@ void unloadGameState(GameState *gs)
 void updateMenu(GameState *gs)
 {
     BeginDrawing();
-    ClearBackground(GetColor(0xf0f2f5ff));
+    ClearBackground(GetColor(0x0b132b));
 
     // PLAY BUTTON
     Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5, SCREENWIDTH / 5, 35},
-                       BLUE,
+                       DARKBLUE,
                        0, WHITE, "PLAY", RAYWHITE, 25};
-    drawButton(play_btn);
+    drawButton(play_btn, gs->font1);
     if (hovered(play_btn))
     {
-        play_btn.buttonColor = GetColor(0x7a35ffff);
-        drawButtonShadow(play_btn);
+        play_btn.buttonColor = BLUE;
+        drawButton(play_btn, gs->font1);
     }
     if (clicked(play_btn))
+    {
+        PlaySound(gs->click_sound);
         gs->page = PLAYING;
+    }
 
     // CREDIT BUTTON
     Button credit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5 + 50, SCREENWIDTH / 5, 35},
-                         BLUE,
+                         DARKBLUE,
                          0, WHITE, "CREDIT", RAYWHITE, 25};
-    drawButton(credit_btn);
+    drawButton(credit_btn, gs->font1);
     if (hovered(credit_btn))
     {
-        credit_btn.buttonColor = GetColor(0x7a35ffff);
-        drawButtonShadow(credit_btn);
+        credit_btn.buttonColor = BLUE;
+        drawButton(credit_btn, gs->font1);
     }
     if (clicked(credit_btn))
+    {
+        PlaySound(gs->click_sound);
         gs->page = CREDIT;
+    }
 
     // QUIT BUTTON
     Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5 + 50 * 2, SCREENWIDTH / 5, 35},
-                       BLUE,
+                       DARKBLUE,
                        0, WHITE, "QUIT", RAYWHITE, 25};
-    drawButton(quit_btn);
+    drawButton(quit_btn, gs->font1);
     if (hovered(quit_btn))
     {
-        quit_btn.buttonColor = GetColor(0x7a35ffff);
-        drawButtonShadow(quit_btn);
+        quit_btn.buttonColor = BLUE;
+        drawButton(quit_btn, gs->font1);
     }
     if (clicked(quit_btn))
+    {
+        PlaySound(gs->click_sound);
         gs->shouldQuit = true;
+    }
 
     // change mouse cursor
     if (hovered(play_btn) || hovered(credit_btn) || hovered(quit_btn))
+    {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+        // PlaySound(gs->hover_sound);
+    }
     else
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 
@@ -117,11 +139,11 @@ void updateCredit(GameState *gs)
     Button menu_btn = {(Rectangle){10, SCREENHEIGHT - 30 - 10, 70, 30}, DARKGRAY,
                        0, WHITE,
                        "MENU", RAYWHITE, 20};
-    drawButton(menu_btn);
+    drawButton(menu_btn, gs->font1);
     if (hovered(menu_btn))
     {
         menu_btn.buttonColor = GRAY;
-        drawButtonShadow(menu_btn);
+        // drawButtonShadow(menu_btn, gs->font1);
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
     }
     else
@@ -129,7 +151,10 @@ void updateCredit(GameState *gs)
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
     if (clicked(menu_btn))
+    {
+        PlaySound(gs->click_sound);
         gs->page = MENU;
+    }
 
     EndDrawing();
 }
@@ -174,30 +199,48 @@ void updateGameplay(GameState *gs)
     int y = gs->player.y;
     Cell cell_old = gs->maze.cells[y][x];
 
+    bool movement_attempt;
+
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
     {
         y--;
+        movement_attempt = true;
     }
     else if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
     {
         y++;
+        movement_attempt = true;
     }
     else if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D))
     {
         x++;
+        movement_attempt = true;
     }
     else if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A))
     {
         x--;
+        movement_attempt = true;
     }
 
-    if (isCellValid(x, y, gs->maze))
+    if (movement_attempt)
     {
-        Cell cell_new = gs->maze.cells[y][x];
-        if (isCellAllowed(cell_old, cell_new))
+        if (isCellValid(x, y, gs->maze))
         {
-            gs->player.x = x;
-            gs->player.y = y;
+            Cell cell_new = gs->maze.cells[y][x];
+            if (isCellAllowed(cell_old, cell_new))
+            {
+                gs->player.x = x;
+                gs->player.y = y;
+                PlaySound(gs->movement_sound);
+            }
+            else
+            {
+                PlaySound(gs->movement_blocked_sound);
+            }
+        }
+        else
+        {
+            PlaySound(gs->movement_blocked_sound);
         }
     }
 
@@ -218,7 +261,7 @@ void updateGameplay(GameState *gs)
 void drawGame(GameState *gs)
 {
     BeginDrawing();
-    ClearBackground(RAYWHITE);
+    ClearBackground(GetColor(0x0b132b));
 
     drawMaze(&gs->maze, (Vector2){MAZE_MARGIN_X, MAZE_MARGIN_Y}, CELLSIZE, gs->player);
 
@@ -232,11 +275,11 @@ void drawGame(GameState *gs)
     Button menu_btn = {(Rectangle){10, SCREENHEIGHT - 30 - 10, 70, 30}, DARKGRAY,
                        0, WHITE,
                        "MENU", RAYWHITE, 20};
-    drawButton(menu_btn);
+    drawButton(menu_btn, gs->font1);
     if (hovered(menu_btn))
     {
         menu_btn.buttonColor = GRAY;
-        drawButtonShadow(menu_btn);
+        // drawButtonShadow(menu_btn, gs->font1);
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
     }
     else
@@ -245,7 +288,10 @@ void drawGame(GameState *gs)
     }
 
     if (clicked(menu_btn))
+    {
+        PlaySound(gs->click_sound);
         gs->page = 0;
+    }
 
     EndDrawing();
 }

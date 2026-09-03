@@ -160,10 +160,10 @@ void drawMaze(Maze *maze, Vector2 pos, float tile_side_len, Player player)
                            (Rectangle){0, 0, tile.width, tile.height},
                            tile_rec, Vector2Zero(), 0, WHITE);
 
-            drawBorder(tile_rec, UP, maze->cells[y][x].up_wall ? 2 : 0, WHITE);
-            drawBorder(tile_rec, DOWN, maze->cells[y][x].down_wall ? 2 : 0, WHITE);
-            drawBorder(tile_rec, RIGHT, maze->cells[y][x].right_wall ? 2 : 0, WHITE);
-            drawBorder(tile_rec, LEFT, maze->cells[y][x].left_wall ? 2 : 0, WHITE);
+            drawBorder(tile_rec, UP, maze->cells[y][x].up_wall ? WALL_THICK : 0, WHITE);
+            drawBorder(tile_rec, DOWN, maze->cells[y][x].down_wall ? WALL_THICK : 0, WHITE);
+            drawBorder(tile_rec, RIGHT, maze->cells[y][x].right_wall ? WALL_THICK : 0, WHITE);
+            drawBorder(tile_rec, LEFT, maze->cells[y][x].left_wall ? WALL_THICK : 0, WHITE);
 
             pos.x += tile_side_len;
         }

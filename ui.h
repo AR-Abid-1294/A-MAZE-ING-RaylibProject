@@ -16,13 +16,13 @@ typedef struct Button
     int textFontSize;
 } Button;
 
-void drawButton(Button btn);
+void drawButton(Button btn, Font font);
 
 bool hovered(Button btn);
 
 bool clicked(Button btn);
 
-void drawButtonShadow(Button btn);
+void drawButtonShadow(Button btn, Font font);
 
 typedef struct Card
 {

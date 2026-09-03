@@ -38,6 +38,16 @@ typedef struct GameState
     // assets
     Texture2D wall_texture;
     Texture2D player_sprite;
+
+    // fonts
+    Font font1;
+    Font font2;
+
+    // sound effects
+    Sound hover_sound;
+    Sound click_sound;
+    Sound movement_sound;
+    Sound movement_blocked_sound;
 } GameState;
 
 // set up initial game state, load assets

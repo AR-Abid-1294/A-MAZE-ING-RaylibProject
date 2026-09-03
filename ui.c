@@ -2,14 +2,15 @@
 
 // ---------- Menu Page Function Definitions ----------
 
-void drawButton(Button btn)
+void drawButton(Button btn, Font font)
 {
-    DrawRectangleRounded(btn.buttonRec, 2, 100, btn.buttonColor);
+    DrawRectangleRec(btn.buttonRec, btn.buttonColor);
     DrawRectangleLinesEx(btn.buttonRec, btn.stroke, btn.strokeColor);
     int textWidth = MeasureText(btn.text, btn.textFontSize);
     Vector2 textPos = (Vector2){btn.buttonRec.x + btn.buttonRec.width / 2 - textWidth / 2,
                                 btn.buttonRec.y + btn.buttonRec.height / 2 - btn.textFontSize / 2};
-    DrawText(btn.text, textPos.x, textPos.y, btn.textFontSize, btn.textColor);
+    DrawTextEx(font, btn.text, (Vector2){textPos.x, textPos.y},
+               btn.textFontSize, 5, btn.textColor);
 }
 
 bool hovered(Button btn)
@@ -27,15 +28,14 @@ bool clicked(Button btn)
     return false;
 }
 
-void drawButtonShadow(Button btn)
+void drawButtonShadow(Button btn, Font font)
 {
     Rectangle shadow = {btn.buttonRec.x + 5,
                         btn.buttonRec.y + 5,
                         btn.buttonRec.width,
                         btn.buttonRec.height};
-    // DrawRectangleRec(shadow, GetColor(0x00000050));
-    DrawRectangleRounded(shadow, 2, 100, GetColor(0x00000050));
-    drawButton(btn);
+    DrawRectangleRec(shadow, GetColor(0x00000050));
+    drawButton(btn, font);
 }
 
 void drawCard(Card card)

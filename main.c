@@ -8,6 +8,7 @@
 int main()
 {
     InitWindow(SCREENWIDTH, SCREENHEIGHT, "Demo Game");
+    InitAudioDevice();
     SetTargetFPS(60);
 
     GameState gs = {0};
@@ -21,6 +22,7 @@ int main()
     }
 
     unloadGameState(&gs);
+    CloseAudioDevice();
     CloseWindow();
 
     return 0;
