@@ -14,6 +14,8 @@ void initGameState(GameState *gs)
 
     // Load Sprites and Textures
     gs->wall_texture = LoadTexture("Assets/brick2.png");
+    gs->maze.cell_texture = LoadTexture("Assets/plaster1.png");
+    gs->player.player_texture = LoadTexture("Assets/stone1.png");
 
     // calculate inital position of the ball
     float init_pos_x = MAZE_MARGIN_X + CELLSIZE * (3.0 / 2);
@@ -25,15 +27,24 @@ void initGameState(GameState *gs)
     gs->sprite_side = CELLSIZE;
     gs->ball_speed = Vector2Zero();
 
+    gs->player.x = 0;
+    gs->player.y = 0;
+
     srand(time(NULL));
     initializeMaze();
     generateMaze(1, 1);
+
+    initializeMaze2(&gs->maze, MAZEHEIGHT, MAZEWIDTH);
+    generateMaze2(&gs->maze, &gs->maze.cells[0][0]);
 }
 
 // unload textures
 void unloadGameState(GameState *gs)
 {
     UnloadTexture(gs->wall_texture);
+    UnloadTexture(gs->maze.cell_texture);
+    UnloadTexture(gs->player.player_texture);
+    destroyMaze2(&gs->maze);
 }
 
 // update game logic
@@ -212,6 +223,122 @@ void updateCredit(GameState *gs)
     EndDrawing();
 }
 
+bool isCellAllowed(Cell cell1, Cell cell2)
+{
+    if (cell1.x == cell2.x)
+    {
+        if (cell1.y - cell2.y == 1)
+        {
+            return !(cell1.up_wall && cell2.down_wall);
+        }
+        else if (cell2.y - cell1.y == 1)
+        {
+            return !(cell2.up_wall && cell1.down_wall);
+        }
+    }
+    else if (cell1.y == cell2.y)
+    {
+        if (cell1.x - cell2.x == 1)
+        {
+            return !(cell1.left_wall && cell2.right_wall);
+        }
+        else if (cell2.x - cell1.x == 1)
+        {
+            return !(cell2.left_wall && cell1.right_wall);
+        }
+    }
+    return true;
+}
+
+void updateGameplay2(GameState *gs)
+{
+
+    // Logic Part
+
+    // Delta Time
+    float dt = GetFrameTime();
+
+    // movement
+    int x = gs->player.x;
+    int y = gs->player.y;
+    Cell cell_old = gs->maze.cells[y][x];
+
+    if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+    {
+        y--;
+    }
+    else if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+    {
+        y++;
+    }
+    else if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D))
+    {
+        x++;
+    }
+    else if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A))
+    {
+        x--;
+    }
+
+    if (isCellValid2(x, y, gs->maze))
+    {
+        Cell cell_new = gs->maze.cells[y][x];
+        if (isCellAllowed(cell_old, cell_new))
+        {
+            gs->player.x = x;
+            gs->player.y = y;
+        }
+    }
+
+    // Generate New Maze
+    if (IsKeyPressed(KEY_SPACE))
+    {
+        destroyMaze2(&gs->maze);
+        initializeMaze2(&gs->maze, MAZEHEIGHT, MAZEWIDTH);
+        generateMaze2(&gs->maze, &gs->maze.cells[0][0]);
+        gs->player.x = 0;
+        gs->player.y = 0;
+    }
+
+    // frames_count increasing to determine time
+    frames_count++;
+}
+
+void drawGame2(GameState *gs)
+{
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+
+    drawMaze2(&gs->maze, (Vector2){MAZE_MARGIN_X, MAZE_MARGIN_Y}, CELLSIZE, gs->player);
+
+    // Time sector
+    DrawText(TextFormat("Time : %2d:%3.1f    Remaining : %2d:%3.1f",
+                        frames_count / 3600, (frames_count % 3600) / 60.0,
+                        (net_time * 60 - frames_count) / 3600,
+                        ((net_time * 60 - frames_count) % 3600) / 60.0),
+             5, 5, 15, BLACK);
+
+    Button menu_btn = {(Rectangle){10, SCREENHEIGHT - 30 - 10, 70, 30}, DARKGRAY,
+                       0, WHITE,
+                       "MENU", RAYWHITE, 20};
+    drawButton(menu_btn);
+    if (hovered(menu_btn))
+    {
+        menu_btn.buttonColor = GRAY;
+        drawButtonShadow(menu_btn);
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    }
+    else
+    {
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    }
+
+    if (clicked(menu_btn))
+        gs->page = 0;
+
+    EndDrawing();
+}
+
 void updateGame(GameState *gs)
 {
     switch (gs->page)
@@ -221,8 +348,8 @@ void updateGame(GameState *gs)
         break;
 
     case PLAYING:
-        updateGameplay(gs);
-        drawGame(gs);
+        updateGameplay2(gs);
+        drawGame2(gs);
         break;
 
     case CREDIT:

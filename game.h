@@ -7,6 +7,7 @@
 
 #include "maze.h"
 #include "ui.h"
+#include "player.h"
 
 typedef enum PageState
 {
@@ -21,6 +22,11 @@ typedef struct GameState
 {
     PageState page;
     bool shouldQuit;
+
+    Maze maze;
+
+    // player
+    Player player;
 
     // ball
     Vector2 ball_pos0;
@@ -46,5 +52,8 @@ void updateGameplay(GameState *gs);
 void drawGame(GameState *gs);
 void updateMenu(GameState *gs);
 void updateCredit(GameState *gs);
+
+void updateGameplay2(GameState *gs);
+void drawGame2(GameState *gs);
 
 #endif
