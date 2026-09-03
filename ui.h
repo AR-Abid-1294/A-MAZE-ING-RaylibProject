@@ -31,6 +31,7 @@ typedef struct Card
     float stroke;
     Color strokeColor;
     char text[1000];
+    Font font;
     Color textColor;
     int textFontSize;
 } Card;
@@ -38,5 +39,7 @@ typedef struct Card
 void drawCard(Card card);
 
 void drawCardShadow(Card card);
+
+const char *formatTime(double time);
 
 #endif

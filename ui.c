@@ -45,7 +45,7 @@ void drawCard(Card card)
     int textWidth = MeasureText(card.text, card.textFontSize);
     Vector2 textPos = (Vector2){card.cardRec.x + card.cardRec.width / 2 - textWidth / 2,
                                 card.cardRec.y + card.cardRec.height / 2 - card.textFontSize};
-    DrawText(card.text, textPos.x, textPos.y, card.textFontSize, card.textColor);
+    DrawTextEx(card.font, card.text, (Vector2){textPos.x, textPos.y}, card.textFontSize, 1, card.textColor);
 }
 
 void drawCardShadow(Card card)
@@ -57,4 +57,12 @@ void drawCardShadow(Card card)
     // DrawRectangleRec(shadow, GetColor(0x00000050));
     DrawRectangleRec(shadow, GetColor(0x00000050));
     drawCard(card);
+}
+
+const char *formatTime(double time)
+{
+    int min = time / 60;
+    time -= min * 60;
+
+    return TextFormat("%2d:%4.2lf", min, time);
 }

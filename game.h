@@ -8,13 +8,17 @@
 #include "maze.h"
 #include "ui.h"
 #include "player.h"
+#include "scores.h"
 
 typedef enum PageState
 {
     MENU = 0,
-    PLAYING = 1,
+    NAME_INPUT = 5,
+    PLAYING = 10,
+    GAME_FINISH = 13,
+    GAME_OVER = 15,
     CREDIT = 19,
-    SETTINgs = 20,
+    SETTINGS = 20,
     HIGH_SCORES = 21
 } PageState;
 
@@ -22,6 +26,7 @@ typedef struct GameState
 {
     PageState page;
     bool shouldQuit;
+    double start_time;
 
     Maze maze;
 
@@ -42,12 +47,28 @@ typedef struct GameState
     // fonts
     Font font1;
     Font font2;
+    Font font3;
+    Font font4;
+    Font font5;
+    Font font6;
+    Font font7;
+    Font title_font;
+    Font btn_font;
+    Font msg_font;
 
     // sound effects
     Sound hover_sound;
     Sound click_sound;
     Sound movement_sound;
     Sound movement_blocked_sound;
+
+    // images
+    Texture2D abid_pic;
+    Texture2D afif_pic;
+
+    // scores and times
+    BestTime best_times[10];
+    FILE *best_times_file;
 } GameState;
 
 // set up initial game state, load assets
@@ -58,12 +79,18 @@ void unloadGameState(GameState *gs);
 
 // update game logic
 void updateGame(GameState *gs);
+void updateMenu(GameState *gs);
+void updateNameInput(GameState *gs);
+void drawNameInput(GameState *gs);
+void drawCredit(GameState *gs);
+
+void initGameplay(GameState *gs);
 void updateGameplay(GameState *gs);
 void drawGame(GameState *gs);
-void updateMenu(GameState *gs);
-void updateCredit(GameState *gs);
 
 void updateGameplay(GameState *gs);
 void drawGame(GameState *gs);
+
+void drawScore(GameState *gs);
 
 #endif
