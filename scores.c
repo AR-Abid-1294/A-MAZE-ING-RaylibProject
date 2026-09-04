@@ -1,4 +1,4 @@
-#include <scores.h>
+#include "scores.h"
 
 void sortBestTimes(BestTime *times)
 {
@@ -18,12 +18,12 @@ void sortBestTimes(BestTime *times)
 
 void loadBestTimes(BestTime *times, FILE *file)
 {
-    while (fscanf(file, "%s %d", times->player_name, &times->time))
+    while (fscanf(file, "%s %f", times->player_name, &times->time))
     {
     }
 }
 
 void storeBestTimes(BestTime *times, FILE *file)
 {
-    
+
 }

@@ -10,15 +10,17 @@
 #define SCREENWIDTH 1400
 #define SCREENHEIGHT 800
 
-#define MAZEWIDTH 41
-#define MAZEHEIGHT 25
-#define CELLSIZE 25
+#define MAZEWIDTH 21
+#define MAZEHEIGHT 13
+#define CELLSIZE 50
 #define WALL_THICK 3
 
 #define MAZE_MARGIN_X (SCREENWIDTH - MAZEWIDTH * CELLSIZE) / 2
 #define MAZE_MARGIN_Y (SCREENHEIGHT - MAZEHEIGHT * CELLSIZE) / 2
 
 #define SPEED_MAX 120.0f
+
+extern int directions[4][2];
 
 // for time sector
 extern int frames_count;
@@ -54,6 +56,13 @@ typedef struct Cell
     bool left_wall;
 } Cell;
 
+typedef struct Frontier
+{
+    Cell *visisted_cell;
+    Cell *univisited_cell;
+}Frontier;
+
+
 typedef struct Maze
 {
     int height;
@@ -61,11 +70,14 @@ typedef struct Maze
 
     Cell **cells;
 
+    Frontier *frontiers;
+    int frontier_count;
+
     Texture2D cell_texture;
 } Maze;
 
 // Check if a cell is inside the maze
-void shuffleDirections(int directions[4][2]);
+void shuffleDirections();
 
 int isPostionFree(Vector2 pos);
 
@@ -77,7 +89,17 @@ void breakWall(Maze *maze, Cell *cell1, Cell *cell2);
 
 void generateMaze(Maze *maze, Cell *cell);
 
-void drawMaze(Maze *maze, Vector2 pos, float tile_side_len, Player player);
+void addFrontier(Maze *maze, Cell *cell);
+
+void removeFrontier(Maze *maze, int frontier_index);
+
+void chooseRandFrontier(Maze *maze);
+
+void generateMaze2(Maze *maze);
+
+void drawLineShadow();
+
+void drawMaze(Maze *maze, Vector2 pos, float tile_side_len, Player *player);
 
 void destroyMaze(Maze *maze);
 

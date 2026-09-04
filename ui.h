@@ -30,7 +30,7 @@ typedef struct Card
     Color cardColor;
     float stroke;
     Color strokeColor;
-    char text[1000];
+    const char *text;
     Font font;
     Color textColor;
     int textFontSize;
@@ -41,5 +41,7 @@ void drawCard(Card card);
 void drawCardShadow(Card card);
 
 const char *formatTime(double time);
+
+void drawTextureShadow(Texture2D texture, Rectangle texture_rec);
 
 #endif

@@ -6,12 +6,13 @@
 #include "player.h"
 
 int maze[MAZEHEIGHT][MAZEWIDTH];
+int directions[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
 // for time sector
 int frames_count = 0;
 int net_time = 100; // seconds
 
-void shuffleDirections(int directions[4][2])
+void shuffleDirections()
 {
     for (int i = 0; i < 4; i++)
     {
@@ -46,6 +47,15 @@ void initializeMaze(Maze *maze, int height, int width)
             maze->cells[i][j].left_wall = true;
         }
     }
+
+    // initialize frontiers
+    int max_frontier = (maze->height) * (maze->width) * 4;
+    maze->frontiers = malloc(max_frontier * sizeof(Frontier));
+
+    maze->cells[0][0].cellState = VISITED;
+    maze->frontiers[0] = (Frontier){&maze->cells[0][0], &maze->cells[0][1]};
+    maze->frontiers[1] = (Frontier){&maze->cells[0][0], &maze->cells[1][0]};
+    maze->frontier_count = 2;
 }
 
 bool isCellValid(int x, int y, Maze maze)
@@ -87,8 +97,7 @@ void generateMaze(Maze *maze, Cell *cell)
 {
     cell->cellState = VISITED;
 
-    int directions[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}}; // (y,x) for maze (array)
-    shuffleDirections(directions);
+    shuffleDirections();
 
     for (int i = 0; i < 4; i++)
     {
@@ -104,6 +113,59 @@ void generateMaze(Maze *maze, Cell *cell)
                 generateMaze(maze, neighbor_cell);
             }
         }
+    }
+}
+
+void addFrontier(Maze *maze, Cell *cell)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        int x = cell->x + directions[i][0];
+        int y = cell->y + directions[i][1];
+        if (isCellValid(x, y, *maze))
+        {
+            Cell *neighbor_cell = &maze->cells[y][x];
+            if (neighbor_cell->cellState == UNVISITED)
+            {
+                maze->frontiers[maze->frontier_count] = (Frontier){cell, neighbor_cell};
+                maze->frontier_count++;
+            }
+        }
+    }
+}
+
+void removeFrontier(Maze *maze, int frontier_index)
+{
+    for (int i = frontier_index; i < maze->frontier_count; i++)
+    {
+        maze->frontiers[i] = maze->frontiers[i + 1];
+    }
+}
+
+void chooseRandFrontier(Maze *maze)
+{
+    int r = rand() % maze->frontier_count;
+    Cell *target_cell = maze->frontiers[r].univisited_cell;
+    if (target_cell->cellState == VISITED)
+    {
+        maze->frontier_count--;
+        removeFrontier(maze, r);
+    }
+    else
+    {
+        target_cell->cellState = VISITED;
+        breakWall(maze, maze->frontiers[r].visisted_cell, maze->frontiers[r].univisited_cell);
+        maze->frontier_count--;
+        removeFrontier(maze, r);
+        addFrontier(maze, target_cell);
+    }
+}
+
+void generateMaze2(Maze *maze)
+{
+    while (maze->frontier_count)
+    {
+        chooseRandFrontier(maze);
     }
 }
 
@@ -138,32 +200,42 @@ void drawBorder(Rectangle rec, Direction dir, float thick, Color color)
     DrawLineEx(start, end, thick, color);
 }
 
-void drawMaze(Maze *maze, Vector2 pos, float tile_side_len, Player player)
+void drawMaze(Maze *maze, Vector2 pos, float tile_side_len, Player *player)
 {
-    Texture2D tile;
+    Texture2D tile = maze->cell_texture;
+    Texture2D sprite = player->player_sprite_idle[player->sprite_index];
     for (int y = 0; y < maze->height; y++)
     {
         float startx = pos.x;
         for (int x = 0; x < maze->width; x++)
         {
-            if (x == player.x && y == player.y)
-            {
-                tile = player.player_texture;
-            }
-            else
-            {
-                tile = maze->cell_texture;
-            }
+            // if (x == player->x && y == player->y)
+            // {
+            //     tile = player->player_texture;
+            // }
+            // else
+            // {
+            //     tile = maze->cell_texture;
+            // }
 
-            Rectangle tile_rec = (Rectangle){pos.x, pos.y, tile_side_len, tile_side_len};
+            Rectangle cell_rec = (Rectangle){pos.x, pos.y, tile_side_len, tile_side_len};
+
             DrawTexturePro(tile,
                            (Rectangle){0, 0, tile.width, tile.height},
-                           tile_rec, Vector2Zero(), 0, WHITE);
+                           cell_rec, Vector2Zero(), 0, WHITE);
 
-            drawBorder(tile_rec, UP, maze->cells[y][x].up_wall ? WALL_THICK : 0, WHITE);
-            drawBorder(tile_rec, DOWN, maze->cells[y][x].down_wall ? WALL_THICK : 0, WHITE);
-            drawBorder(tile_rec, RIGHT, maze->cells[y][x].right_wall ? WALL_THICK : 0, WHITE);
-            drawBorder(tile_rec, LEFT, maze->cells[y][x].left_wall ? WALL_THICK : 0, WHITE);
+            drawBorder(cell_rec, UP, maze->cells[y][x].up_wall ? WALL_THICK : 0, WHITE);
+            drawBorder(cell_rec, DOWN, maze->cells[y][x].down_wall ? WALL_THICK : 0, WHITE);
+            drawBorder(cell_rec, RIGHT, maze->cells[y][x].right_wall ? WALL_THICK : 0, WHITE);
+            drawBorder(cell_rec, LEFT, maze->cells[y][x].left_wall ? WALL_THICK : 0, WHITE);
+
+            if (x == player->x && y == player->y)
+            {
+                DrawTexturePro(sprite,
+                               (Rectangle){0, 0, player->flip ? -sprite.width : sprite.width,
+                                           sprite.height},
+                               cell_rec, Vector2Zero(), 0, WHITE);
+            }
 
             pos.x += tile_side_len;
         }

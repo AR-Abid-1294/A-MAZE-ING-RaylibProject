@@ -66,3 +66,13 @@ const char *formatTime(double time)
 
     return TextFormat("%2d:%4.2lf", min, time);
 }
+
+void drawTextureShadow(Texture2D texture, Rectangle texture_rec){
+    Rectangle shadow = {texture_rec.x + 10,
+                        texture_rec.y + 10,
+                        texture_rec.width,
+                        texture_rec.height};
+    DrawRectangleRec(shadow, GetColor(0x00000050));
+    DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.height},
+                   texture_rec, (Vector2){0, 0}, 0, WHITE);
+}

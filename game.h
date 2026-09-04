@@ -61,12 +61,17 @@ typedef struct GameState
     Sound click_sound;
     Sound movement_sound;
     Sound movement_blocked_sound;
+    Sound game_finish_sound;
+
+    // music
+    Music bg_music;
 
     // images
     Texture2D abid_pic;
     Texture2D afif_pic;
 
     // scores and times
+    float last_time;
     BestTime best_times[10];
     FILE *best_times_file;
 } GameState;
