@@ -31,8 +31,9 @@ void initGameState(GameState *gs)
 
     // Load Fonts
     gs->font1 = LoadFontEx("Assets/Fonts/Font3.otf", 100, NULL, 0);
-    gs->title_font = LoadFontEx("Assets/Fonts/Font4.ttf", 100, NULL, 0);
-    gs->msg_font = LoadFontEx("Assets/Fonts/Font2.TTF", 100, NULL, 0);
+    gs->btn_font = LoadFontEx("Assets/Fonts/Font4.ttf", 100, NULL, 0);
+    gs->title_font = LoadFontEx("Assets/Fonts/Game Of Squids.ttf", 100, NULL, 0);
+    gs->msg_font = LoadFontEx("Assets/Fonts/The Amazing Spider-Man.ttf", 100, NULL, 0);
 
     // Load Sound Effects
     gs->hover_sound = LoadSound("Assets/Sound Effects/pop_1.wav");
@@ -68,7 +69,7 @@ void unloadGameState(GameState *gs)
 
     UnloadMusicStream(gs->bg_music);
 
-    UnloadFont(gs->font1);
+    UnloadFont(gs->btn_font);
     UnloadFont(gs->title_font);
     UnloadFont(gs->msg_font);
 
@@ -82,16 +83,21 @@ void updateMenu(GameState *gs)
     BeginDrawing();
     ClearBackground(GetColor(0x2e2e2eff));
 
+    // TITLE
+    const char *title = "SQUID MAZE";
+    Vector2 title_pos = {(SCREENWIDTH - MeasureText(title, 100)) / 2, 15};
+    drawText(gs->title_font, title, title_pos, 100, 1, WHITE, 80);
+
     // PLAY BUTTON
-    Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5, SCREENWIDTH / 5, 35},
+    Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300, SCREENWIDTH / 5, 35},
                        GetColor(0x00f0ffff),
-                       0, WHITE, "PLAY", BLACK, 25};
-    drawButton(play_btn, gs->font1);
+                       0, WHITE, "PLAY", gs->btn_font, BLACK, 25, 1, 80};
+    drawButton(play_btn);
     if (hovered(play_btn))
     {
         play_btn.buttonColor = BLUE;
         play_btn.textColor = WHITE;
-        drawButton(play_btn, gs->font1);
+        drawButton(play_btn);
     }
     if (clicked(play_btn))
     {
@@ -102,15 +108,15 @@ void updateMenu(GameState *gs)
     }
 
     // CREDIT BUTTON
-    Button credit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5 + 50, SCREENWIDTH / 5, 35},
+    Button credit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50, SCREENWIDTH / 5, 35},
                          GetColor(0x00f0ffff),
-                         0, WHITE, "CREDIT", BLACK, 25};
-    drawButton(credit_btn, gs->font1);
+                         0, WHITE, "CREDIT", gs->btn_font, BLACK, 25, 1, 80};
+    drawButton(credit_btn);
     if (hovered(credit_btn))
     {
         credit_btn.buttonColor = BLUE;
         credit_btn.textColor = WHITE;
-        drawButton(credit_btn, gs->font1);
+        drawButton(credit_btn);
     }
     if (clicked(credit_btn))
     {
@@ -118,16 +124,33 @@ void updateMenu(GameState *gs)
         gs->page = CREDIT;
     }
 
+    // BEST TIMES BUTTON
+    Button best_times_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50 * 2, SCREENWIDTH / 5, 35},
+                             GetColor(0x00f0ffff),
+                             0, WHITE, "BEST TIMES", gs->btn_font, BLACK, 25, 1, 80};
+    drawButton(best_times_btn);
+    if (hovered(best_times_btn))
+    {
+        best_times_btn.buttonColor = BLUE;
+        best_times_btn.textColor = WHITE;
+        drawButton(best_times_btn);
+    }
+    if (clicked(best_times_btn))
+    {
+        PlaySound(gs->click_sound);
+        gs->page = BEST_TIMES;
+    }
+
     // QUIT BUTTON
-    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 5 + 50 * 2, SCREENWIDTH / 5, 35},
+    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50 * 3, SCREENWIDTH / 5, 35},
                        GetColor(0xff6b5bff),
-                       0, WHITE, "QUIT", BLACK, 25};
-    drawButton(quit_btn, gs->font1);
+                       0, WHITE, "QUIT", gs->btn_font, BLACK, 25, 1, 80};
+    drawButton(quit_btn);
     if (hovered(quit_btn))
     {
         quit_btn.buttonColor = GetColor(0xff0055ff);
         quit_btn.textColor = WHITE;
-        drawButton(quit_btn, gs->font1);
+        drawButton(quit_btn);
     }
     if (clicked(quit_btn))
     {
@@ -138,14 +161,14 @@ void updateMenu(GameState *gs)
     // Sprite Animation
     Texture2D menu_sprite1 = gs->player.player_sprite_attacking[gs->player.sprite_index];
     DrawTexturePro(menu_sprite1, (Rectangle){0, 0, menu_sprite1.width, menu_sprite1.height},
-                   (Rectangle){80, 70, 300, 300}, Vector2Zero(), 0, WHITE);
+                   (Rectangle){80, 250, 300, 300}, Vector2Zero(), 0, WHITE);
 
     Texture2D menu_sprite2 = gs->player.player_sprite_dying[gs->player.sprite_index];
     DrawTexturePro(menu_sprite2, (Rectangle){0, 0, -menu_sprite2.width, menu_sprite2.height},
-                   (Rectangle){1000, 70, 300, 300}, Vector2Zero(), 0, WHITE);
+                   (Rectangle){1000, 250, 300, 300}, Vector2Zero(), 0, WHITE);
 
     // change mouse cursor
-    if (hovered(play_btn) || hovered(credit_btn) || hovered(quit_btn))
+    if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn))
     {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
         // PlaySound(gs->hover_sound);
@@ -208,45 +231,86 @@ void drawCredit(GameState *gs)
 
     // Abid Part
     Rectangle abid_pic_rec = (Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT * (1.5 / 10), SCREENWIDTH * (3.0 / 10), SCREENHEIGHT / 2.0};
-
-    DrawTexturePro(gs->abid_pic, (Rectangle){0, 0, gs->abid_pic.width, gs->abid_pic.height},
-                   abid_pic_rec, Vector2Zero(), 0, WHITE);
+    drawTextureShadowed(gs->abid_pic, abid_pic_rec);
 
     const char *abid_credit = "Md Abidur Rahman\n2505019\n";
-    Card abid_card = {(Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, abid_credit, gs->font1, RAYWHITE, 30};
-    drawTextureShadow(gs->abid_pic, abid_pic_rec);
-
+    Card abid_card = {(Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, abid_credit, gs->font1, RAYWHITE, 30, 1, 80};
     drawCard(abid_card);
-    drawCardShadow(abid_card);
 
     // Afif Part
     Rectangle afif_pic_rec = (Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT * (1.5 / 10), SCREENWIDTH * (3.0 / 10), SCREENHEIGHT / 2.0};
-
-    DrawTexturePro(gs->afif_pic, (Rectangle){0, 0, gs->afif_pic.width, gs->afif_pic.height},
-                   afif_pic_rec, Vector2Zero(), 0, WHITE);
-    drawTextureShadow(gs->afif_pic, afif_pic_rec);
+    drawTextureShadowed(gs->afif_pic, afif_pic_rec);
 
     const char *afif_credit = "S.M. Afif Iqbal\n2505004\n";
-    Card afif_card = {(Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, afif_credit, gs->font1, RAYWHITE, 30};
-
+    Card afif_card = {(Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, afif_credit, gs->font1, RAYWHITE, 30, 1, 80};
     drawCard(afif_card);
-    drawCardShadow(afif_card);
 
     // MENU BUTTON
-    Button menu_btn = {(Rectangle){10, 10, 70, 30}, DARKBLUE,
+    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
                        0, WHITE,
-                       "MENU", RAYWHITE, 20};
-    drawButton(menu_btn, gs->font1);
+                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
+    drawButton(menu_btn);
     if (hovered(menu_btn))
     {
         menu_btn.buttonColor = BLUE;
-        drawButton(menu_btn, gs->font1);
+        menu_btn.shadow_opacity = 80;
+        drawButton(menu_btn);
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
     }
     else
     {
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
+    if (clicked(menu_btn))
+    {
+        PlaySound(gs->click_sound);
+        gs->page = MENU;
+    }
+
+    EndDrawing();
+}
+
+void drawBestTimes(GameState *gs)
+{
+    float best_times_[10] = {23.12,
+                             12.67,
+                             21.98,
+                             67.89,
+                             12.43,
+                             76.54,
+                             12.09,
+                             32.30,
+                             11.21,
+                             10.01};
+
+    BeginDrawing();
+    ClearBackground(GetColor(0xdff7ffff));
+
+    for (int i = 0; i < 10; i++)
+    {
+        Rectangle best_times_rec = {(SCREENWIDTH - 800) / 2, (SCREENHEIGHT - 500) / 2 + 60 * i, 800, 45};
+        const char *best_time_text = formatTime(best_times_[i]);
+        Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%s",best_time_text), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, 80};
+        drawCard(best_times_card);
+    }
+
+    // MENU BUTTON
+    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
+                       0, WHITE,
+                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
+    drawButton(menu_btn);
+    if (hovered(menu_btn))
+    {
+        menu_btn.buttonColor = BLUE;
+        menu_btn.shadow_opacity = 80;
+        drawButton(menu_btn);
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    }
+    else
+    {
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    }
+
     if (clicked(menu_btn))
     {
         PlaySound(gs->click_sound);
@@ -393,14 +457,15 @@ void drawGame(GameState *gs)
     DrawTextEx(gs->title_font, title, (Vector2){(SCREENWIDTH - MeasureText(title, 40)) / 2, 20}, 40, 1, WHITE);
 
     // MENU BUTTON
-    Button menu_btn = {(Rectangle){10, 10, 70, 30}, DARKBLUE,
+    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
                        0, WHITE,
-                       "MENU", RAYWHITE, 20};
-    drawButton(menu_btn, gs->font1);
+                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
+    drawButton(menu_btn);
     if (hovered(menu_btn))
     {
         menu_btn.buttonColor = BLUE;
-        drawButton(menu_btn, gs->font1);
+        menu_btn.shadow_opacity = 80;
+        drawButton(menu_btn);
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
     }
     else
@@ -411,7 +476,7 @@ void drawGame(GameState *gs)
     if (clicked(menu_btn))
     {
         PlaySound(gs->click_sound);
-        gs->page = 0;
+        gs->page = MENU;
     }
 
     // BRAND NEW MAZE
@@ -419,12 +484,12 @@ void drawGame(GameState *gs)
     const char *new_maze_msg = "BRAND NEW MAZE";
     if (current_time <= 0.5 || (current_time >= 1 && current_time <= 1.5))
     {
-        DrawTextEx(gs->msg_font, new_maze_msg, (Vector2){(SCREENWIDTH - MeasureText(new_maze_msg, 50)) / 2, SCREENHEIGHT - 70}, 50, 1, WHITE);
+        DrawTextEx(gs->msg_font, new_maze_msg, (Vector2){(SCREENWIDTH - MeasureText(new_maze_msg, 50)) / 2, SCREENHEIGHT - 65}, 50, 1, WHITE);
     }
 
     // Time sector
     const char *time_text = formatTime(current_time);
-    DrawTextEx(gs->font1, time_text, (Vector2){1300, 15}, 20, 1, WHITE);
+    DrawTextEx(gs->btn_font, time_text, (Vector2){1300, 15}, 20, 1, WHITE);
 
     EndDrawing();
 }
@@ -435,14 +500,15 @@ void drawScore(GameState *gs)
     ClearBackground(GetColor(0xddfbefff));
 
     // MENU BUTTON
-    Button menu_btn = {(Rectangle){10, 10, 70, 30}, DARKBLUE,
+    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
                        0, WHITE,
-                       "MENU", RAYWHITE, 20};
-    drawButton(menu_btn, gs->font1);
+                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
+    drawButton(menu_btn);
     if (hovered(menu_btn))
     {
         menu_btn.buttonColor = BLUE;
-        drawButton(menu_btn, gs->font1);
+        menu_btn.shadow_opacity = 80;
+        drawButton(menu_btn);
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
     }
     else
@@ -453,12 +519,12 @@ void drawScore(GameState *gs)
     if (clicked(menu_btn))
     {
         PlaySound(gs->click_sound);
-        gs->page = 0;
+        gs->page = MENU;
     }
 
-    Card time_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 50, SCREENHEIGHT * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, formatTime(gs->last_time), gs->font1, WHITE, 40};
+    Card time_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 50, SCREENHEIGHT * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, formatTime(gs->last_time), gs->font1, WHITE, 40, 1, 80};
 
-    drawCardShadow(time_card);
+    drawCard(time_card);
 
     EndDrawing();
 }
@@ -487,6 +553,10 @@ void updateGame(GameState *gs)
 
     case CREDIT:
         drawCredit(gs);
+        break;
+
+    case BEST_TIMES:
+        drawBestTimes(gs);
         break;
 
     default:

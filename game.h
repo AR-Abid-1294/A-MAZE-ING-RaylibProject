@@ -19,7 +19,8 @@ typedef enum PageState
     GAME_OVER = 15,
     CREDIT = 19,
     SETTINGS = 20,
-    HIGH_SCORES = 21
+    HIGH_SCORES = 21,
+    BEST_TIMES = 23
 } PageState;
 
 typedef struct GameState
