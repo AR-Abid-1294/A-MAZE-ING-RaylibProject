@@ -44,8 +44,8 @@ bool clicked(Button btn)
 void drawCard(Card card)
 {
     // Shadow
-    Rectangle shadow = {card.cardRec.x + 10,
-                        card.cardRec.y + 10,
+    Rectangle shadow = {card.cardRec.x + card.shadowX,
+                        card.cardRec.y + card.shadowY,
                         card.cardRec.width,
                         card.cardRec.height};
     Color shadow_color = {0, 0, 0, card.shadow_opacity};
@@ -60,7 +60,7 @@ void drawCard(Card card)
     // Text
     int textWidth = MeasureText(card.text, card.fontSize);
     Vector2 textPos = (Vector2){card.cardRec.x + card.cardRec.width / 2 - textWidth / 2,
-                                card.cardRec.y + card.cardRec.height / 2 - card.fontSize};
+                                card.cardRec.y + card.textPosY};
     DrawTextEx(card.font, card.text, (Vector2){textPos.x, textPos.y}, card.fontSize, 1, card.textColor);
 }
 

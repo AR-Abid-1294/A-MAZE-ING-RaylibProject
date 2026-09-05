@@ -82,16 +82,16 @@ void updateMenu(GameState *gs)
 {
     BeginDrawing();
     ClearBackground(GetColor(0x2e2e2eff));
-
+    
     // TITLE
     const char *title = "SQUID MAZE";
     Vector2 title_pos = {(SCREENWIDTH - MeasureText(title, 100)) / 2, 15};
     drawText(gs->title_font, title, title_pos, 100, 1, WHITE, 80);
-
+    
     // PLAY BUTTON
     Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300, SCREENWIDTH / 5, 35},
-                       GetColor(0x00f0ffff),
-                       0, WHITE, "PLAY", gs->btn_font, BLACK, 25, 1, 80};
+    GetColor(0x00f0ffff),
+    0, WHITE, "PLAY", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(play_btn);
     if (hovered(play_btn))
     {
@@ -106,11 +106,11 @@ void updateMenu(GameState *gs)
         initGameplay(gs);
         gs->start_time = GetTime();
     }
-
+    
     // CREDIT BUTTON
     Button credit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50, SCREENWIDTH / 5, 35},
-                         GetColor(0x00f0ffff),
-                         0, WHITE, "CREDIT", gs->btn_font, BLACK, 25, 1, 80};
+    GetColor(0x00f0ffff),
+    0, WHITE, "CREDIT", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(credit_btn);
     if (hovered(credit_btn))
     {
@@ -123,11 +123,11 @@ void updateMenu(GameState *gs)
         PlaySound(gs->click_sound);
         gs->page = CREDIT;
     }
-
+    
     // BEST TIMES BUTTON
     Button best_times_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50 * 2, SCREENWIDTH / 5, 35},
-                             GetColor(0x00f0ffff),
-                             0, WHITE, "BEST TIMES", gs->btn_font, BLACK, 25, 1, 80};
+    GetColor(0x00f0ffff),
+    .stroke = 0, WHITE, "BEST TIMES", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(best_times_btn);
     if (hovered(best_times_btn))
     {
@@ -140,11 +140,11 @@ void updateMenu(GameState *gs)
         PlaySound(gs->click_sound);
         gs->page = BEST_TIMES;
     }
-
+    
     // QUIT BUTTON
     Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50 * 3, SCREENWIDTH / 5, 35},
-                       GetColor(0xff6b5bff),
-                       0, WHITE, "QUIT", gs->btn_font, BLACK, 25, 1, 80};
+    GetColor(0xff6b5bff),
+    0, WHITE, "QUIT", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(quit_btn);
     if (hovered(quit_btn))
     {
@@ -157,16 +157,18 @@ void updateMenu(GameState *gs)
         PlaySound(gs->click_sound);
         gs->shouldQuit = true;
     }
+    
+    DrawCircleGradient((Vector2){SCREENWIDTH / 2, SCREENHEIGHT / 2}, 100, GetColor(0xffffffaa), BLACK);
 
     // Sprite Animation
     Texture2D menu_sprite1 = gs->player.player_sprite_attacking[gs->player.sprite_index];
     DrawTexturePro(menu_sprite1, (Rectangle){0, 0, menu_sprite1.width, menu_sprite1.height},
-                   (Rectangle){80, 250, 300, 300}, Vector2Zero(), 0, WHITE);
-
+    (Rectangle){80, 250, 300, 300}, Vector2Zero(), 0, WHITE);
+    
     Texture2D menu_sprite2 = gs->player.player_sprite_dying[gs->player.sprite_index];
     DrawTexturePro(menu_sprite2, (Rectangle){0, 0, -menu_sprite2.width, menu_sprite2.height},
-                   (Rectangle){1000, 250, 300, 300}, Vector2Zero(), 0, WHITE);
-
+    (Rectangle){1000, 250, 300, 300}, Vector2Zero(), 0, WHITE);
+    
     // change mouse cursor
     if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn))
     {
@@ -174,8 +176,8 @@ void updateMenu(GameState *gs)
         // PlaySound(gs->hover_sound);
     }
     else
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-
+    SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    
     EndDrawing();
 }
 
@@ -234,7 +236,7 @@ void drawCredit(GameState *gs)
     drawTextureShadowed(gs->abid_pic, abid_pic_rec);
 
     const char *abid_credit = "Md Abidur Rahman\n2505019\n";
-    Card abid_card = {(Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, abid_credit, gs->font1, RAYWHITE, 30, 1, 80};
+    Card abid_card = {(Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, abid_credit, gs->font1, RAYWHITE, 30, 1, 0, 80, 10, 10};
     drawCard(abid_card);
 
     // Afif Part
@@ -242,7 +244,7 @@ void drawCredit(GameState *gs)
     drawTextureShadowed(gs->afif_pic, afif_pic_rec);
 
     const char *afif_credit = "S.M. Afif Iqbal\n2505004\n";
-    Card afif_card = {(Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, afif_credit, gs->font1, RAYWHITE, 30, 1, 80};
+    Card afif_card = {(Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, afif_credit, gs->font1, RAYWHITE, 30, 1, 0, 80, 10, 10};
     drawCard(afif_card);
 
     // MENU BUTTON
@@ -261,7 +263,7 @@ void drawCredit(GameState *gs)
     {
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
-    if (clicked(menu_btn))
+    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound);
         gs->page = MENU;
@@ -272,6 +274,16 @@ void drawCredit(GameState *gs)
 
 void drawBestTimes(GameState *gs)
 {
+    char player_names_[20][10] = {"Abid",
+                                  "Afif",
+                                  "Rumman",
+                                  "Tahsin",
+                                  "Akif",
+                                  "Ahnaf",
+                                  "Raisa",
+                                  "Ananto",
+                                  "Jibon",
+                                  "Mahin"};
     float best_times_[10] = {23.12,
                              12.67,
                              21.98,
@@ -288,9 +300,15 @@ void drawBestTimes(GameState *gs)
 
     for (int i = 0; i < 10; i++)
     {
-        Rectangle best_times_rec = {(SCREENWIDTH - 800) / 2, (SCREENHEIGHT - 500) / 2 + 60 * i, 800, 45};
+        // Player Name
+        Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
+        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", player_names_[i]), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+        drawCard(player_name_card);
+
+        // Best Time
+        Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
         const char *best_time_text = formatTime(best_times_[i]);
-        Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%s",best_time_text), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, 80};
+        Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%s", best_time_text), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
         drawCard(best_times_card);
     }
 
@@ -311,7 +329,7 @@ void drawBestTimes(GameState *gs)
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
 
-    if (clicked(menu_btn))
+    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound);
         gs->page = MENU;
@@ -473,7 +491,7 @@ void drawGame(GameState *gs)
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
 
-    if (clicked(menu_btn))
+    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound);
         gs->page = MENU;
@@ -516,13 +534,13 @@ void drawScore(GameState *gs)
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
 
-    if (clicked(menu_btn))
+    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound);
         gs->page = MENU;
     }
 
-    Card time_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 50, SCREENHEIGHT * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, formatTime(gs->last_time), gs->font1, WHITE, 40, 1, 80};
+    Card time_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 50, SCREENHEIGHT * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, formatTime(gs->last_time), gs->font1, WHITE, 40, 1, 10, 80, 10, 10};
 
     drawCard(time_card);
 

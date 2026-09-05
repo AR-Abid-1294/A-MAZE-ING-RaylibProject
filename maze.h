@@ -10,9 +10,9 @@
 #define SCREENWIDTH 1400
 #define SCREENHEIGHT 800
 
-#define MAZEWIDTH 21
-#define MAZEHEIGHT 15
-#define CELLSIZE 50
+#define MAZEWIDTH 41
+#define MAZEHEIGHT 25
+#define CELLSIZE 25
 #define WALL_THICK 3
 
 #define MAZE_MARGIN_X (SCREENWIDTH - MAZEWIDTH * CELLSIZE) / 2
@@ -21,10 +21,6 @@
 #define SPEED_MAX 120.0f
 
 extern int directions[4][2];
-
-// for time sector
-extern int frames_count;
-extern int net_time;
 
 typedef enum Direction
 {

@@ -48,9 +48,12 @@ typedef struct Card
     Color textColor;
     float fontSize;
     float textSpacing;
+    float textPosY;
 
     // Shadow
     int shadow_opacity;
+    float shadowX;
+    float shadowY;
 } Card;
 
 void drawCard(Card card);
