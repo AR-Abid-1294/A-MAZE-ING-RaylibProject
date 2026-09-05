@@ -41,14 +41,22 @@ void initGameState(GameState *gs)
     gs->movement_sound = LoadSound("Assets/Sound Effects/water_drop_synthetic.wav");
     gs->movement_blocked_sound = LoadSound("Assets/Sound Effects/cardboard_hit.wav");
     gs->game_finish_sound = LoadSound("Assets/Sound Effects/xylophone_positive_long.wav");
-
+    
     // Load Music
     gs->bg_music = LoadMusicStream("Assets/Music/Mingle Game Song.mp3");
     gs->bg_music.looping = true;
-
+    
+    // Optimize Volume
+    SetMusicVolume(gs->bg_music, 0.3f);
+    SetSoundVolume(gs->movement_sound, 2);
+    SetSoundVolume(gs->game_finish_sound, 2);
+    SetSoundVolume(gs->movement_blocked_sound, 1.5);
+    
     // Load Images
     gs->abid_pic = LoadTexture("Assets/Images/abid.png");
     gs->afif_pic = LoadTexture("Assets/Images/afif.png");
+
+    PlayMusicStream(gs->bg_music);
 }
 
 // unload textures
@@ -78,7 +86,7 @@ void unloadGameState(GameState *gs)
 
 // draw and update different pages
 
-void updateMenu(GameState *gs)
+void drawMenu(GameState *gs)
 {
     BeginDrawing();
     ClearBackground(GetColor(0x2e2e2eff));
@@ -157,8 +165,6 @@ void updateMenu(GameState *gs)
         PlaySound(gs->click_sound);
         gs->shouldQuit = true;
     }
-    
-    DrawCircleGradient((Vector2){SCREENWIDTH / 2, SCREENHEIGHT / 2}, 100, GetColor(0xffffffaa), BLACK);
 
     // Sprite Animation
     Texture2D menu_sprite1 = gs->player.player_sprite_attacking[gs->player.sprite_index];
@@ -176,7 +182,7 @@ void updateMenu(GameState *gs)
         // PlaySound(gs->hover_sound);
     }
     else
-    SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     
     EndDrawing();
 }
@@ -552,7 +558,7 @@ void updateGame(GameState *gs)
     switch (gs->page)
     {
     case MENU:
-        updateMenu(gs);
+        drawMenu(gs);
         break;
 
     case NAME_INPUT:

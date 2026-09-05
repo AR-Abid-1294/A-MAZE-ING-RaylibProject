@@ -15,11 +15,6 @@ int main()
 
     initGameState(&gs);
 
-    PlayMusicStream(gs.bg_music);
-    SetMusicVolume(gs.bg_music, 0.3f);
-    SetSoundVolume(gs.movement_sound, 2);
-    SetSoundVolume(gs.game_finish_sound, 2);
-    SetSoundVolume(gs.movement_blocked_sound, 1.5);
 
     // Game Loop
     while (!WindowShouldClose() && !gs.shouldQuit)

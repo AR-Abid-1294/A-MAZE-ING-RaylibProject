@@ -251,4 +251,5 @@ void destroyMaze(Maze *maze)
         free(maze->cells[i]);
     }
     free(maze->cells);
+    free(maze->frontiers);
 }

@@ -12,16 +12,24 @@
 
 typedef enum PageState
 {
-    MENU = 0,
-    NAME_INPUT = 5,
-    PLAYING = 10,
-    GAME_FINISH = 13,
-    GAME_OVER = 15,
-    CREDIT = 19,
-    SETTINGS = 20,
-    HIGH_SCORES = 21,
-    BEST_TIMES = 23
+    MENU,
+    NAME_INPUT,
+    PLAYING,
+    GAME_FINISH,
+    GAME_OVER,
+    CREDIT,
+    SETTINGS,
+    HIGH_SCORES,
+    BEST_TIMES
 } PageState;
+
+typedef enum GameMode
+{
+    BEST,
+    MULTIVERSE,
+    DARK_NIGHT,
+    INFINITY_WAR
+} GameMode;
 
 typedef struct GameState
 {
@@ -85,7 +93,7 @@ void unloadGameState(GameState *gs);
 
 // update game logic
 void updateGame(GameState *gs);
-void updateMenu(GameState *gs);
+void drawMenu(GameState *gs);
 void updateNameInput(GameState *gs);
 void drawNameInput(GameState *gs);
 void drawCredit(GameState *gs);
