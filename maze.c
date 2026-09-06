@@ -203,20 +203,20 @@ void drawBorder(Rectangle rec, Direction dir, float thick, Color color)
 void drawMaze(Maze *maze, Vector2 pos, float tile_side_len, Player *player)
 {
     Texture2D tile = maze->cell_texture;
-    Texture2D sprite = player->player_sprite_idle[player->sprite_index];
+    // Texture2D sprite = player->player_sprite_idle[player->sprite_index];
     for (int y = 0; y < maze->height; y++)
     {
         float startx = pos.x;
         for (int x = 0; x < maze->width; x++)
         {
-            // if (x == player->x && y == player->y)
-            // {
-            //     tile = player->player_texture;
-            // }
-            // else
-            // {
-            //     tile = maze->cell_texture;
-            // }
+            if (x == player->x && y == player->y)
+            {
+                tile = player->player_texture;
+            }
+            else
+            {
+                tile = maze->cell_texture;
+            }
 
             Rectangle cell_rec = (Rectangle){pos.x, pos.y, tile_side_len, tile_side_len};
 
@@ -229,13 +229,13 @@ void drawMaze(Maze *maze, Vector2 pos, float tile_side_len, Player *player)
             drawBorder(cell_rec, RIGHT, maze->cells[y][x].right_wall ? WALL_THICK : 0, WHITE);
             drawBorder(cell_rec, LEFT, maze->cells[y][x].left_wall ? WALL_THICK : 0, WHITE);
 
-            if (x == player->x && y == player->y)
-            {
-                DrawTexturePro(sprite,
-                               (Rectangle){0, 0, player->flip ? -sprite.width : sprite.width,
-                                           sprite.height},
-                               cell_rec, Vector2Zero(), 0, WHITE);
-            }
+            // if (x == player->x && y == player->y)
+            // {
+            //     DrawTexturePro(sprite,
+            //                    (Rectangle){0, 0, player->flip ? -sprite.width : sprite.width,
+            //                                sprite.height},
+            //                    cell_rec, Vector2Zero(), 0, WHITE);
+            // }
 
             pos.x += tile_side_len;
         }

@@ -41,17 +41,17 @@ void initGameState(GameState *gs)
     gs->movement_sound = LoadSound("Assets/Sound Effects/water_drop_synthetic.wav");
     gs->movement_blocked_sound = LoadSound("Assets/Sound Effects/cardboard_hit.wav");
     gs->game_finish_sound = LoadSound("Assets/Sound Effects/xylophone_positive_long.wav");
-    
+
     // Load Music
     gs->bg_music = LoadMusicStream("Assets/Music/Mingle Game Song.mp3");
     gs->bg_music.looping = true;
-    
+
     // Optimize Volume
     SetMusicVolume(gs->bg_music, 0.3f);
     SetSoundVolume(gs->movement_sound, 2);
     SetSoundVolume(gs->game_finish_sound, 2);
     SetSoundVolume(gs->movement_blocked_sound, 1.5);
-    
+
     // Load Images
     gs->abid_pic = LoadTexture("Assets/Images/abid.png");
     gs->afif_pic = LoadTexture("Assets/Images/afif.png");
@@ -90,16 +90,16 @@ void drawMenu(GameState *gs)
 {
     BeginDrawing();
     ClearBackground(GetColor(0x2e2e2eff));
-    
+
     // TITLE
     const char *title = "SQUID MAZE";
     Vector2 title_pos = {(SCREENWIDTH - MeasureText(title, 100)) / 2, 15};
     drawText(gs->title_font, title, title_pos, 100, 1, WHITE, 80);
-    
+
     // PLAY BUTTON
     Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300, SCREENWIDTH / 5, 35},
-    GetColor(0x00f0ffff),
-    0, WHITE, "PLAY", gs->btn_font, BLACK, 25, 1, 80};
+                       GetColor(0x00f0ffff),
+                       0, WHITE, "PLAY", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(play_btn);
     if (hovered(play_btn))
     {
@@ -114,11 +114,11 @@ void drawMenu(GameState *gs)
         initGameplay(gs);
         gs->start_time = GetTime();
     }
-    
+
     // CREDIT BUTTON
     Button credit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50, SCREENWIDTH / 5, 35},
-    GetColor(0x00f0ffff),
-    0, WHITE, "CREDIT", gs->btn_font, BLACK, 25, 1, 80};
+                         GetColor(0x00f0ffff),
+                         0, WHITE, "CREDIT", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(credit_btn);
     if (hovered(credit_btn))
     {
@@ -131,11 +131,11 @@ void drawMenu(GameState *gs)
         PlaySound(gs->click_sound);
         gs->page = CREDIT;
     }
-    
+
     // BEST TIMES BUTTON
     Button best_times_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50 * 2, SCREENWIDTH / 5, 35},
-    GetColor(0x00f0ffff),
-    .stroke = 0, WHITE, "BEST TIMES", gs->btn_font, BLACK, 25, 1, 80};
+                             GetColor(0x00f0ffff),
+                             .stroke = 0, WHITE, "BEST TIMES", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(best_times_btn);
     if (hovered(best_times_btn))
     {
@@ -148,11 +148,11 @@ void drawMenu(GameState *gs)
         PlaySound(gs->click_sound);
         gs->page = BEST_TIMES;
     }
-    
+
     // QUIT BUTTON
     Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50 * 3, SCREENWIDTH / 5, 35},
-    GetColor(0xff6b5bff),
-    0, WHITE, "QUIT", gs->btn_font, BLACK, 25, 1, 80};
+                       GetColor(0xff6b5bff),
+                       0, WHITE, "QUIT", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(quit_btn);
     if (hovered(quit_btn))
     {
@@ -169,12 +169,12 @@ void drawMenu(GameState *gs)
     // Sprite Animation
     Texture2D menu_sprite1 = gs->player.player_sprite_attacking[gs->player.sprite_index];
     DrawTexturePro(menu_sprite1, (Rectangle){0, 0, menu_sprite1.width, menu_sprite1.height},
-    (Rectangle){80, 250, 300, 300}, Vector2Zero(), 0, WHITE);
-    
+                   (Rectangle){80, 250, 300, 300}, Vector2Zero(), 0, WHITE);
+
     Texture2D menu_sprite2 = gs->player.player_sprite_dying[gs->player.sprite_index];
     DrawTexturePro(menu_sprite2, (Rectangle){0, 0, -menu_sprite2.width, menu_sprite2.height},
-    (Rectangle){1000, 250, 300, 300}, Vector2Zero(), 0, WHITE);
-    
+                   (Rectangle){1000, 250, 300, 300}, Vector2Zero(), 0, WHITE);
+
     // change mouse cursor
     if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn))
     {
@@ -183,7 +183,7 @@ void drawMenu(GameState *gs)
     }
     else
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    
+
     EndDrawing();
 }
 
@@ -242,7 +242,7 @@ void drawCredit(GameState *gs)
     drawTextureShadowed(gs->abid_pic, abid_pic_rec);
 
     const char *abid_credit = "Md Abidur Rahman\n2505019\n";
-    Card abid_card = {(Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, abid_credit, gs->font1, RAYWHITE, 30, 1, 0, 80, 10, 10};
+    Card abid_card = {(Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, abid_credit, gs->font1, RAYWHITE, 30, 1, 20, 80, 10, 10};
     drawCard(abid_card);
 
     // Afif Part
@@ -250,7 +250,7 @@ void drawCredit(GameState *gs)
     drawTextureShadowed(gs->afif_pic, afif_pic_rec);
 
     const char *afif_credit = "S.M. Afif Iqbal\n2505004\n";
-    Card afif_card = {(Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, afif_credit, gs->font1, RAYWHITE, 30, 1, 0, 80, 10, 10};
+    Card afif_card = {(Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, afif_credit, gs->font1, RAYWHITE, 30, 1, 20, 80, 10, 10};
     drawCard(afif_card);
 
     // MENU BUTTON
@@ -477,7 +477,7 @@ void drawGame(GameState *gs)
     drawMaze(&gs->maze, (Vector2){MAZE_MARGIN_X, MAZE_MARGIN_Y}, CELLSIZE, &gs->player);
 
     // Title
-    const char *title = "CHAMBER OF SECRETS";
+    const char *title = "THE BEST OF US";
     DrawTextEx(gs->title_font, title, (Vector2){(SCREENWIDTH - MeasureText(title, 40)) / 2, 20}, 40, 1, WHITE);
 
     // MENU BUTTON
@@ -505,11 +505,13 @@ void drawGame(GameState *gs)
 
     // BRAND NEW MAZE
     double current_time = GetTime() - gs->start_time;
-    const char *new_maze_msg = "BRAND NEW MAZE";
-    if (current_time <= 0.5 || (current_time >= 1 && current_time <= 1.5))
-    {
-        DrawTextEx(gs->msg_font, new_maze_msg, (Vector2){(SCREENWIDTH - MeasureText(new_maze_msg, 50)) / 2, SCREENHEIGHT - 65}, 50, 1, WHITE);
-    }
+    // const char *new_maze_msg = "BRAND NEW MAZE";
+    // Card new_maze_card = {(Rectangle){(SCREENWIDTH - 500) / 2, (SCREENHEIGHT - 100) / 2, 500, 100},
+    //                       DARKBLUE, 0, WHITE, new_maze_msg, gs->msg_font, WHITE, 50, 1, 20, 80, 10, 10};
+    // if (current_time <= 1)
+    // {
+    //     drawCard(new_maze_card);
+    // }
 
     // Time sector
     const char *time_text = formatTime(current_time);
@@ -546,9 +548,46 @@ void drawScore(GameState *gs)
         gs->page = MENU;
     }
 
-    Card time_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 50, SCREENHEIGHT * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, formatTime(gs->last_time), gs->font1, WHITE, 40, 1, 10, 80, 10, 10};
+    Card time_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 100, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, formatTime(gs->last_time), gs->font1, WHITE, 40, 1, 10, 80, 10, 10};
 
     drawCard(time_card);
+
+    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 + 30, 140, 50}, GetColor(0xff6b5bff), 0, BLACK, "QUIT GAME", gs->btn_font, WHITE, 15, 1, 0};
+
+    drawButton(quit_btn);
+
+    if (hovered(quit_btn))
+    {
+        quit_btn.buttonColor = GetColor(0xff0055ff);
+        quit_btn.shadow_opacity = 80;
+        drawButton(quit_btn);
+    }
+
+    if (clicked(quit_btn))
+    {
+        gs->shouldQuit = true;
+    }
+
+    Button replay_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5) + 160, SCREENHEIGHT / 2 + 30, 120, 50}, DARKGREEN, 0, BLACK, "REPLAY", gs->btn_font, WHITE, 15, 1, 0};
+
+    if (hovered(replay_btn))
+    {
+        replay_btn.buttonColor = GREEN;
+        replay_btn.shadow_opacity = 80;
+        drawButton(replay_btn);
+    }
+
+    if (clicked(replay_btn))
+    {
+
+        PlaySound(gs->click_sound);
+        gs->page = PLAYING;
+        initGameplay(gs);
+        gs->start_time = GetTime();
+    }
+
+    drawButton(replay_btn);
+
 
     EndDrawing();
 }
