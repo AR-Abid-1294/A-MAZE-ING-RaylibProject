@@ -3,16 +3,22 @@
 
 #include <stdio.h>
 
-typedef struct BestTime
+typedef struct Score
 {
     char *player_name;
-    float time;
-} BestTime;
+    float score;    // or time
+} Score;
 
-void sortBestTimes(BestTime *times);
+void sortHighScores(Score *scores);
 
-void loadBestTimes(BestTime *times, FILE *file);
+void loadHighScores(Score *scores, FILE *file);
 
-void storeBestTimes(BestTime *times, FILE *file);
+void storeHighScores(Score *scores, FILE *file);
+
+void sortBestTimes(Score *times);
+
+int loadBestTimes(Score *times, FILE *file);
+
+void storeBestTimes(Score *times, FILE *file);
 
 #endif

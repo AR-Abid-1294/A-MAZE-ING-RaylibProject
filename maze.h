@@ -10,17 +10,20 @@
 #define SCREENWIDTH 1400
 #define SCREENHEIGHT 800
 
-#define MAZEWIDTH 41
+#define MAZEWIDTH 50
 #define MAZEHEIGHT 25
 #define CELLSIZE 25
 #define WALL_THICK 3
+#define MAX_LEVEL 50
 
 #define MAZE_MARGIN_X (SCREENWIDTH - MAZEWIDTH * CELLSIZE) / 2
-#define MAZE_MARGIN_Y (SCREENHEIGHT - MAZEHEIGHT * CELLSIZE) / 2
+#define MAZE_MARGIN_Y (SCREENHEIGHT - MAZEHEIGHT * CELLSIZE) / 2 + CELLSIZE
 
 #define SPEED_MAX 120.0f
 
 extern int directions[4][2];
+
+#define MIN(a, b) (a < b ? a : b)
 
 typedef enum Direction
 {
@@ -56,13 +59,14 @@ typedef struct Frontier
 {
     Cell *visisted_cell;
     Cell *univisited_cell;
-}Frontier;
-
+} Frontier;
 
 typedef struct Maze
 {
     int height;
     int width;
+    int cell_size;
+    float wall_thickness;
 
     Cell **cells;
 
@@ -70,14 +74,17 @@ typedef struct Maze
     int frontier_count;
 
     Texture2D cell_texture;
+    Texture2D crossed_cell_texture;
+
+    // Maze width, height and cell size
+    // for different levels of MULTIVERSE mode
+    int levels[50][3];
 } Maze;
 
 // Check if a cell is inside the maze
 void shuffleDirections();
 
-int isPostionFree(Vector2 pos);
-
-void initializeMaze(Maze *maze, int height, int width);
+void initializeMaze(Maze *maze, int level);
 
 bool isCellValid(int x, int y, Maze maze);
 
@@ -93,9 +100,7 @@ void chooseRandFrontier(Maze *maze);
 
 void generateMaze2(Maze *maze);
 
-void drawLineShadow();
-
-void drawMaze(Maze *maze, Vector2 pos, float tile_side_len, Player *player);
+void drawMaze(Maze *maze, Vector2 pos, Player *player);
 
 void destroyMaze(Maze *maze);
 

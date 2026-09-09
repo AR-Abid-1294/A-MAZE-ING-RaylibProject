@@ -15,6 +15,7 @@ typedef enum PageState
     MENU,
     NAME_INPUT,
     PLAYING,
+    LEVELS,
     GAME_FINISH,
     GAME_OVER,
     CREDIT,
@@ -66,8 +67,7 @@ typedef struct GameState
     Font msg_font;
 
     // sound effects
-    Sound hover_sound;
-    Sound click_sound;
+    Sound click_sound1;
     Sound movement_sound;
     Sound movement_blocked_sound;
     Sound game_finish_sound;
@@ -79,10 +79,20 @@ typedef struct GameState
     Texture2D abid_pic;
     Texture2D afif_pic;
 
-    // scores and times
+    // best times for THE BEST OF US mode
     float last_time;
-    BestTime best_times[10];
+    Score best_times[10];
     FILE *best_times_file;
+
+    // high scores for THE MULTIVERSE OF MADMAZE
+    Score high_scores[10];
+    FILE *high_scores_file;
+
+    // mode
+    GameMode mode;
+
+    // level
+    int level;
 } GameState;
 
 // set up initial game state, load assets
@@ -99,9 +109,6 @@ void drawNameInput(GameState *gs);
 void drawCredit(GameState *gs);
 
 void initGameplay(GameState *gs);
-void updateGameplay(GameState *gs);
-void drawGame(GameState *gs);
-
 void updateGameplay(GameState *gs);
 void drawGame(GameState *gs);
 

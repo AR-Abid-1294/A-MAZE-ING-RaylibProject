@@ -1,14 +1,14 @@
 #include "scores.h"
 
-void sortBestTimes(BestTime *times)
+void sortBestTimes(Score *times)
 {
     for (int i = 0; i < 9; i++)
     {
         for (int j = 0; j < 9; j++)
         {
-            if (times[j].time < times[j + 1].time)
+            if (times[j].score < times[j + 1].score)
             {
-                BestTime temp = times[j];
+                Score temp = times[j];
                 times[j] = times[j + 1];
                 times[j + 1] = temp;
             }
@@ -16,14 +16,17 @@ void sortBestTimes(BestTime *times)
     }
 }
 
-void loadBestTimes(BestTime *times, FILE *file)
+int loadBestTimes(Score *times, FILE *file)
 {
-    while (fscanf(file, "%s %f", times->player_name, &times->time))
+    int time_count = 0;
+    while (fscanf(file, "%s %f", times[time_count].player_name, &times[time_count].score) == 2 && time_count<=10)
     {
+        time_count++;
     }
+    return time_count;
 }
 
-void storeBestTimes(BestTime *times, FILE *file)
+void storeBestTimes(Score *times, FILE *file)
 {
 
 }

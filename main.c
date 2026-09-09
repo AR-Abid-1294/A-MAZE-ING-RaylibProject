@@ -11,6 +11,8 @@ int main()
     InitAudioDevice();
     SetTargetFPS(60);
 
+    srand(time(NULL));
+
     GameState gs = {0};
 
     initGameState(&gs);

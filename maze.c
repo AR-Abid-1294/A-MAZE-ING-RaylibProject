@@ -26,10 +26,29 @@ void shuffleDirections()
     }
 }
 
-void initializeMaze(Maze *maze, int height, int width)
+void initializeMaze(Maze *maze, int level)
 {
-    maze->height = height;
-    maze->width = width;
+    if (level == 0)
+    {
+        maze->height = MAZEHEIGHT;
+        maze->width = MAZEWIDTH;
+        maze->cell_size = CELLSIZE;
+        maze->wall_thickness = WALL_THICK;
+    }
+    else
+    {
+        maze->cell_size = round(50 - (level - 1) * 40.0 / 49.0);
+
+        maze->width = MIN(
+            round(5 + (level - 1) * 125.0 / 49.0),
+            1300 / maze->cell_size);
+
+        maze->height = MIN(
+            round(5 + (level - 1) * 55.0 / 49.0),
+            600 / maze->cell_size);
+
+        maze->wall_thickness = 5 - (level - 1) / 10;
+    }
 
     // initialize cells
     maze->cells = malloc(maze->height * sizeof(Cell *));
@@ -200,10 +219,10 @@ void drawBorder(Rectangle rec, Direction dir, float thick, Color color)
     DrawLineEx(start, end, thick, color);
 }
 
-void drawMaze(Maze *maze, Vector2 pos, float tile_side_len, Player *player)
+void drawMaze(Maze *maze, Vector2 pos, Player *player)
 {
     Texture2D tile = maze->cell_texture;
-    // Texture2D sprite = player->player_sprite_idle[player->sprite_index];
+
     for (int y = 0; y < maze->height; y++)
     {
         float startx = pos.x;
@@ -213,34 +232,30 @@ void drawMaze(Maze *maze, Vector2 pos, float tile_side_len, Player *player)
             {
                 tile = player->player_texture;
             }
+            else if (x == maze->width - 1 && y == maze->height - 1)
+            {
+                tile = maze->crossed_cell_texture;
+            }
             else
             {
                 tile = maze->cell_texture;
             }
 
-            Rectangle cell_rec = (Rectangle){pos.x, pos.y, tile_side_len, tile_side_len};
+            Rectangle cell_rec = (Rectangle){pos.x, pos.y, maze->cell_size, maze->cell_size};
 
             DrawTexturePro(tile,
                            (Rectangle){0, 0, tile.width, tile.height},
                            cell_rec, Vector2Zero(), 0, WHITE);
 
-            drawBorder(cell_rec, UP, maze->cells[y][x].up_wall ? WALL_THICK : 0, WHITE);
-            drawBorder(cell_rec, DOWN, maze->cells[y][x].down_wall ? WALL_THICK : 0, WHITE);
-            drawBorder(cell_rec, RIGHT, maze->cells[y][x].right_wall ? WALL_THICK : 0, WHITE);
-            drawBorder(cell_rec, LEFT, maze->cells[y][x].left_wall ? WALL_THICK : 0, WHITE);
+            drawBorder(cell_rec, UP, maze->cells[y][x].up_wall ? maze->wall_thickness : 0, WHITE);
+            drawBorder(cell_rec, DOWN, maze->cells[y][x].down_wall ? maze->wall_thickness : 0, WHITE);
+            drawBorder(cell_rec, RIGHT, maze->cells[y][x].right_wall ? maze->wall_thickness : 0, WHITE);
+            drawBorder(cell_rec, LEFT, maze->cells[y][x].left_wall ? maze->wall_thickness : 0, WHITE);
 
-            // if (x == player->x && y == player->y)
-            // {
-            //     DrawTexturePro(sprite,
-            //                    (Rectangle){0, 0, player->flip ? -sprite.width : sprite.width,
-            //                                sprite.height},
-            //                    cell_rec, Vector2Zero(), 0, WHITE);
-            // }
-
-            pos.x += tile_side_len;
+            pos.x += maze->cell_size;
         }
         pos.x = startx;
-        pos.y += tile_side_len;
+        pos.y += maze->cell_size;
     }
 }
 
