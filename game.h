@@ -17,6 +17,7 @@ typedef enum PageState
     LEVELS,
     GAME_FINISH,
     GAME_OVER,
+    MULTIVERSE_CONQUERED,
     CREDIT,
     SETTINGS,
     HIGH_SCORES,

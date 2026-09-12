@@ -715,8 +715,15 @@ void updateGameplay(GameState *gs)
         else if (gs->mode == MULTIVERSE)
         {
             destroyMaze(&gs->maze);
-            gs->level++;
-            initGameplay(gs);
+            if (gs->level < 50)
+            {
+                gs->level++;
+                initGameplay(gs);
+            }
+            else
+            {
+                gs->page = MULTIVERSE_CONQUERED;
+            }
         }
     }
 }
@@ -827,9 +834,83 @@ void drawScore(GameState *gs)
         gs->page = MENU;
     }
 
-    Card time_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 100, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, formatTime(gs->last_time), gs->font1, WHITE, 40, 1, 10, 80, 10, 10};
+    // Time Card
+    Card congo_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 100, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, formatTime(gs->last_time), gs->font1, WHITE, 40, 1, 10, 80, 10, 10};
 
-    drawCard(time_card);
+    drawCard(congo_card);
+
+    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 + 30, 140, 50}, GetColor(0xff6b5bff), 0, BLACK, "QUIT GAME", gs->btn_font, WHITE, 15, 1, 0};
+
+    drawButton(quit_btn);
+
+    if (hovered(quit_btn))
+    {
+        quit_btn.buttonColor = GetColor(0xff0055ff);
+        quit_btn.shadow_opacity = 80;
+        drawButton(quit_btn);
+    }
+
+    if (clicked(quit_btn))
+    {
+        gs->shouldQuit = true;
+    }
+
+    Button replay_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5) + 160, SCREENHEIGHT / 2 + 30, 120, 50}, DARKGREEN, 0, BLACK, "REPLAY", gs->btn_font, WHITE, 15, 1, 0};
+
+    if (hovered(replay_btn))
+    {
+        replay_btn.buttonColor = GREEN;
+        replay_btn.shadow_opacity = 80;
+        drawButton(replay_btn);
+    }
+
+    if (clicked(replay_btn))
+    {
+
+        PlaySound(gs->click_sound1);
+        gs->page = PLAYING;
+        initGameplay(gs);
+        gs->start_time = GetTime();
+    }
+
+    drawButton(replay_btn);
+
+    EndDrawing();
+}
+
+void drawMultiConq(GameState *gs)
+{
+    BeginDrawing();
+    ClearBackground(GetColor(0xddfbefff));
+
+    // MENU BUTTON
+    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
+                       0, WHITE,
+                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
+    drawButton(menu_btn);
+    if (hovered(menu_btn))
+    {
+        menu_btn.buttonColor = BLUE;
+        menu_btn.shadow_opacity = 80;
+        drawButton(menu_btn);
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    }
+    else
+    {
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    }
+
+    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
+    {
+        PlaySound(gs->click_sound1);
+        gs->page = MENU;
+    }
+
+    // Congrats Card
+    const char *congo_text = "       Jhapana!!\n  Tu si great ho..\nTohfa qabul karo.";
+    Card congo_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 120, SCREENWIDTH * (1.0 / 5), 120}, GetColor(0x2f4858ff), 0, BLACK, congo_text, gs->font1, WHITE, 30, 1, 10, 80, 10, 10};
+
+    drawCard(congo_card);
 
     Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 + 30, 140, 50}, GetColor(0xff6b5bff), 0, BLACK, "QUIT GAME", gs->btn_font, WHITE, 15, 1, 0};
 
@@ -879,7 +960,8 @@ void updateGame(GameState *gs)
     switch (gs->page)
     {
     case MENU:
-        drawMenu(gs);
+        // drawMenu(gs);
+        drawMultiConq(gs);
         break;
 
     case NAME_INPUT:
@@ -898,6 +980,10 @@ void updateGame(GameState *gs)
 
     case GAME_FINISH:
         drawScore(gs);
+        break;
+
+    case MULTIVERSE_CONQUERED:
+        drawMultiConq(gs);
         break;
 
     case CREDIT:
