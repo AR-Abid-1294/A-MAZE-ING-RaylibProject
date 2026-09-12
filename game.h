@@ -5,9 +5,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "maze.h"
+#include "prim.h"
 #include "ui.h"
-#include "player.h"
 #include "scores.h"
 
 typedef enum PageState
@@ -74,6 +73,7 @@ typedef struct GameState
 
     // music
     Music bg_music;
+    bool music_on;
 
     // images
     Texture2D abid_pic;

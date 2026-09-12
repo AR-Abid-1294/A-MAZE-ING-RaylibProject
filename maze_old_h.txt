@@ -1,10 +1,6 @@
 #ifndef MAZE_H
 #define MAZE_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
 #include "raylib.h"
 #include "raymath.h"
 #include "player.h"
@@ -14,7 +10,7 @@
 #define SCREENWIDTH 1400
 #define SCREENHEIGHT 800
 
-#define MAZEWIDTH 40
+#define MAZEWIDTH 50
 #define MAZEHEIGHT 25
 #define CELLSIZE 25
 #define WALL_THICK 3
@@ -73,11 +69,7 @@ typedef struct Maze
     float wall_thickness;
 
     Cell **cells;
-    int visited_count;
 
-    Cell *current_cell;  // for Recursive Backtracker
-
-    // for Randomized Prim's
     Frontier *frontiers;
     int frontier_count;
 
@@ -89,7 +81,7 @@ typedef struct Maze
     int levels[50][3];
 } Maze;
 
-
+// Check if a cell is inside the maze
 void shuffleDirections();
 
 void initializeMaze(Maze *maze, int level);
@@ -98,9 +90,15 @@ bool isCellValid(int x, int y, Maze maze);
 
 void breakWall(Maze *maze, Cell *cell1, Cell *cell2);
 
+void generateMaze(Maze *maze, Cell *cell);
+
 void addFrontier(Maze *maze, Cell *cell);
 
 void removeFrontier(Maze *maze, int frontier_index);
+
+void chooseRandFrontier(Maze *maze);
+
+void generateMaze2(Maze *maze);
 
 void drawMaze(Maze *maze, Vector2 pos, Player *player);
 

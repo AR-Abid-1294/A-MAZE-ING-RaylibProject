@@ -9,6 +9,13 @@
 // set up initial game state, load assets
 void initGameState(GameState *gs)
 {
+
+    InitWindow(SCREENWIDTH, SCREENHEIGHT, "Demo Game");
+    InitAudioDevice();
+    SetTargetFPS(60);
+
+    srand(time(NULL));
+
     gs->page = MENU;
     gs->shouldQuit = false;
 
@@ -48,6 +55,7 @@ void initGameState(GameState *gs)
     // Load Music
     gs->bg_music = LoadMusicStream("Assets/Music/Mingle Game Song.mp3");
     gs->bg_music.looping = true;
+    gs->music_on = true;
 
     // Optimize Volume
     SetMusicVolume(gs->bg_music, 0.3f);
@@ -92,6 +100,9 @@ void unloadGameState(GameState *gs)
     UnloadTexture(gs->afif_pic);
 
     destroyMaze(&gs->maze);
+
+    CloseAudioDevice();
+    CloseWindow();
 }
 
 // draw and update different pages
@@ -252,8 +263,39 @@ void drawMenu(GameState *gs)
     DrawTexturePro(menu_sprite2, (Rectangle){0, 0, -menu_sprite2.width, menu_sprite2.height},
                    (Rectangle){1000, 250, 300, 300}, Vector2Zero(), 0, WHITE);
 
+    // Mute Music Button
+    Button mute_music_btn = {(Rectangle){1150, 10, 200, 40}, DARKBLUE,
+                             0, WHITE,
+                             "MUTE MUSIC", gs->btn_font, RAYWHITE, 20, 1, 0};
+    drawButton(mute_music_btn);
+    if (hovered(mute_music_btn))
+    {
+        mute_music_btn.buttonColor = BLUE;
+        mute_music_btn.shadow_opacity = 80;
+        drawButton(mute_music_btn);
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    }
+    else
+    {
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    }
+    if (clicked(mute_music_btn))
+    {
+        PlaySound(gs->click_sound1);
+        if (gs->music_on)
+        {
+            SetMusicVolume(gs->bg_music, 0);
+            gs->music_on = false;
+        }
+        else
+        {
+            SetMusicVolume(gs->bg_music, 0.3f);
+            gs->music_on = true;
+        }
+    }
+
     // change mouse cursor
-    if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn) || hovered(best_mode_btn) || hovered(multiverse_mode_btn))
+    if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn) || hovered(best_mode_btn) || hovered(multiverse_mode_btn) || hovered(mute_music_btn))
     {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
         // PlaySound(gs->hover_sound);
@@ -586,7 +628,7 @@ void initGameplay(GameState *gs)
         gs->level = 0;
 
     initializeMaze(&gs->maze, gs->level);
-    generateMaze2(&gs->maze);
+    generateMaze_prim(&gs->maze);
 }
 
 void updateGameplay(GameState *gs)
@@ -830,6 +872,10 @@ void drawScore(GameState *gs)
 
 void updateGame(GameState *gs)
 {
+
+    UpdateMusicStream(gs->bg_music);
+    gs->player.sprite_index = (int)(GetTime() / 0.1) % 12;
+
     switch (gs->page)
     {
     case MENU:

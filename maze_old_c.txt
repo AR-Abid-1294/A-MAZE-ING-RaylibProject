@@ -3,9 +3,14 @@
 #include <time.h>
 
 #include "maze.h"
+#include "player.h"
 
 int maze[MAZEHEIGHT][MAZEWIDTH];
 int directions[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+// for time sector
+int frames_count = 0;
+int net_time = 100; // seconds
 
 void shuffleDirections()
 {
@@ -62,12 +67,7 @@ void initializeMaze(Maze *maze, int level)
         }
     }
 
-    // initialize current cell (for Recursive Backtracking)
-    maze->cells[0][0].cellState = VISITED;
-    maze->current_cell = &maze->cells[0][0];
-    maze->visited_count = 1;
-
-    // initialize frontiers (for Randomized Prim's)
+    // initialize frontiers
     int max_frontier = (maze->height) * (maze->width) * 4;
     maze->frontiers = malloc(max_frontier * sizeof(Frontier));
 
@@ -112,6 +112,28 @@ void breakWall(Maze *maze, Cell *cell1, Cell *cell2)
     }
 }
 
+void generateMaze(Maze *maze, Cell *cell)
+{
+    cell->cellState = VISITED;
+
+    shuffleDirections();
+
+    for (int i = 0; i < 4; i++)
+    {
+        int nx = cell->x + directions[i][0];
+        int ny = cell->y + directions[i][1];
+        Cell *neighbor_cell;
+        if (isCellValid(nx, ny, *maze))
+        {
+            neighbor_cell = &maze->cells[ny][nx];
+            if (neighbor_cell->cellState == UNVISITED)
+            {
+                breakWall(maze, cell, neighbor_cell);
+                generateMaze(maze, neighbor_cell);
+            }
+        }
+    }
+}
 
 void addFrontier(Maze *maze, Cell *cell)
 {
@@ -136,6 +158,33 @@ void removeFrontier(Maze *maze, int frontier_index)
     for (int i = frontier_index; i < maze->frontier_count; i++)
     {
         maze->frontiers[i] = maze->frontiers[i + 1];
+    }
+}
+
+void chooseRandFrontier(Maze *maze)
+{
+    int r = rand() % maze->frontier_count;
+    Cell *target_cell = maze->frontiers[r].univisited_cell;
+    if (target_cell->cellState == VISITED)
+    {
+        maze->frontier_count--;
+        removeFrontier(maze, r);
+    }
+    else
+    {
+        target_cell->cellState = VISITED;
+        breakWall(maze, maze->frontiers[r].visisted_cell, maze->frontiers[r].univisited_cell);
+        maze->frontier_count--;
+        removeFrontier(maze, r);
+        addFrontier(maze, target_cell);
+    }
+}
+
+void generateMaze2(Maze *maze)
+{
+    while (maze->frontier_count)
+    {
+        chooseRandFrontier(maze);
     }
 }
 
