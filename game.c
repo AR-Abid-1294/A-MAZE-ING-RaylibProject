@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "raylib.h"
-#include "raymath.h"
 #include "game.h"
 
 // set up initial game state, load assets
@@ -66,6 +64,10 @@ void initGameState(GameState *gs)
     // Load Images
     gs->abid_pic = LoadTexture("Assets/Images/abid.png");
     gs->afif_pic = LoadTexture("Assets/Images/afif.png");
+
+    // Name Input
+    gs->name[0] = '\0';
+    gs->letter_count = 0;
 
     // Load Best Times (THE BEST OF US)
 
@@ -131,16 +133,9 @@ void drawMenu(GameState *gs)
     if (clicked(play_btn))
     {
         PlaySound(gs->click_sound1);
-        if (gs->mode == BEST)
-        {
-            gs->page = PLAYING;
-            gs->start_time = GetTime();
-            initGameplay(gs);
-        }
-        else if (gs->mode == MULTIVERSE)
-        {
-            gs->page = LEVELS;
-        }
+        gs->page = NAME_INPUT;
+        gs->name[0] = '\0';
+        gs->letter_count = 0;
     }
 
     // CREDIT BUTTON
@@ -308,44 +303,77 @@ void drawMenu(GameState *gs)
 
 void updateNameInput(GameState *gs)
 {
-    char name[20] = "";
-    int letter_count = 0;
-
     int letter = GetCharPressed();
     while (letter)
     {
-        if (letter_count < 19 && ((letter >= 'A' && letter <= 'Z') ||
-                                  (letter >= 'a' && letter <= 'z')))
+        if (gs->letter_count < 19 && ((letter >= 'A' && letter <= 'Z') ||
+                                      (letter >= 'a' && letter <= 'z')))
         {
-            name[letter_count] = letter;
-            name[letter_count + 1] = '\0';
-            letter_count++;
-        }
-
-        if (IsKeyPressed(KEY_BACKSPACE) && letter_count)
-        {
-            letter_count--;
-            name[letter_count] = '\0';
+            gs->name[gs->letter_count] = (char)letter;
+            gs->name[gs->letter_count + 1] = '\0';
+            gs->letter_count++;
         }
 
         letter = GetCharPressed();
     }
 
+    if (IsKeyPressed(KEY_BACKSPACE) && gs->letter_count)
+    {
+        gs->letter_count--;
+        gs->name[gs->letter_count] = '\0';
+    }
+
     if (IsKeyPressed(KEY_ENTER))
     {
-        gs->page = PLAYING;
         PlaySound(gs->click_sound1);
+
+        if (gs->mode == BEST)
+        {
+            gs->page = PLAYING;
+            gs->start_time = GetTime();
+            initGameplay(gs);
+        }
+        else if (gs->mode == MULTIVERSE)
+        {
+            gs->page = LEVELS;
+        }
     }
 }
 
 void drawNameInput(GameState *gs)
 {
     BeginDrawing();
-    ClearBackground(GetColor(0xffefb3ff));
+    ClearBackground(GetColor(0xf15153ff));
 
-    Card input_card = {(Rectangle){SCREENWIDTH * (1.0 / 5), SCREENHEIGHT * (1.0 / 5), SCREENWIDTH * (3.0 / 5), 100},
-                       GetColor(0x013e37ff),
-                       0, WHITE, "", gs->font1, RAYWHITE, 25};
+    const char *instruct = "ENTER YOUR NAME";
+    DrawTextEx(gs->font1, instruct, (Vector2){(SCREENWIDTH - MeasureText(instruct, 30)) / 2.0, SCREENHEIGHT / 2.0 - 150}, 30, 1, WHITE);
+
+    Card input_card = {(Rectangle){SCREENWIDTH * (1.0 / 5), SCREENHEIGHT * (1.0 / 2) - 100, SCREENWIDTH * (3.0 / 5), 100},
+                       GetColor(0x321847ff),
+                       0, WHITE, gs->name, gs->font1, RAYWHITE, 80, 1, 10, 80, 5, 5};
+    drawCard(input_card);
+
+    // MENU BUTTON
+    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
+                       0, WHITE,
+                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
+    drawButton(menu_btn);
+    if (hovered(menu_btn))
+    {
+        menu_btn.buttonColor = BLUE;
+        menu_btn.shadow_opacity = 80;
+        drawButton(menu_btn);
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    }
+    else
+    {
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    }
+    if (clicked(menu_btn))
+    {
+        PlaySound(gs->click_sound1);
+        gs->page = MENU;
+    }
 
     EndDrawing();
 }
@@ -583,7 +611,7 @@ void drawLevels(GameState *gs)
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
 
-    if (clicked(menu_btn) || IsKeyPressed(KEY_SPACE))
+    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound1);
         gs->page = MENU;
@@ -835,9 +863,10 @@ void drawScore(GameState *gs)
     }
 
     // Time Card
-    Card congo_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 100, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, formatTime(gs->last_time), gs->font1, WHITE, 40, 1, 10, 80, 10, 10};
+    const char *time_card_text = TextFormat("%s\n%s", gs->name, formatTime(gs->last_time));
+    Card time_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 100, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, time_card_text, gs->font1, WHITE, 40, 1, 10, 80, 10, 10};
 
-    drawCard(congo_card);
+    drawCard(time_card);
 
     Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 + 30, 140, 50}, GetColor(0xff6b5bff), 0, BLACK, "QUIT GAME", gs->btn_font, WHITE, 15, 1, 0};
 
@@ -960,8 +989,7 @@ void updateGame(GameState *gs)
     switch (gs->page)
     {
     case MENU:
-        // drawMenu(gs);
-        drawMultiConq(gs);
+        drawMenu(gs);
         break;
 
     case NAME_INPUT:

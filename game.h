@@ -80,6 +80,10 @@ typedef struct GameState
     Texture2D abid_pic;
     Texture2D afif_pic;
 
+    // name_input
+    char name[20];
+    int letter_count;
+
     // best times for THE BEST OF US mode
     float last_time;
     Score best_times[10];
