@@ -69,8 +69,6 @@ void initGameState(GameState *gs)
     gs->name[0] = '\0';
     gs->letter_count = 0;
 
-    // Load Best Times (THE BEST OF US)
-
     PlayMusicStream(gs->bg_music);
 }
 
@@ -80,6 +78,14 @@ void unloadGameState(GameState *gs)
     UnloadTexture(gs->maze.cell_texture);
     UnloadTexture(gs->maze.crossed_cell_texture);
     UnloadTexture(gs->player.player_texture);
+
+    // Unload Sprites
+    for (int i = 0; i <= 11; i++)
+    {
+        UnloadTexture(gs->player.player_sprite_idle[i]);
+        UnloadTexture(gs->player.player_sprite_attacking[i]);
+        UnloadTexture(gs->player.player_sprite_dying[i]);
+    }
 
     // Unload Fonts
     UnloadFont(gs->font1);
@@ -157,9 +163,9 @@ void drawMenu(GameState *gs)
 
     // BEST TIMES/HIGH SCORES BUTTON
     const char *best_times_btn_text;
-    if (gs->mode == BEST)
+    if (gs->mode == BEST_OF_US)
         best_times_btn_text = "BEST TIMES";
-    else if (gs->mode == MULTIVERSE || gs->mode == DARK_NIGHT)
+    else if (gs->mode == MULTIVERSE || gs->mode == DARK_NIGHT || gs->mode == TIME_RUNS_OUT)
         best_times_btn_text = "HIGH SCORES";
 
     Button best_times_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50 * 2, SCREENWIDTH / 5, 35},
@@ -175,7 +181,7 @@ void drawMenu(GameState *gs)
     if (clicked(best_times_btn))
     {
         PlaySound(gs->click_sound1);
-        if (gs->mode == BEST)
+        if (gs->mode == BEST_OF_US)
             gs->page = BEST_TIMES;
         else if (gs->mode == MULTIVERSE)
             gs->page = HIGH_SCORES;
@@ -200,23 +206,23 @@ void drawMenu(GameState *gs)
 
     // Mode Selection Options
 
-    // The Best Of Us
-    Button best_mode_btn = {(Rectangle){20, 550, 300, 50}, WHITE, 0, BLACK, "THE BEST OF US", gs->font2, BLACK, 20, 1, 0};
-    drawButton(best_mode_btn);
+    // THE BEST OF US
+    Button best_of_us_mode_btn = {(Rectangle){20, 550, 300, 50}, WHITE, 0, BLACK, "THE BEST OF US", gs->font2, BLACK, 20, 1, 0};
+    drawButton(best_of_us_mode_btn);
 
-    if (hovered(best_mode_btn) || gs->mode == BEST)
+    if (hovered(best_of_us_mode_btn) || gs->mode == BEST_OF_US)
     {
-        best_mode_btn.buttonColor = DARKBLUE;
-        best_mode_btn.textColor = WHITE;
-        drawButton(best_mode_btn);
+        best_of_us_mode_btn.buttonColor = DARKBLUE;
+        best_of_us_mode_btn.textColor = WHITE;
+        drawButton(best_of_us_mode_btn);
     }
-    if (clicked(best_mode_btn))
+    if (clicked(best_of_us_mode_btn))
     {
         PlaySound(gs->click_sound1);
-        gs->mode = BEST;
+        gs->mode = BEST_OF_US;
     }
 
-    // The Multiverse of Madmaze
+    // THE MULTIVERSE OF MADMAZE
     Button multiverse_mode_btn = {(Rectangle){350, 550, 500, 50}, WHITE, 0, BLACK, "THE MULTIVERSE OF MADMAZE", gs->font2, BLACK, 20, 1, 0};
     drawButton(multiverse_mode_btn);
 
@@ -233,7 +239,7 @@ void drawMenu(GameState *gs)
         gs->level = 1;
     }
 
-    // The Dark Knight
+    // THE DARK NIGHT
     Button dark_night_mode_btn = {(Rectangle){870, 550, 400, 50}, WHITE, 0, BLACK, "THE DARK NIGHT", gs->font2, BLACK, 20, 1, 0};
     drawButton(dark_night_mode_btn);
 
@@ -247,6 +253,22 @@ void drawMenu(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->mode = DARK_NIGHT;
+    }
+
+    // TIME RUNS OUT
+    Button time_runs_out_mode_btn = {(Rectangle){20, 620, 300, 50}, WHITE, 0, BLACK, "TIME RUNS OUT", gs->font2, BLACK, 20, 1, 0};
+    drawButton(time_runs_out_mode_btn);
+
+    if (hovered(time_runs_out_mode_btn) || gs->mode == TIME_RUNS_OUT)
+    {
+        time_runs_out_mode_btn.buttonColor = DARKBLUE;
+        time_runs_out_mode_btn.textColor = WHITE;
+        drawButton(time_runs_out_mode_btn);
+    }
+    if (clicked(time_runs_out_mode_btn))
+    {
+        PlaySound(gs->click_sound1);
+        gs->mode = TIME_RUNS_OUT;
     }
 
     // Sprite Animation
@@ -290,7 +312,7 @@ void drawMenu(GameState *gs)
     }
 
     // change mouse cursor
-    if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn) || hovered(best_mode_btn) || hovered(multiverse_mode_btn) || hovered(mute_music_btn))
+    if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn) || hovered(best_of_us_mode_btn) || hovered(multiverse_mode_btn) || hovered(time_runs_out_mode_btn) || hovered(mute_music_btn))
     {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
         // PlaySound(gs->hover_sound);
@@ -327,7 +349,7 @@ void updateNameInput(GameState *gs)
     {
         PlaySound(gs->click_sound1);
 
-        if (gs->mode == BEST)
+        if (gs->mode == BEST_OF_US)
         {
             gs->page = PLAYING;
             gs->start_time = GetTime();
@@ -343,14 +365,14 @@ void updateNameInput(GameState *gs)
 void drawNameInput(GameState *gs)
 {
     BeginDrawing();
-    ClearBackground(GetColor(0xf15153ff));
+    ClearBackground(GetColor(0xfff4d6ff));
 
     const char *instruct = "ENTER YOUR NAME";
-    DrawTextEx(gs->font1, instruct, (Vector2){(SCREENWIDTH - MeasureText(instruct, 30)) / 2.0, SCREENHEIGHT / 2.0 - 150}, 30, 1, WHITE);
+    DrawTextEx(gs->font1, instruct, (Vector2){(SCREENWIDTH - MeasureText(instruct, 30)) / 2.0, SCREENHEIGHT / 2.0 - 150}, 30, 1, BLACK);
 
     Card input_card = {(Rectangle){SCREENWIDTH * (1.0 / 5), SCREENHEIGHT * (1.0 / 2) - 100, SCREENWIDTH * (3.0 / 5), 100},
-                       GetColor(0x321847ff),
-                       0, WHITE, gs->name, gs->font1, RAYWHITE, 80, 1, 10, 80, 5, 5};
+                       GetColor(0x263baaff),
+                       0, WHITE, gs->name, gs->font1, GetColor(0xfff4d6ff), 80, 1, 10, 80, 5, 5};
     drawCard(input_card);
 
     // MENU BUTTON
@@ -363,17 +385,49 @@ void drawNameInput(GameState *gs)
         menu_btn.buttonColor = BLUE;
         menu_btn.shadow_opacity = 80;
         drawButton(menu_btn);
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
     }
-    else
-    {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
+
     if (clicked(menu_btn))
     {
         PlaySound(gs->click_sound1);
         gs->page = MENU;
     }
+
+    // ENTER button
+    Button enter_btn = {(Rectangle){(SCREENWIDTH - 100) / 2, SCREENHEIGHT / 2.0 + 20, 100, 40}, GetColor(0x2e2e2eff), 0, RAYWHITE, "ENTER", gs->btn_font, WHITE, 20, 1, 0};
+
+    if (gs->letter_count)
+    {
+        drawButton(enter_btn);
+
+        if (hovered(enter_btn))
+        {
+            enter_btn.buttonColor = BLACK;
+            enter_btn.textColor = WHITE;
+            drawButton(enter_btn);
+        }
+
+        if (clicked(enter_btn))
+        {
+            PlaySound(gs->click_sound1);
+
+            if (gs->mode == BEST_OF_US)
+            {
+                gs->page = PLAYING;
+                gs->start_time = GetTime();
+                initGameplay(gs);
+            }
+            else if (gs->mode == MULTIVERSE)
+            {
+                gs->page = LEVELS;
+            }
+        }
+    }
+
+    if (hovered(menu_btn) || hovered(enter_btn))
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    else
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 
     EndDrawing();
 }
@@ -652,7 +706,7 @@ void initGameplay(GameState *gs)
     gs->player.x = 0;
     gs->player.y = 0;
 
-    if (gs->mode == BEST)
+    if (gs->mode == BEST_OF_US)
         gs->level = 0;
 
     initializeMaze(&gs->maze, gs->level);
@@ -721,7 +775,7 @@ void updateGameplay(GameState *gs)
     }
 
     // Generate New Maze
-    if (IsKeyPressed(KEY_SPACE) && gs->mode == BEST)
+    if (IsKeyPressed(KEY_SPACE) && gs->mode == BEST_OF_US)
     {
         gs->start_time = GetTime();
 
@@ -736,7 +790,7 @@ void updateGameplay(GameState *gs)
     {
         gs->last_time = GetTime() - gs->start_time;
         PlaySound(gs->game_finish_sound);
-        if (gs->mode == BEST)
+        if (gs->mode == BEST_OF_US)
         {
             gs->page = GAME_FINISH;
         }
@@ -767,7 +821,7 @@ void drawGame(GameState *gs)
 
     // TITLE
     const char *title;
-    if (gs->mode == BEST)
+    if (gs->mode == BEST_OF_US)
         title = "THE BEST OF US";
     else if (gs->mode == MULTIVERSE)
         title = "THE MULTIVERSE OF MADMAZE";
@@ -803,7 +857,7 @@ void drawGame(GameState *gs)
 
     if (IsKeyPressed(KEY_BACKSPACE))
     {
-        if (gs->mode == BEST)
+        if (gs->mode == BEST_OF_US)
             gs->page = MENU;
         else if (gs->mode == MULTIVERSE)
             gs->page = LEVELS;
@@ -819,7 +873,7 @@ void drawGame(GameState *gs)
     //     drawCard(new_maze_card);
     // }
 
-    if (gs->mode == BEST)
+    if (gs->mode == BEST_OF_US)
     {
         // Time sector
         const char *time_text = formatTime(current_time);

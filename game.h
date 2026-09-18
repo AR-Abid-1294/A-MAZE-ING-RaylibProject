@@ -26,9 +26,10 @@ typedef enum PageState
 
 typedef enum GameMode
 {
-    BEST,
+    BEST_OF_US,
     MULTIVERSE,
     DARK_NIGHT,
+    TIME_RUNS_OUT,
     INFINITY_WAR
 } GameMode;
 
