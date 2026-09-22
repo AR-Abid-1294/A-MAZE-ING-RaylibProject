@@ -576,27 +576,6 @@ void drawBestTimes(GameState *gs)
 
 void drawHighScores(GameState *gs)
 {
-    /*char player_names_[20][10] = {"Abid",
-                                  "Afif",
-                                  "Rumman",
-                                  "Tahsin",
-                                  "Akif",
-                                  "Ahnaf",
-                                  "Raisa",
-                                  "Ananto",
-                                  "Jibon",
-                                  "Mahin"};
-    float best_times_[10] = {23.12,
-                             12.67,
-                             21.98,
-                             67.89,
-                             12.43,
-                             76.54,
-                             12.09,
-                             32.30,
-                             11.21,
-                             10.01};*/
-
     BeginDrawing();
     ClearBackground(GetColor(0xdff7ffff));
 
@@ -946,9 +925,9 @@ void drawGame(GameState *gs)
         DrawTextEx(gs->btn_font, TextFormat("SCORE: %5d", gs->last_score), (Vector2){1175, 45}, 20, 1, WHITE);
 
         // FINISH BUTTON
-        Button finish_btn = {(Rectangle){SCREENWIDTH-20-100, SCREENHEIGHT-20-40, 100, 40}, DARKBLUE,
-                           0, WHITE,
-                           "FINISH", gs->btn_font, RAYWHITE, 20, 1, 0};
+        Button finish_btn = {(Rectangle){SCREENWIDTH - 20 - 100, SCREENHEIGHT - 20 - 40, 100, 40}, DARKBLUE,
+                             0, WHITE,
+                             "FINISH", gs->btn_font, RAYWHITE, 20, 1, 0};
         drawButton(finish_btn);
         if (hovered(finish_btn))
         {
@@ -967,7 +946,6 @@ void drawGame(GameState *gs)
             PlaySound(gs->click_sound1);
             addScore(gs);
             gs->page = GAME_FINISH;
-            
         }
     }
 
@@ -1003,7 +981,7 @@ void drawTime(GameState *gs)
     }
 
     // Time Card
-    const char *time_card_text = TextFormat("%s\n%s", gs->name, formatTime(gs->last_time));
+    const char *time_card_text = TextFormat("%3s\n%s", gs->name, formatTime(gs->last_time));
     Card time_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 100, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, time_card_text, gs->font1, WHITE, 40, 1, 10, 80, 10, 10};
 
     drawCard(time_card);
@@ -1110,7 +1088,7 @@ void drawScore(GameState *gs)
     {
 
         PlaySound(gs->click_sound1);
-        gs->last_score=0;
+        gs->last_score = 0;
         gs->page = LEVELS;
         initGameplay(gs);
         gs->start_time = GetTime();
@@ -1235,10 +1213,10 @@ void updateGame(GameState *gs)
         break;
 
     case GAME_FINISH:
-        if(gs->mode==BEST_OF_US)
-        drawTime(gs);
-        else if(gs->mode==MULTIVERSE)
-        drawScore(gs);
+        if (gs->mode == BEST_OF_US)
+            drawTime(gs);
+        else if (gs->mode == MULTIVERSE)
+            drawScore(gs);
         break;
 
     case MULTIVERSE_CONQUERED:
