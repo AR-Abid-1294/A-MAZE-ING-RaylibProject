@@ -87,11 +87,12 @@ typedef struct GameState
 
     // best times for THE BEST OF US mode
     float last_time;
-    Score best_times[10];
+    Time best_times[11];
     FILE *best_times_file;
 
     // high scores for THE MULTIVERSE OF MADMAZE
-    Score high_scores[10];
+    int last_score;
+    Score high_scores[11];
     FILE *high_scores_file;
 
     // mode
@@ -118,6 +119,11 @@ void initGameplay(GameState *gs);
 void updateGameplay(GameState *gs);
 void drawGame(GameState *gs);
 
+void addTime(GameState *gs);
+void addScore(GameState *gs);
+void drawTime(GameState *gs);
 void drawScore(GameState *gs);
+
+
 
 #endif
