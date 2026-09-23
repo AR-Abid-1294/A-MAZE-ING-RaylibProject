@@ -32,6 +32,10 @@ bool hovered(Button btn);
 
 bool clicked(Button btn);
 
+bool hoveredRec(Rectangle rec);
+
+bool clickedRec(Rectangle rec);
+
 typedef struct Card
 {
     // Main Card

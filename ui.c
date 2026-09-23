@@ -41,6 +41,21 @@ bool clicked(Button btn)
     return false;
 }
 
+bool hoveredRec(Rectangle rec)
+{
+    Vector2 mouse = GetMousePosition();
+    if (CheckCollisionPointRec(mouse, rec))
+        return true;
+    return false;
+}
+
+bool clickedRec(Rectangle rec)
+{
+    if (hoveredRec(rec) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        return true;
+    return false;
+}
+
 void drawCard(Card card)
 {
     // Shadow

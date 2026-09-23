@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "prim.h"
+#include "aldous_broder.h"
 #include "ui.h"
 #include "scores.h"
 
@@ -80,6 +80,15 @@ typedef struct GameState
     // images
     Texture2D abid_pic;
     Texture2D afif_pic;
+
+    // mode selection buttons
+    Texture2D best_of_us_btn;
+    Texture2D multiverse_btn;
+    Texture2D dark_night_btn;
+    Texture2D infinity_war_btn;
+    Texture2D time_runs_out_btn;
+    Texture2D gravity_grave_btn;
+    Texture2D endgame_btn;
 
     // name_input
     char name[20];

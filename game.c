@@ -65,6 +65,15 @@ void initGameState(GameState *gs)
     gs->abid_pic = LoadTexture("Assets/Images/abid.png");
     gs->afif_pic = LoadTexture("Assets/Images/afif.png");
 
+    // Load Mode Selection Buttons
+    gs->best_of_us_btn = LoadTexture("Assets/Mode Buttons/the_best_of_us.png");
+    gs->multiverse_btn = LoadTexture("Assets/Mode Buttons/multiverse_of_madmaze.png");
+    gs->dark_night_btn = LoadTexture("Assets/Mode Buttons/dark_night.png");
+    gs->infinity_war_btn = LoadTexture("Assets/Mode Buttons/infinity_war.png");
+    gs->time_runs_out_btn = LoadTexture("Assets/Mode Buttons/time_runs_out.png");
+    gs->gravity_grave_btn = LoadTexture("Assets/Mode Buttons/gravity_grave.png");
+    gs->endgame_btn = LoadTexture("Assets/Mode Buttons/endgame.png");
+
     // Name Input
     gs->name[0] = '\0';
     gs->letter_count = 0;
@@ -107,6 +116,15 @@ void unloadGameState(GameState *gs)
     UnloadTexture(gs->abid_pic);
     UnloadTexture(gs->afif_pic);
 
+    // Unload Mode Selction Buttons
+    UnloadTexture(gs->best_of_us_btn);
+    UnloadTexture(gs->multiverse_btn);
+    UnloadTexture(gs->dark_night_btn);
+    UnloadTexture(gs->infinity_war_btn);
+    UnloadTexture(gs->time_runs_out_btn);
+    UnloadTexture(gs->gravity_grave_btn);
+    UnloadTexture(gs->endgame_btn);
+
     destroyMaze(&gs->maze);
 
     CloseAudioDevice();
@@ -126,7 +144,7 @@ void drawMenu(GameState *gs)
     drawText(gs->title_font, title, title_pos, 100, 1, WHITE, 80);
 
     // PLAY BUTTON
-    Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300, SCREENWIDTH / 5, 35},
+    Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 200, SCREENWIDTH / 5, 35},
                        GetColor(0x00f0ffff),
                        0, WHITE, "PLAY", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(play_btn);
@@ -145,7 +163,7 @@ void drawMenu(GameState *gs)
     }
 
     // CREDIT BUTTON
-    Button credit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50, SCREENWIDTH / 5, 35},
+    Button credit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 200 + 50, SCREENWIDTH / 5, 35},
                          GetColor(0x00f0ffff),
                          0, WHITE, "CREDIT", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(credit_btn);
@@ -168,7 +186,7 @@ void drawMenu(GameState *gs)
     else if (gs->mode == MULTIVERSE || gs->mode == DARK_NIGHT || gs->mode == TIME_RUNS_OUT)
         best_times_btn_text = "HIGH SCORES";
 
-    Button best_times_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50 * 2, SCREENWIDTH / 5, 35},
+    Button best_times_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 200 + 50 * 2, SCREENWIDTH / 5, 35},
                              GetColor(0x00f0ffff),
                              .stroke = 0, WHITE, best_times_btn_text, gs->btn_font, BLACK, 25, 1, 80};
     drawButton(best_times_btn);
@@ -188,7 +206,7 @@ void drawMenu(GameState *gs)
     }
 
     // QUIT BUTTON
-    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 300 + 50 * 3, SCREENWIDTH / 5, 35},
+    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 200 + 50 * 3, SCREENWIDTH / 5, 35},
                        GetColor(0xff6b5bff),
                        0, WHITE, "QUIT", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(quit_btn);
@@ -274,11 +292,11 @@ void drawMenu(GameState *gs)
     // Sprite Animation
     Texture2D menu_sprite1 = gs->player.player_sprite_attacking[gs->player.sprite_index];
     DrawTexturePro(menu_sprite1, (Rectangle){0, 0, menu_sprite1.width, menu_sprite1.height},
-                   (Rectangle){80, 250, 300, 300}, Vector2Zero(), 0, WHITE);
+                   (Rectangle){80, 150, 300, 300}, Vector2Zero(), 0, WHITE);
 
     Texture2D menu_sprite2 = gs->player.player_sprite_dying[gs->player.sprite_index];
     DrawTexturePro(menu_sprite2, (Rectangle){0, 0, -menu_sprite2.width, menu_sprite2.height},
-                   (Rectangle){1000, 250, 300, 300}, Vector2Zero(), 0, WHITE);
+                   (Rectangle){1000, 150, 300, 300}, Vector2Zero(), 0, WHITE);
 
     // Mute Music Button
     Button mute_music_btn = {(Rectangle){1150, 10, 200, 40}, DARKBLUE,
@@ -710,7 +728,7 @@ void initGameplay(GameState *gs)
         gs->level = 0;
 
     initializeMaze(&gs->maze, gs->level);
-    generateMaze_prim(&gs->maze);
+    generateMaze_aldous_broder(&gs->maze);
 }
 
 void updateGameplay(GameState *gs)
