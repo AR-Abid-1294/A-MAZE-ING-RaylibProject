@@ -438,7 +438,7 @@ void drawNameInput(GameState *gs)
         {
             PlaySound(gs->click_sound1);
 
-            if (gs->mode == BEST_OF_US)
+            if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
             {
                 gs->page = PLAYING;
                 gs->start_time = GetTime();
@@ -853,6 +853,8 @@ void drawGame(GameState *gs)
     Vector2 maze_starting_pos = {(SCREENWIDTH - gs->maze.width * gs->maze.cell_size) / 2,
                                  (SCREENHEIGHT - gs->maze.height * gs->maze.cell_size) / 2 + gs->maze.cell_size};
     drawMaze(&gs->maze, maze_starting_pos, &gs->player);
+    if(gs->mode == DARK_NIGHT)
+        drawDark(gs);
 
     // TITLE
     const char *title;
@@ -866,6 +868,12 @@ void drawGame(GameState *gs)
     {
         title = "THE MULTIVERSE OF MADMAZE";
         const char *control_inst = "W/A/S/D or Arrow Keys for Movement | F for Auto Solve";
+        DrawTextEx(gs->font1, control_inst, (Vector2){(SCREENWIDTH - MeasureText(control_inst, 20)) / 2, 70}, 20, 1, GRAY);
+    }
+    else if (gs->mode ==DARK_NIGHT)
+    {
+        title = "DARK NIGHT";
+        const char *control_inst = "W/A/S/D or Arrow Keys for Movement | Space for New Maze | F for Auto Solve";
         DrawTextEx(gs->font1, control_inst, (Vector2){(SCREENWIDTH - MeasureText(control_inst, 20)) / 2, 70}, 20, 1, GRAY);
     }
     DrawTextEx(gs->title_font, title, (Vector2){(SCREENWIDTH - MeasureText(title, 50)) / 2, 20}, 50, 1, WHITE);
@@ -911,7 +919,7 @@ void drawGame(GameState *gs)
     //     drawCard(new_maze_card);
     // }
 
-    if (gs->mode == BEST_OF_US)
+    if (gs->mode == BEST_OF_US ||gs->mode == DARK_NIGHT)
     {
         // Time sector
         const char *time_text = formatTime(current_time);
@@ -950,6 +958,31 @@ void drawGame(GameState *gs)
     }
 
     EndDrawing();
+}
+
+void drawDark(GameState *gs)
+{
+    Vector2 pos = {(SCREENWIDTH - gs->maze.width * gs->maze.cell_size) / 2,
+                                 (SCREENHEIGHT - gs->maze.height * gs->maze.cell_size) / 2 + gs->maze.cell_size};
+    for (int y = 0; y < gs->maze.height; y++)
+    {
+        float startx = pos.x;
+        int range = 5;
+        for (int x = 0; x < gs->maze.width; x++)
+        {
+            int distance2 = (x - gs->player.x) * (x - gs->player.x) + (y - gs->player.y) *(y - gs->player.y);
+            if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (distance2 > range * range))
+            {
+                DrawRectangle(pos.x, pos.y, gs->maze.cell_size, gs->maze.cell_size,BLACK);
+            }
+            
+            pos.x += gs->maze.cell_size;
+        }
+        pos.x = startx;
+        pos.y += gs->maze.cell_size;
+    }
+            
+
 }
 
 void drawTime(GameState *gs)

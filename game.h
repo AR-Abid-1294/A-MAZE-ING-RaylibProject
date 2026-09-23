@@ -124,6 +124,8 @@ void addScore(GameState *gs);
 void drawTime(GameState *gs);
 void drawScore(GameState *gs);
 
+void drawDark(GameState *gs);
+
 
 
 #endif
