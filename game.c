@@ -65,6 +65,10 @@ void initGameState(GameState *gs)
     gs->abid_pic = LoadTexture("Assets/Images/abid.png");
     gs->afif_pic = LoadTexture("Assets/Images/afif.png");
 
+    // Load Music Buttons
+    gs->music_on_btn = LoadTexture("Assets/Buttons/music_on.png");
+    gs->music_off_btn = LoadTexture("Assets/Buttons/music_off.png");
+
     // Load Mode Selection Buttons
     gs->best_of_us_btn = LoadTexture("Assets/Mode Buttons/the_best_of_us.png");
     gs->multiverse_btn = LoadTexture("Assets/Mode Buttons/multiverse_of_madmaze.png");
@@ -116,6 +120,10 @@ void unloadGameState(GameState *gs)
     UnloadTexture(gs->abid_pic);
     UnloadTexture(gs->afif_pic);
 
+    // Unload Music Buttons
+    UnloadTexture(gs->music_on_btn);
+    UnloadTexture(gs->music_off_btn);
+
     // Unload Mode Selction Buttons
     UnloadTexture(gs->best_of_us_btn);
     UnloadTexture(gs->multiverse_btn);
@@ -144,7 +152,7 @@ void drawMenu(GameState *gs)
     drawText(gs->title_font, title, title_pos, 100, 1, WHITE, 80);
 
     // PLAY BUTTON
-    Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 200, SCREENWIDTH / 5, 35},
+    Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 250, SCREENWIDTH / 5, 35},
                        GetColor(0x00f0ffff),
                        0, WHITE, "PLAY", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(play_btn);
@@ -163,7 +171,7 @@ void drawMenu(GameState *gs)
     }
 
     // CREDIT BUTTON
-    Button credit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 200 + 50, SCREENWIDTH / 5, 35},
+    Button credit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 250 + 50, SCREENWIDTH / 5, 35},
                          GetColor(0x00f0ffff),
                          0, WHITE, "CREDIT", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(credit_btn);
@@ -186,7 +194,7 @@ void drawMenu(GameState *gs)
     else if (gs->mode == MULTIVERSE || gs->mode == DARK_NIGHT || gs->mode == TIME_RUNS_OUT)
         best_times_btn_text = "HIGH SCORES";
 
-    Button best_times_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 200 + 50 * 2, SCREENWIDTH / 5, 35},
+    Button best_times_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 250 + 50 * 2, SCREENWIDTH / 5, 35},
                              GetColor(0x00f0ffff),
                              .stroke = 0, WHITE, best_times_btn_text, gs->btn_font, BLACK, 25, 1, 80};
     drawButton(best_times_btn);
@@ -206,7 +214,7 @@ void drawMenu(GameState *gs)
     }
 
     // QUIT BUTTON
-    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 200 + 50 * 3, SCREENWIDTH / 5, 35},
+    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 250 + 50 * 3, SCREENWIDTH / 5, 35},
                        GetColor(0xff6b5bff),
                        0, WHITE, "QUIT", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(quit_btn);
@@ -225,32 +233,22 @@ void drawMenu(GameState *gs)
     // Mode Selection Options
 
     // THE BEST OF US
-    Button best_of_us_mode_btn = {(Rectangle){20, 550, 300, 50}, WHITE, 0, BLACK, "THE BEST OF US", gs->font2, BLACK, 20, 1, 0};
-    drawButton(best_of_us_mode_btn);
+    Rectangle best_of_us_mode_btn = {17.5, 600, 180, 118.125};
 
-    if (hovered(best_of_us_mode_btn) || gs->mode == BEST_OF_US)
-    {
-        best_of_us_mode_btn.buttonColor = DARKBLUE;
-        best_of_us_mode_btn.textColor = WHITE;
-        drawButton(best_of_us_mode_btn);
-    }
-    if (clicked(best_of_us_mode_btn))
+    DrawTexturePro(gs->best_of_us_btn, (Rectangle){0, 0, gs->best_of_us_btn.width, gs->best_of_us_btn.height}, best_of_us_mode_btn, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(best_of_us_mode_btn))
     {
         PlaySound(gs->click_sound1);
         gs->mode = BEST_OF_US;
     }
 
     // THE MULTIVERSE OF MADMAZE
-    Button multiverse_mode_btn = {(Rectangle){350, 550, 500, 50}, WHITE, 0, BLACK, "THE MULTIVERSE OF MADMAZE", gs->font2, BLACK, 20, 1, 0};
-    drawButton(multiverse_mode_btn);
+    Rectangle multiverse_mode_btn = {17.5 * 2 + 180, 600, 180, 118.125};
 
-    if (hovered(multiverse_mode_btn) || gs->mode == MULTIVERSE)
-    {
-        multiverse_mode_btn.buttonColor = DARKBLUE;
-        multiverse_mode_btn.textColor = WHITE;
-        drawButton(multiverse_mode_btn);
-    }
-    if (clicked(multiverse_mode_btn))
+    DrawTexturePro(gs->multiverse_btn, (Rectangle){0, 0, gs->multiverse_btn.width, gs->multiverse_btn.height}, multiverse_mode_btn, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(multiverse_mode_btn))
     {
         PlaySound(gs->click_sound1);
         gs->mode = MULTIVERSE;
@@ -258,63 +256,77 @@ void drawMenu(GameState *gs)
     }
 
     // THE DARK NIGHT
-    Button dark_night_mode_btn = {(Rectangle){870, 550, 400, 50}, WHITE, 0, BLACK, "THE DARK NIGHT", gs->font2, BLACK, 20, 1, 0};
-    drawButton(dark_night_mode_btn);
+    Rectangle dark_night_mode_btn = {17.5 * 3 + 180 * 2, 600, 180, 118.125};
 
-    if (hovered(dark_night_mode_btn) || gs->mode == DARK_NIGHT)
-    {
-        dark_night_mode_btn.buttonColor = DARKBLUE;
-        dark_night_mode_btn.textColor = WHITE;
-        drawButton(dark_night_mode_btn);
-    }
-    if (clicked(dark_night_mode_btn))
+    DrawTexturePro(gs->dark_night_btn, (Rectangle){0, 0, gs->dark_night_btn.width, gs->dark_night_btn.height}, dark_night_mode_btn, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(dark_night_mode_btn))
     {
         PlaySound(gs->click_sound1);
         gs->mode = DARK_NIGHT;
     }
 
     // TIME RUNS OUT
-    Button time_runs_out_mode_btn = {(Rectangle){20, 620, 300, 50}, WHITE, 0, BLACK, "TIME RUNS OUT", gs->font2, BLACK, 20, 1, 0};
-    drawButton(time_runs_out_mode_btn);
+    Rectangle time_runs_out_mode_btn = {17.5 * 4 + 180 * 3, 600, 180, 118.125};
 
-    if (hovered(time_runs_out_mode_btn) || gs->mode == TIME_RUNS_OUT)
-    {
-        time_runs_out_mode_btn.buttonColor = DARKBLUE;
-        time_runs_out_mode_btn.textColor = WHITE;
-        drawButton(time_runs_out_mode_btn);
-    }
-    if (clicked(time_runs_out_mode_btn))
+    DrawTexturePro(gs->time_runs_out_btn, (Rectangle){0, 0, gs->time_runs_out_btn.width, gs->time_runs_out_btn.height}, time_runs_out_mode_btn, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(time_runs_out_mode_btn))
     {
         PlaySound(gs->click_sound1);
         gs->mode = TIME_RUNS_OUT;
     }
 
+    // INFINITY WAR
+    Rectangle infinity_war_mode_btn = {17.5 * 5 + 180 * 4, 600, 180, 118.125};
+
+    DrawTexturePro(gs->infinity_war_btn, (Rectangle){0, 0, gs->infinity_war_btn.width, gs->infinity_war_btn.height}, infinity_war_mode_btn, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(infinity_war_mode_btn))
+    {
+        PlaySound(gs->click_sound1);
+        gs->mode = INFINITY_WAR;
+    }
+
+    // GRAVITY GRAVE
+    Rectangle gravity_grave_mode_btn = {17.5 * 6 + 180 * 5, 600, 180, 118.125};
+
+    DrawTexturePro(gs->gravity_grave_btn, (Rectangle){0, 0, gs->gravity_grave_btn.width, gs->gravity_grave_btn.height}, gravity_grave_mode_btn, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(gravity_grave_mode_btn))
+    {
+        PlaySound(gs->click_sound1);
+        gs->mode = GRAVITY_GRAVE;
+    }
+
+    // ENDGAME
+    Rectangle endgame_mode_btn = {17.5 * 7 + 180 * 6, 600, 180, 118.125};
+
+    DrawTexturePro(gs->endgame_btn, (Rectangle){0, 0, gs->endgame_btn.width, gs->endgame_btn.height}, endgame_mode_btn, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(endgame_mode_btn))
+    {
+        PlaySound(gs->click_sound1);
+        gs->mode = ENDGAME;
+    }
+
     // Sprite Animation
     Texture2D menu_sprite1 = gs->player.player_sprite_attacking[gs->player.sprite_index];
     DrawTexturePro(menu_sprite1, (Rectangle){0, 0, menu_sprite1.width, menu_sprite1.height},
-                   (Rectangle){80, 150, 300, 300}, Vector2Zero(), 0, WHITE);
+                   (Rectangle){80, 200, 300, 300}, Vector2Zero(), 0, WHITE);
 
     Texture2D menu_sprite2 = gs->player.player_sprite_dying[gs->player.sprite_index];
     DrawTexturePro(menu_sprite2, (Rectangle){0, 0, -menu_sprite2.width, menu_sprite2.height},
-                   (Rectangle){1000, 150, 300, 300}, Vector2Zero(), 0, WHITE);
+                   (Rectangle){1000, 200, 300, 300}, Vector2Zero(), 0, WHITE);
 
     // Mute Music Button
-    Button mute_music_btn = {(Rectangle){1150, 10, 200, 40}, DARKBLUE,
-                             0, WHITE,
-                             "MUTE MUSIC", gs->btn_font, RAYWHITE, 20, 1, 0};
-    drawButton(mute_music_btn);
-    if (hovered(mute_music_btn))
-    {
-        mute_music_btn.buttonColor = BLUE;
-        mute_music_btn.shadow_opacity = 80;
-        drawButton(mute_music_btn);
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    }
-    else
-    {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
-    if (clicked(mute_music_btn))
+    Rectangle music_btn_rec = {SCREENWIDTH - 60, 20, 30, 30};
+
+    Texture2D music_btn = gs->music_on ? gs->music_on_btn : gs->music_off_btn;
+
+    DrawTexturePro(music_btn, (Rectangle){0, 0, gs->music_on_btn.width, gs->music_on_btn.height}, music_btn_rec, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(music_btn_rec))
     {
         PlaySound(gs->click_sound1);
         if (gs->music_on)
@@ -329,8 +341,8 @@ void drawMenu(GameState *gs)
         }
     }
 
-    // change mouse cursor
-    if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn) || hovered(best_of_us_mode_btn) || hovered(multiverse_mode_btn) || hovered(time_runs_out_mode_btn) || hovered(mute_music_btn))
+    // Change Mouse Cursor
+    if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn) || hoveredRec(best_of_us_mode_btn) || hoveredRec(multiverse_mode_btn) || hoveredRec(dark_night_mode_btn) || hoveredRec(time_runs_out_mode_btn) || hoveredRec(infinity_war_mode_btn) || hoveredRec(gravity_grave_mode_btn) || hoveredRec(endgame_mode_btn) || hoveredRec(music_btn_rec))
     {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
         // PlaySound(gs->hover_sound);

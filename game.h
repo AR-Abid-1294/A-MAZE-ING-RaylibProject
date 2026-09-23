@@ -30,7 +30,9 @@ typedef enum GameMode
     MULTIVERSE,
     DARK_NIGHT,
     TIME_RUNS_OUT,
-    INFINITY_WAR
+    INFINITY_WAR,
+    GRAVITY_GRAVE,
+    ENDGAME
 } GameMode;
 
 typedef struct GameState
@@ -80,6 +82,10 @@ typedef struct GameState
     // images
     Texture2D abid_pic;
     Texture2D afif_pic;
+
+    // music buttons
+    Texture2D music_on_btn;
+    Texture2D music_off_btn;
 
     // mode selection buttons
     Texture2D best_of_us_btn;
