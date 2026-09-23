@@ -233,7 +233,7 @@ void drawMenu(GameState *gs)
     // Mode Selection Options
 
     // THE BEST OF US
-    Rectangle best_of_us_mode_btn = {17.5, 600, 180, 118.125};
+    Rectangle best_of_us_mode_btn = {50, 600, 220, 140};
 
     DrawTexturePro(gs->best_of_us_btn, (Rectangle){0, 0, gs->best_of_us_btn.width, gs->best_of_us_btn.height}, best_of_us_mode_btn, Vector2Zero(), 0, WHITE);
 
@@ -244,7 +244,7 @@ void drawMenu(GameState *gs)
     }
 
     // THE MULTIVERSE OF MADMAZE
-    Rectangle multiverse_mode_btn = {17.5 * 2 + 180, 600, 180, 118.125};
+    Rectangle multiverse_mode_btn = {50 + 220 + 50, 600, 220, 140};
 
     DrawTexturePro(gs->multiverse_btn, (Rectangle){0, 0, gs->multiverse_btn.width, gs->multiverse_btn.height}, multiverse_mode_btn, Vector2Zero(), 0, WHITE);
 
@@ -255,19 +255,8 @@ void drawMenu(GameState *gs)
         gs->level = 1;
     }
 
-    // THE DARK NIGHT
-    Rectangle dark_night_mode_btn = {17.5 * 3 + 180 * 2, 600, 180, 118.125};
-
-    DrawTexturePro(gs->dark_night_btn, (Rectangle){0, 0, gs->dark_night_btn.width, gs->dark_night_btn.height}, dark_night_mode_btn, Vector2Zero(), 0, WHITE);
-
-    if (clickedRec(dark_night_mode_btn))
-    {
-        PlaySound(gs->click_sound1);
-        gs->mode = DARK_NIGHT;
-    }
-
     // TIME RUNS OUT
-    Rectangle time_runs_out_mode_btn = {17.5 * 4 + 180 * 3, 600, 180, 118.125};
+    Rectangle time_runs_out_mode_btn = {50 + 220 * 2 + 50 * 2, 600, 220, 140};
 
     DrawTexturePro(gs->time_runs_out_btn, (Rectangle){0, 0, gs->time_runs_out_btn.width, gs->time_runs_out_btn.height}, time_runs_out_mode_btn, Vector2Zero(), 0, WHITE);
 
@@ -277,8 +266,19 @@ void drawMenu(GameState *gs)
         gs->mode = TIME_RUNS_OUT;
     }
 
+    // THE DARK NIGHT
+    Rectangle dark_night_mode_btn = {50 + 220 * 3 + 50 * 3, 600, 220, 140};
+
+    DrawTexturePro(gs->dark_night_btn, (Rectangle){0, 0, gs->dark_night_btn.width, gs->dark_night_btn.height}, dark_night_mode_btn, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(dark_night_mode_btn))
+    {
+        PlaySound(gs->click_sound1);
+        gs->mode = DARK_NIGHT;
+    }
+
     // INFINITY WAR
-    Rectangle infinity_war_mode_btn = {17.5 * 5 + 180 * 4, 600, 180, 118.125};
+    Rectangle infinity_war_mode_btn = {50 + 220 * 4 + 50 * 4, 600, 220, 140};
 
     DrawTexturePro(gs->infinity_war_btn, (Rectangle){0, 0, gs->infinity_war_btn.width, gs->infinity_war_btn.height}, infinity_war_mode_btn, Vector2Zero(), 0, WHITE);
 
@@ -288,27 +288,46 @@ void drawMenu(GameState *gs)
         gs->mode = INFINITY_WAR;
     }
 
-    // GRAVITY GRAVE
-    Rectangle gravity_grave_mode_btn = {17.5 * 6 + 180 * 5, 600, 180, 118.125};
+    // // GRAVITY GRAVE
+    // Rectangle gravity_grave_mode_btn = {17.5 * 6 + 180 * 5, 600, 180, 130};
 
-    DrawTexturePro(gs->gravity_grave_btn, (Rectangle){0, 0, gs->gravity_grave_btn.width, gs->gravity_grave_btn.height}, gravity_grave_mode_btn, Vector2Zero(), 0, WHITE);
+    // DrawTexturePro(gs->gravity_grave_btn, (Rectangle){0, 0, gs->gravity_grave_btn.width, gs->gravity_grave_btn.height}, gravity_grave_mode_btn, Vector2Zero(), 0, WHITE);
 
-    if (clickedRec(gravity_grave_mode_btn))
-    {
-        PlaySound(gs->click_sound1);
-        gs->mode = GRAVITY_GRAVE;
-    }
+    // if (clickedRec(gravity_grave_mode_btn))
+    // {
+    //     PlaySound(gs->click_sound1);
+    //     gs->mode = GRAVITY_GRAVE;
+    // }
 
-    // ENDGAME
-    Rectangle endgame_mode_btn = {17.5 * 7 + 180 * 6, 600, 180, 118.125};
+    // // ENDGAME
+    // Rectangle endgame_mode_btn = {17.5 * 7 + 180 * 6, 600, 180, 130};
 
-    DrawTexturePro(gs->endgame_btn, (Rectangle){0, 0, gs->endgame_btn.width, gs->endgame_btn.height}, endgame_mode_btn, Vector2Zero(), 0, WHITE);
+    // DrawTexturePro(gs->endgame_btn, (Rectangle){0, 0, gs->endgame_btn.width, gs->endgame_btn.height}, endgame_mode_btn, Vector2Zero(), 0, WHITE);
 
-    if (clickedRec(endgame_mode_btn))
-    {
-        PlaySound(gs->click_sound1);
-        gs->mode = ENDGAME;
-    }
+    // if (clickedRec(endgame_mode_btn))
+    // {
+    //     PlaySound(gs->click_sound1);
+    //     gs->mode = ENDGAME;
+    // }
+
+    // Selected Mode Pointer
+    int i;
+    if (gs->mode == BEST_OF_US)
+        i = 0;
+    else if (gs->mode == MULTIVERSE)
+        i = 1;
+    else if (gs->mode == TIME_RUNS_OUT)
+        i = 2;
+    else if (gs->mode == DARK_NIGHT)
+        i = 3;
+    else if (gs->mode == INFINITY_WAR)
+        i = 4;
+
+    Vector2 v1 = {50 + 110 + (50 + 220) * i, 600 + 150};
+    Vector2 v2 = {v1.x - 10, v1.y + 15};
+    Vector2 v3 = {v1.x + 10, v1.y + 15};
+
+    DrawTriangle(v1, v2, v3, WHITE);
 
     // Sprite Animation
     Texture2D menu_sprite1 = gs->player.player_sprite_attacking[gs->player.sprite_index];
@@ -342,7 +361,7 @@ void drawMenu(GameState *gs)
     }
 
     // Change Mouse Cursor
-    if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn) || hoveredRec(best_of_us_mode_btn) || hoveredRec(multiverse_mode_btn) || hoveredRec(dark_night_mode_btn) || hoveredRec(time_runs_out_mode_btn) || hoveredRec(infinity_war_mode_btn) || hoveredRec(gravity_grave_mode_btn) || hoveredRec(endgame_mode_btn) || hoveredRec(music_btn_rec))
+    if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn) || hoveredRec(best_of_us_mode_btn) || hoveredRec(multiverse_mode_btn) || hoveredRec(dark_night_mode_btn) || hoveredRec(time_runs_out_mode_btn) || hoveredRec(infinity_war_mode_btn) || hoveredRec(music_btn_rec))
     {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
         // PlaySound(gs->hover_sound);
