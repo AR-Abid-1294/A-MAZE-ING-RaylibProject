@@ -14,8 +14,8 @@
 #define SCREENWIDTH 1400
 #define SCREENHEIGHT 800
 
-#define MAZEWIDTH 5
-#define MAZEHEIGHT 5
+#define MAZEWIDTH 31
+#define MAZEHEIGHT 25
 #define CELLSIZE 25
 #define WALL_THICK 3
 #define MAX_LEVEL 50

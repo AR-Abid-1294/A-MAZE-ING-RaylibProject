@@ -2,12 +2,22 @@
 #define SCORES_H
 
 #include <stdio.h>
+#include <string.h>
 
 typedef struct Score
 {
-    char *player_name;
-    float score;    // or time
+    char player_name[30];
+    int score;    
 } Score;
+
+typedef struct Time
+{
+    char player_name[30];
+    float time;
+} Time;
+
+
+
 
 void sortHighScores(Score *scores);
 
@@ -15,10 +25,11 @@ void loadHighScores(Score *scores, FILE *file);
 
 void storeHighScores(Score *scores, FILE *file);
 
-void sortBestTimes(Score *times);
+void sortBestTimes(Time *times);
 
-int loadBestTimes(Score *times, FILE *file);
+void nukeBestTimes(Time *times);
 
-void storeBestTimes(Score *times, FILE *file);
+void nukeHighScores(Score *scores);
+
 
 #endif

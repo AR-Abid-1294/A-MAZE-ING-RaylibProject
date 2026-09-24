@@ -82,6 +82,20 @@ void initGameState(GameState *gs)
     gs->name[0] = '\0';
     gs->letter_count = 0;
 
+    // Load Leaderboard Data
+
+    // Best Times for THE BEST OF US
+    gs->best_times_file = fopen("scores/Best_Times.txt", "r");
+    for (int i = 0; i < 10; i++)
+        fscanf(gs->best_times_file, "%f %[^\n]", &gs->best_times[i].time, gs->best_times[i].player_name);
+    fclose(gs->best_times_file);
+
+    // High Scores for THE MULTIVERSE OF MADMAZE
+    gs->high_scores_file = fopen("scores/High_Scores.txt", "r");
+    for (int i = 0; i < 10; i++)
+        fscanf(gs->high_scores_file, "%d %[^\n]", &gs->high_scores[i].score, gs->high_scores[i].player_name);
+    fclose(gs->high_scores_file);
+
     PlayMusicStream(gs->bg_music);
 }
 
@@ -132,6 +146,18 @@ void unloadGameState(GameState *gs)
     UnloadTexture(gs->time_runs_out_btn);
     UnloadTexture(gs->gravity_grave_btn);
     UnloadTexture(gs->endgame_btn);
+
+    // Store Best Times of THE BEST OF US in external file
+    gs->best_times_file = fopen("scores/Best_Times.txt", "w");
+    for (int i = 0; i < 10; i++)
+        fprintf(gs->best_times_file, "%f %s\n", gs->best_times[i].time, gs->best_times[i].player_name);
+    fclose(gs->best_times_file);
+
+    // store High Scores of THE MULTIVERSE OF MADMAZE file
+    gs->high_scores_file = fopen("scores/High_Scores.txt", "w");
+    for (int i = 0; i < 10; i++)
+        fprintf(gs->high_scores_file, "%d %s\n", gs->high_scores[i].score, gs->high_scores[i].player_name);
+    fclose(gs->high_scores_file);
 
     destroyMaze(&gs->maze);
 
@@ -230,7 +256,7 @@ void drawMenu(GameState *gs)
         gs->shouldQuit = true;
     }
 
-    // Mode Selection Options
+    // Mode Selection Buttons
 
     // THE BEST OF US
     Rectangle best_of_us_mode_btn = {50, 600, 220, 140};
@@ -239,6 +265,7 @@ void drawMenu(GameState *gs)
 
     if (clickedRec(best_of_us_mode_btn))
     {
+        srand(52);
         PlaySound(gs->click_sound1);
         gs->mode = BEST_OF_US;
     }
@@ -364,7 +391,6 @@ void drawMenu(GameState *gs)
     if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn) || hoveredRec(best_of_us_mode_btn) || hoveredRec(multiverse_mode_btn) || hoveredRec(dark_night_mode_btn) || hoveredRec(time_runs_out_mode_btn) || hoveredRec(infinity_war_mode_btn) || hoveredRec(music_btn_rec))
     {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-        // PlaySound(gs->hover_sound);
     }
     else
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
@@ -378,7 +404,8 @@ void updateNameInput(GameState *gs)
     while (letter)
     {
         if (gs->letter_count < 19 && ((letter >= 'A' && letter <= 'Z') ||
-                                      (letter >= 'a' && letter <= 'z')))
+                                      (letter >= 'a' && letter <= 'z')) ||
+            letter == ' ' || letter == '.')
         {
             gs->name[gs->letter_count] = (char)letter;
             gs->name[gs->letter_count + 1] = '\0';
@@ -407,6 +434,7 @@ void updateNameInput(GameState *gs)
         else if (gs->mode == MULTIVERSE)
         {
             gs->page = LEVELS;
+            gs->last_score = 0;
         }
     }
 }
@@ -460,7 +488,7 @@ void drawNameInput(GameState *gs)
         {
             PlaySound(gs->click_sound1);
 
-            if (gs->mode == BEST_OF_US)
+            if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
             {
                 gs->page = PLAYING;
                 gs->start_time = GetTime();
@@ -530,26 +558,6 @@ void drawCredit(GameState *gs)
 
 void drawBestTimes(GameState *gs)
 {
-    char player_names_[20][10] = {"Abid",
-                                  "Afif",
-                                  "Rumman",
-                                  "Tahsin",
-                                  "Akif",
-                                  "Ahnaf",
-                                  "Raisa",
-                                  "Ananto",
-                                  "Jibon",
-                                  "Mahin"};
-    float best_times_[10] = {23.12,
-                             12.67,
-                             21.98,
-                             67.89,
-                             12.43,
-                             76.54,
-                             12.09,
-                             32.30,
-                             11.21,
-                             10.01};
 
     BeginDrawing();
     ClearBackground(GetColor(0xdff7ffff));
@@ -558,12 +566,12 @@ void drawBestTimes(GameState *gs)
     {
         // Player Name
         Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", player_names_[i]), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->best_times[i].player_name), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
         drawCard(player_name_card);
 
         // Best Time
         Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-        const char *best_time_text = formatTime(best_times_[i]);
+        const char *best_time_text = formatTime(gs->best_times[i].time);
         Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%s", best_time_text), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
         drawCard(best_times_card);
     }
@@ -589,6 +597,29 @@ void drawBestTimes(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->page = MENU;
+    }
+
+    // NUKE BUTTON
+    Button nuke_btn = {(Rectangle){SCREENWIDTH - 10 - 100, 10, 100, 40}, DARKBLUE,
+                       0, WHITE,
+                       "NUKE", gs->btn_font, RAYWHITE, 20, 1, 0};
+    drawButton(nuke_btn);
+    if (hovered(nuke_btn))
+    {
+        nuke_btn.buttonColor = BLUE;
+        nuke_btn.shadow_opacity = 80;
+        drawButton(nuke_btn);
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    }
+    else
+    {
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    }
+
+    if (clicked(nuke_btn) || IsKeyPressed(KEY_BACKSPACE))
+    {
+        PlaySound(gs->click_sound1);
+        nukeBestTimes(gs->best_times);
     }
 
     EndDrawing();
@@ -596,27 +627,6 @@ void drawBestTimes(GameState *gs)
 
 void drawHighScores(GameState *gs)
 {
-    char player_names_[20][10] = {"Abid",
-                                  "Afif",
-                                  "Rumman",
-                                  "Tahsin",
-                                  "Akif",
-                                  "Ahnaf",
-                                  "Raisa",
-                                  "Ananto",
-                                  "Jibon",
-                                  "Mahin"};
-    float best_times_[10] = {23.12,
-                             12.67,
-                             21.98,
-                             67.89,
-                             12.43,
-                             76.54,
-                             12.09,
-                             32.30,
-                             11.21,
-                             10.01};
-
     BeginDrawing();
     ClearBackground(GetColor(0xdff7ffff));
 
@@ -624,12 +634,12 @@ void drawHighScores(GameState *gs)
     {
         // Player Name
         Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", player_names_[i]), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->high_scores[i].player_name), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
         drawCard(player_name_card);
 
         // Best Time
         Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-        const char *best_time_text = TextFormat("%.2lf", best_times_[i]);
+        const char *best_time_text = TextFormat("%03d", gs->high_scores[i].score);
         Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%s", best_time_text), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
         drawCard(best_times_card);
     }
@@ -655,6 +665,29 @@ void drawHighScores(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->page = MENU;
+    }
+
+    // NUKE BUTTON
+    Button nuke_btn = {(Rectangle){SCREENWIDTH - 10 - 100, 10, 100, 40}, DARKBLUE,
+                       0, WHITE,
+                       "NUKE", gs->btn_font, RAYWHITE, 20, 1, 0};
+    drawButton(nuke_btn);
+    if (hovered(nuke_btn))
+    {
+        nuke_btn.buttonColor = BLUE;
+        nuke_btn.shadow_opacity = 80;
+        drawButton(nuke_btn);
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    }
+    else
+    {
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    }
+
+    if (clicked(nuke_btn) || IsKeyPressed(KEY_BACKSPACE))
+    {
+        PlaySound(gs->click_sound1);
+        nukeHighScores(gs->high_scores);
     }
 
     EndDrawing();
@@ -757,6 +790,8 @@ void initGameplay(GameState *gs)
 
     if (gs->mode == BEST_OF_US)
         gs->level = 0;
+    else if (gs->mode == MULTIVERSE)
+        srand(4 + 19);
 
     initializeMaze(&gs->maze, gs->level);
     generateMaze_aldous_broder(&gs->maze);
@@ -841,10 +876,12 @@ void updateGameplay(GameState *gs)
         PlaySound(gs->game_finish_sound);
         if (gs->mode == BEST_OF_US)
         {
+            addTime(gs);
             gs->page = GAME_FINISH;
         }
         else if (gs->mode == MULTIVERSE)
         {
+            gs->last_score += gs->maze.height * gs->maze.width * 5;
             destroyMaze(&gs->maze);
             if (gs->level < 50)
             {
@@ -867,19 +904,30 @@ void drawGame(GameState *gs)
     Vector2 maze_starting_pos = {(SCREENWIDTH - gs->maze.width * gs->maze.cell_size) / 2,
                                  (SCREENHEIGHT - gs->maze.height * gs->maze.cell_size) / 2 + gs->maze.cell_size};
     drawMaze(&gs->maze, maze_starting_pos, &gs->player);
+    if (gs->mode == DARK_NIGHT)
+        drawDark(gs);
 
     // TITLE
     const char *title;
     if (gs->mode == BEST_OF_US)
+    {
         title = "THE BEST OF US";
+        const char *control_inst = "W/A/S/D or Arrow Keys for Movement | Space for New Maze | F for Auto Solve";
+        DrawTextEx(gs->font1, control_inst, (Vector2){(SCREENWIDTH - MeasureText(control_inst, 20)) / 2, 70}, 20, 1, GRAY);
+    }
     else if (gs->mode == MULTIVERSE)
+    {
         title = "THE MULTIVERSE OF MADMAZE";
-
+        const char *control_inst = "W/A/S/D or Arrow Keys for Movement | F for Auto Solve";
+        DrawTextEx(gs->font1, control_inst, (Vector2){(SCREENWIDTH - MeasureText(control_inst, 20)) / 2, 70}, 20, 1, GRAY);
+    }
+    else if (gs->mode == DARK_NIGHT)
+    {
+        title = "DARK NIGHT";
+        const char *control_inst = "W/A/S/D or Arrow Keys for Movement | Space for New Maze | F for Auto Solve";
+        DrawTextEx(gs->font1, control_inst, (Vector2){(SCREENWIDTH - MeasureText(control_inst, 20)) / 2, 70}, 20, 1, GRAY);
+    }
     DrawTextEx(gs->title_font, title, (Vector2){(SCREENWIDTH - MeasureText(title, 50)) / 2, 20}, 50, 1, WHITE);
-
-    // Control Instructions
-    const char *control_inst = "W/A/S/D or Arrow Keys for Movement | Space for New Maze | F for Auto Solve";
-    DrawTextEx(gs->font1, control_inst, (Vector2){(SCREENWIDTH - MeasureText(control_inst, 20)) / 2, 70}, 20, 1, GRAY);
 
     // MENU BUTTON
     Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
@@ -922,7 +970,7 @@ void drawGame(GameState *gs)
     //     drawCard(new_maze_card);
     // }
 
-    if (gs->mode == BEST_OF_US)
+    if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
     {
         // Time sector
         const char *time_text = formatTime(current_time);
@@ -931,13 +979,63 @@ void drawGame(GameState *gs)
     else if (gs->mode == MULTIVERSE)
     {
         // Level
-        DrawTextEx(gs->btn_font, TextFormat("LEVEL: %d", gs->level), (Vector2){1250, 15}, 20, 1, WHITE);
+        DrawTextEx(gs->btn_font, TextFormat("LEVEL: %d", gs->level), (Vector2){1200, 15}, 20, 1, WHITE);
+
+        // Score
+        DrawTextEx(gs->btn_font, TextFormat("SCORE: %5d", gs->last_score), (Vector2){1175, 45}, 20, 1, WHITE);
+
+        // FINISH BUTTON
+        Button finish_btn = {(Rectangle){SCREENWIDTH - 20 - 100, SCREENHEIGHT - 20 - 40, 100, 40}, DARKBLUE,
+                             0, WHITE,
+                             "FINISH", gs->btn_font, RAYWHITE, 20, 1, 0};
+        drawButton(finish_btn);
+        if (hovered(finish_btn))
+        {
+            finish_btn.buttonColor = BLUE;
+            finish_btn.shadow_opacity = 80;
+            drawButton(finish_btn);
+            SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+        }
+        else
+        {
+            SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+        }
+
+        if (clicked(finish_btn))
+        {
+            PlaySound(gs->click_sound1);
+            addScore(gs);
+            gs->page = GAME_FINISH;
+        }
     }
 
     EndDrawing();
 }
 
-void drawScore(GameState *gs)
+void drawDark(GameState *gs)
+{
+    Vector2 pos = {(SCREENWIDTH - gs->maze.width * gs->maze.cell_size) / 2,
+                   (SCREENHEIGHT - gs->maze.height * gs->maze.cell_size) / 2 + gs->maze.cell_size};
+    for (int y = 0; y < gs->maze.height; y++)
+    {
+        float startx = pos.x;
+        int range = 5;
+        for (int x = 0; x < gs->maze.width; x++)
+        {
+            int distance2 = (x - gs->player.x) * (x - gs->player.x) + (y - gs->player.y) * (y - gs->player.y);
+            if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (distance2 > range * range))
+            {
+                DrawRectangle(pos.x, pos.y, gs->maze.cell_size, gs->maze.cell_size, BLACK);
+            }
+
+            pos.x += gs->maze.cell_size;
+        }
+        pos.x = startx;
+        pos.y += gs->maze.cell_size;
+    }
+}
+
+void drawTime(GameState *gs)
 {
     BeginDrawing();
     ClearBackground(GetColor(0xddfbefff));
@@ -966,7 +1064,7 @@ void drawScore(GameState *gs)
     }
 
     // Time Card
-    const char *time_card_text = TextFormat("%s\n%s", gs->name, formatTime(gs->last_time));
+    const char *time_card_text = TextFormat("%3s\n%s", gs->name, formatTime(gs->last_time));
     Card time_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 100, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, time_card_text, gs->font1, WHITE, 40, 1, 10, 80, 10, 10};
 
     drawCard(time_card);
@@ -1008,6 +1106,94 @@ void drawScore(GameState *gs)
     drawButton(replay_btn);
 
     EndDrawing();
+}
+
+void drawScore(GameState *gs)
+{
+    BeginDrawing();
+    ClearBackground(GetColor(0xddfbefff));
+
+    // MENU BUTTON
+    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
+                       0, WHITE,
+                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
+    drawButton(menu_btn);
+    if (hovered(menu_btn))
+    {
+        menu_btn.buttonColor = BLUE;
+        menu_btn.shadow_opacity = 80;
+        drawButton(menu_btn);
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    }
+    else
+    {
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    }
+
+    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
+    {
+        PlaySound(gs->click_sound1);
+        gs->page = MENU;
+    }
+
+    // Score Card
+    const char *score_card_text = TextFormat("%2s\n%d", gs->name, gs->last_score);
+    Card score_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 100, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, score_card_text, gs->font1, WHITE, 40, 1, 10, 80, 10, 10};
+
+    drawCard(score_card);
+
+    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 + 30, 140, 50}, GetColor(0xff6b5bff), 0, BLACK, "QUIT GAME", gs->btn_font, WHITE, 15, 1, 0};
+
+    drawButton(quit_btn);
+
+    if (hovered(quit_btn))
+    {
+        quit_btn.buttonColor = GetColor(0xff0055ff);
+        quit_btn.shadow_opacity = 80;
+        drawButton(quit_btn);
+    }
+
+    if (clicked(quit_btn))
+    {
+        gs->shouldQuit = true;
+    }
+
+    Button replay_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5) + 160, SCREENHEIGHT / 2 + 30, 120, 50}, DARKGREEN, 0, BLACK, "REPLAY", gs->btn_font, WHITE, 15, 1, 0};
+
+    if (hovered(replay_btn))
+    {
+        replay_btn.buttonColor = GREEN;
+        replay_btn.shadow_opacity = 80;
+        drawButton(replay_btn);
+    }
+
+    if (clicked(replay_btn))
+    {
+
+        PlaySound(gs->click_sound1);
+        gs->last_score = 0;
+        gs->page = LEVELS;
+        initGameplay(gs);
+        gs->start_time = GetTime();
+    }
+
+    drawButton(replay_btn);
+
+    EndDrawing();
+}
+
+void addTime(GameState *gs)
+{
+    strcpy(gs->best_times[10].player_name, gs->name);
+    gs->best_times[10].time = gs->last_time;
+    sortBestTimes(gs->best_times);
+}
+
+void addScore(GameState *gs)
+{
+    strcpy(gs->high_scores[10].player_name, gs->name);
+    gs->high_scores[10].score = gs->last_score;
+    sortHighScores(gs->high_scores);
 }
 
 void drawMultiConq(GameState *gs)
@@ -1110,7 +1296,10 @@ void updateGame(GameState *gs)
         break;
 
     case GAME_FINISH:
-        drawScore(gs);
+        if (gs->mode == BEST_OF_US)
+            drawTime(gs);
+        else if (gs->mode == MULTIVERSE)
+            drawScore(gs);
         break;
 
     case MULTIVERSE_CONQUERED:
