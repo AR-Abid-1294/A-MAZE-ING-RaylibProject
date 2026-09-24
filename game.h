@@ -125,8 +125,12 @@ typedef struct GameState
     // mode
     GameMode mode;
 
-    // level
+    // level for MULTIVERSE OF MADMAZE
     int level;
+
+    // round for INFINTIY WAR
+    int round;
+    float time_limit;
 } GameState;
 
 // set up initial game state, load assets

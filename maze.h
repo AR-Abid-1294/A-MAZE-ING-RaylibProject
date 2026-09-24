@@ -14,7 +14,7 @@
 #define SCREENWIDTH 1400
 #define SCREENHEIGHT 800
 
-#define MAZEWIDTH 31
+#define MAZEWIDTH 35
 #define MAZEHEIGHT 25
 #define CELLSIZE 25
 #define WALL_THICK 3
@@ -75,7 +75,7 @@ typedef struct Maze
     Cell **cells;
     int visited_count;
 
-    Cell *current_cell;  // for Recursive Backtracker
+    Cell *current_cell; // for Recursive Backtracker
 
     // for Randomized Prim's
     Frontier *frontiers;
@@ -88,7 +88,6 @@ typedef struct Maze
     // for different levels of MULTIVERSE mode
     int levels[50][3];
 } Maze;
-
 
 void shuffleDirections();
 

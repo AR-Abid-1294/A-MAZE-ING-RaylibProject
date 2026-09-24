@@ -478,16 +478,22 @@ void drawNameInput(GameState *gs)
         {
             PlaySound(gs->click_sound1);
 
-            if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
+            if (gs->mode == MULTIVERSE)
+            {
+                gs->page = LEVELS;
+                gs->last_score = 0;
+            }
+            else
             {
                 gs->page = PLAYING;
                 gs->start_time = GetTime();
                 initGameplay(gs);
-            }
-            else if (gs->mode == MULTIVERSE)
-            {
-                gs->page = LEVELS;
-                gs->last_score = 0;
+
+                if (gs->mode == TIME_RUNS_OUT)
+                {
+                    gs->round = 1;
+                    gs->time_limit = 120;
+                }
             }
         }
     }
@@ -600,7 +606,6 @@ void drawBestTimes(GameState *gs)
         drawCard(best_times_card);
     }
 
-    // MENU BUTTON
     // MENU BUTTON
     Rectangle menu_btn_rec = {20, 20, 20, 20};
     Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
@@ -777,10 +782,14 @@ void initGameplay(GameState *gs)
     gs->player.x = 0;
     gs->player.y = 0;
 
-    if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
-        gs->level = 0;
-    else if (gs->mode == MULTIVERSE)
+    if (gs->mode == MULTIVERSE)
         srand(4 + 19);
+    else
+    {
+        gs->level = 0;
+        if (gs->mode == TIME_RUNS_OUT)
+            gs->round = 0;
+    }
 
     initializeMaze(&gs->maze, gs->level);
     generateMaze_aldous_broder(&gs->maze);
@@ -791,10 +800,7 @@ void updateGameplay(GameState *gs)
 
     // Logic Part
 
-    // Delta Time
-    float dt = GetFrameTime();
-
-    // movement
+    // Movement
     int x = gs->player.x;
     int y = gs->player.y;
     Cell cell_old = gs->maze.cells[y][x];
@@ -848,7 +854,7 @@ void updateGameplay(GameState *gs)
     }
 
     // Generate New Maze
-    if (IsKeyPressed(KEY_SPACE) && gs->mode == BEST_OF_US)
+    if (IsKeyPressed(KEY_SPACE) && (gs->mode == DARK_NIGHT || gs->mode == INFINITY_WAR))
     {
         gs->start_time = GetTime();
 
@@ -863,11 +869,12 @@ void updateGameplay(GameState *gs)
     {
         gs->last_time = GetTime() - gs->start_time;
         PlaySound(gs->game_finish_sound);
-        if (gs->mode == BEST_OF_US)
+        if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
         {
             addTime(gs);
             gs->page = GAME_FINISH;
         }
+
         else if (gs->mode == MULTIVERSE)
         {
             gs->last_score += gs->maze.height * gs->maze.width * 5;
@@ -881,6 +888,12 @@ void updateGameplay(GameState *gs)
             {
                 gs->page = MULTIVERSE_CONQUERED;
             }
+        }
+
+        else if (gs->mode == TIME_RUNS_OUT)
+        {
+            if (gs->round)
+                gs->round++;
         }
     }
 }
@@ -898,25 +911,36 @@ void drawGame(GameState *gs)
 
     // TITLE
     const char *title;
+    const char *control_inst;
     if (gs->mode == BEST_OF_US)
     {
         title = "THE BEST OF US";
-        const char *control_inst = "W/A/S/D or Arrow Keys for Movement | Space for New Maze | F for Auto Solve";
-        DrawTextEx(gs->font1, control_inst, (Vector2){(SCREENWIDTH - MeasureText(control_inst, 20)) / 2, 70}, 20, 1, GRAY);
+        control_inst = "W/A/S/D or Arrow Keys for Movement | Space for New Maze | F for Auto Solve";
     }
     else if (gs->mode == MULTIVERSE)
     {
         title = "THE MULTIVERSE OF MADMAZE";
-        const char *control_inst = "W/A/S/D or Arrow Keys for Movement | F for Auto Solve";
-        DrawTextEx(gs->font1, control_inst, (Vector2){(SCREENWIDTH - MeasureText(control_inst, 20)) / 2, 70}, 20, 1, GRAY);
+        control_inst = "W/A/S/D or Arrow Keys for Movement | F for Auto Solve";
+    }
+    else if (gs->mode == TIME_RUNS_OUT)
+    {
+        title = "TIME RUNS OUT";
+        control_inst = "W/A/S/D or Arrow Keys for Movement | F for Auto Solve";
     }
     else if (gs->mode == DARK_NIGHT)
     {
         title = "DARK NIGHT";
-        const char *control_inst = "W/A/S/D or Arrow Keys for Movement | Space for New Maze | F for Auto Solve";
-        DrawTextEx(gs->font1, control_inst, (Vector2){(SCREENWIDTH - MeasureText(control_inst, 20)) / 2, 70}, 20, 1, GRAY);
+        control_inst = "W/A/S/D or Arrow Keys for Movement | Space for New Maze | F for Auto Solve";
     }
+    else if (gs->mode == INFINITY_WAR)
+    {
+        title = "INFINITY WAR";
+        control_inst = "W/A/S/D or Arrow Keys for Movement | Space for New Maze | F for Auto Solve";
+    }
+
     DrawTextEx(gs->title_font, title, (Vector2){(SCREENWIDTH - MeasureText(title, 50)) / 2, 20}, 50, 1, WHITE);
+
+    DrawTextEx(gs->font1, control_inst, (Vector2){(SCREENWIDTH - MeasureText(control_inst, 20)) / 2, 70}, 20, 1, GRAY);
 
     // MENU BUTTON
     Rectangle menu_btn_rec = {20, 20, 20, 20};
