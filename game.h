@@ -50,8 +50,8 @@ typedef struct GameState
     // ball
     Vector2 ball_pos0;
     Vector2 ball_pos;
-    float ball_radius;
-    float sprite_side;
+    double ball_radius;
+    double sprite_side;
     Vector2 ball_speed;
 
     // assets
@@ -113,7 +113,7 @@ typedef struct GameState
     int letter_count;
 
     // best times for THE BEST OF US mode
-    float last_time;
+    double last_time;
     Time best_times[11];
     FILE *best_times_file;
 
@@ -130,7 +130,7 @@ typedef struct GameState
 
     // round for INFINTIY WAR
     int round;
-    float time_limit;
+    double time_limit;
 } GameState;
 
 // set up initial game state, load assets

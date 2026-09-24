@@ -983,9 +983,20 @@ void drawGame(GameState *gs)
 
     if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
     {
-        // Time sector
+        // Time Spent
         const char *time_text = formatTime(current_time);
         DrawTextEx(gs->btn_font, time_text, (Vector2){1250, 15}, 20, 1, WHITE);
+    }
+    else if (gs->mode == TIME_RUNS_OUT)
+    {
+        // Time Left
+        const char *time_text = formatTime(gs->time_limit - current_time);
+        DrawTextEx(gs->btn_font, time_text, (Vector2){1250, 15}, 20, 1, WHITE);
+
+        if (gs->time_limit - current_time == 0)
+        {
+            gs->page = GAME_FINISH;
+        }
     }
     else if (gs->mode == MULTIVERSE)
     {
@@ -1029,7 +1040,7 @@ void drawDark(GameState *gs)
                    (SCREENHEIGHT - gs->maze.height * gs->maze.cell_size) / 2 + gs->maze.cell_size};
     for (int y = 0; y < gs->maze.height; y++)
     {
-        float startx = pos.x;
+        double startx = pos.x;
         int range = 5;
         for (int x = 0; x < gs->maze.width; x++)
         {
@@ -1271,9 +1282,9 @@ void updateGame(GameState *gs)
         break;
 
     case GAME_FINISH:
-        if (gs->mode == BEST_OF_US)
+        if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
             drawTime(gs);
-        else if (gs->mode == MULTIVERSE)
+        else if (gs->mode == MULTIVERSE || gs->mode == TIME_RUNS_OUT)
             drawScore(gs);
         break;
 
