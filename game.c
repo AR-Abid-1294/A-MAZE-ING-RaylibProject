@@ -8,7 +8,7 @@
 void initGameState(GameState *gs)
 {
 
-    InitWindow(SCREENWIDTH, SCREENHEIGHT, "Demo Game");
+    InitWindow(SCREENWIDTH, SCREENHEIGHT, "A MAZE ING");
     InitAudioDevice();
     SetTargetFPS(60);
 
@@ -147,7 +147,7 @@ void drawMenu(GameState *gs)
     ClearBackground(GetColor(0x2e2e2eff));
 
     // TITLE
-    const char *title = "SQUID MAZE";
+    const char *title = "A MAZE ING";
     Vector2 title_pos = {(SCREENWIDTH - MeasureText(title, 100)) / 2, 15};
     drawText(gs->title_font, title, title_pos, 100, 1, WHITE, 80);
 
