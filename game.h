@@ -116,7 +116,6 @@ typedef struct GameState
     int letter_count;
 
     // best times for THE BEST OF US mode
-    double last_time;
     Time best_times[11];
     FILE *best_times_file;
 

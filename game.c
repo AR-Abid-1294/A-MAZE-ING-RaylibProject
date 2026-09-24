@@ -639,7 +639,7 @@ void drawBestTimes(GameState *gs)
     }
 
     // NUKE BUTTON
-    Rectangle nuke_btn_rec = {SCREENWIDTH - 10 - 40, 40, 50, 50};
+    Rectangle nuke_btn_rec = {SCREENWIDTH - 10 - 70, 40, 50, 50};
     DrawTexturePro(gs->nuke_btn, (Rectangle){0, 0, gs->nuke_btn.width, gs->nuke_btn.height}, nuke_btn_rec, Vector2Zero(), 0, WHITE);
 
     if (clickedRec(nuke_btn_rec))
@@ -647,6 +647,12 @@ void drawBestTimes(GameState *gs)
         PlaySound(gs->click_sound1);
         nukeBestTimes(gs->times);
     }
+
+    // Change mouse cursor
+    if (hoveredRec(menu_btn_rec) || hoveredRec(nuke_btn_rec))
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    else
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 
     EndDrawing();
 }
@@ -682,7 +688,7 @@ void drawHighScores(GameState *gs)
     }
 
     // NUKE BUTTON
-    Rectangle nuke_btn_rec = {SCREENWIDTH - 10 - 40, 40, 50, 50};
+    Rectangle nuke_btn_rec = {SCREENWIDTH - 10 - 70, 40, 50, 50};
     DrawTexturePro(gs->nuke_btn, (Rectangle){0, 0, gs->nuke_btn.width, gs->nuke_btn.height}, nuke_btn_rec, Vector2Zero(), 0, WHITE);
 
     if (clickedRec(nuke_btn_rec))
@@ -690,6 +696,12 @@ void drawHighScores(GameState *gs)
         PlaySound(gs->click_sound1);
         nukeHighScores(gs->scores);
     }
+
+    // Change mouse cursor
+    if (hoveredRec(menu_btn_rec) || hoveredRec(nuke_btn_rec))
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    else
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 
     EndDrawing();
 }
@@ -783,7 +795,7 @@ void initGameplay(GameState *gs)
     {
         gs->level = 0;
         if (gs->mode == TIME_RUNS_OUT)
-            gs->round = 0;
+            gs->round = 1;
     }
 
     initializeMaze(&gs->maze, gs->level);
@@ -1279,11 +1291,9 @@ void updateGame(GameState *gs)
 
     case GAME_FINISH:
         if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
-            if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
-                drawTime(gs);
-            else if (gs->mode == MULTIVERSE || gs->mode == TIME_RUNS_OUT)
-                else if (gs->mode == MULTIVERSE || gs->mode == TIME_RUNS_OUT)
-                    drawScore(gs);
+            drawTime(gs);
+        else if (gs->mode == MULTIVERSE)
+            drawScore(gs);
         break;
 
     case MULTIVERSE_CONQUERED:
