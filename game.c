@@ -14,6 +14,8 @@ void initGameState(GameState *gs)
 
     srand(time(NULL));
 
+    generateMaze = generateMaze_aldous_broder;
+
     gs->page = MENU;
     gs->shouldQuit = false;
 
@@ -103,6 +105,12 @@ void initGameState(GameState *gs)
         fscanf(gs->high_scores_file, "%d %[^\n]", &gs->high_scores[i].score, gs->high_scores[i].player_name);
     fclose(gs->high_scores_file);
 
+    // Dark Times for the DARK NIGHT
+    gs->dark_times_file = fopen("scores/Dark_Nights.txt","r");
+    for (int i = 0; i < 10; i++)
+        fscanf(gs->dark_times_file, "%f %[^\n]", &gs->dark_times[i].time, gs->dark_times[i].player_name);
+    fclose(gs->dark_times_file);
+
     PlayMusicStream(gs->bg_music);
 }
 
@@ -167,11 +175,17 @@ void unloadGameState(GameState *gs)
         fprintf(gs->best_times_file, "%f %s\n", gs->best_times[i].time, gs->best_times[i].player_name);
     fclose(gs->best_times_file);
 
-    // store High Scores of THE MULTIVERSE OF MADMAZE file
+    // Store High Scores of THE MULTIVERSE OF MADMAZE file
     gs->high_scores_file = fopen("scores/High_Scores.txt", "w");
     for (int i = 0; i < 10; i++)
         fprintf(gs->high_scores_file, "%d %s\n", gs->high_scores[i].score, gs->high_scores[i].player_name);
     fclose(gs->high_scores_file);
+
+    // Store Dark Times for THE DARK NIGHT
+    gs->dark_times_file = fopen("scores/Dark_Nights.txt", "w");
+    for (int i = 0; i < 10; i++)
+        fprintf(gs->dark_times_file, "%f %s\n", gs->dark_times[i].time, gs->dark_times[i].player_name);
+    fclose(gs->dark_times_file);
 
     destroyMaze(&gs->maze);
 
@@ -586,6 +600,7 @@ void drawBestTimes(GameState *gs)
     BeginDrawing();
     ClearBackground(GetColor(0xdff7ffff));
 
+    if(gs->mode == BEST_OF_US)
     for (int i = 0; i < 10; i++)
     {
         // Player Name
@@ -599,6 +614,22 @@ void drawBestTimes(GameState *gs)
         Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%s", best_time_text), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
         drawCard(best_times_card);
     }
+
+    else if(gs->mode == DARK_NIGHT) // not done
+    for (int i = 0; i < 10; i++)
+    {
+        // Player Name
+        Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
+        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->best_times[i].player_name), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+        drawCard(player_name_card);
+
+        // Best Time
+        Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
+        const char *best_time_text = formatTime(gs->best_times[i].time);
+        Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%s", best_time_text), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
+        drawCard(best_times_card);
+    }
+
 
     // MENU BUTTON
     // MENU BUTTON
@@ -783,7 +814,7 @@ void initGameplay(GameState *gs)
         srand(4 + 19);
 
     initializeMaze(&gs->maze, gs->level);
-    generateMaze_aldous_broder(&gs->maze);
+    generateMaze(&gs->maze);
 }
 
 void updateGameplay(GameState *gs)
@@ -863,7 +894,7 @@ void updateGameplay(GameState *gs)
     {
         gs->last_time = GetTime() - gs->start_time;
         PlaySound(gs->game_finish_sound);
-        if (gs->mode == BEST_OF_US)
+        if (gs->mode == BEST_OF_US )
         {
             addTime(gs);
             gs->page = GAME_FINISH;
@@ -881,6 +912,11 @@ void updateGameplay(GameState *gs)
             {
                 gs->page = MULTIVERSE_CONQUERED;
             }
+        }
+        else if (gs->mode == DARK_NIGHT )
+        {
+            addDarkTime(gs);
+            gs->page = GAME_FINISH;
         }
     }
 }
@@ -1010,7 +1046,8 @@ void drawDark(GameState *gs)
         for (int x = 0; x < gs->maze.width; x++)
         {
             int distance2 = (x - gs->player.x) * (x - gs->player.x) + (y - gs->player.y) * (y - gs->player.y);
-            if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (distance2 > range * range))
+            //if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (distance2 > range * range))
+            if(!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (((x-gs->player.x)<-range || (x-gs->player.x)>range) || ((y-gs->player.y)<-range || (y-gs->player.y)>range)))
             {
                 DrawRectangle(pos.x, pos.y, gs->maze.cell_size, gs->maze.cell_size, BLACK);
             }
@@ -1151,6 +1188,14 @@ void addTime(GameState *gs)
     gs->best_times[10].time = gs->last_time;
     sortBestTimes(gs->best_times);
 }
+
+void addDarkTime(GameState *gs)
+{
+    strcpy(gs->dark_times[10].player_name, gs->name);
+    gs->dark_times[10].time = gs->last_time;
+    sortBestTimes(gs->dark_times);
+}
+
 
 void addScore(GameState *gs)
 {

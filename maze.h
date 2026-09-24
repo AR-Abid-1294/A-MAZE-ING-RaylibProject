@@ -14,8 +14,8 @@
 #define SCREENWIDTH 1400
 #define SCREENHEIGHT 800
 
-#define MAZEWIDTH 31
-#define MAZEHEIGHT 25
+#define MAZEWIDTH 10
+#define MAZEHEIGHT 8
 #define CELLSIZE 25
 #define WALL_THICK 3
 #define MAX_LEVEL 50
@@ -101,6 +101,18 @@ void breakWall(Maze *maze, Cell *cell1, Cell *cell2);
 void addFrontier(Maze *maze, Cell *cell);
 
 void removeFrontier(Maze *maze, int frontier_index);
+
+//algo
+
+void generateMaze_backtracker(Maze *maze);
+
+void chooseRandFrontier(Maze *maze);
+
+void generateMaze_prim(Maze *maze);
+
+void generateMaze_aldous_broder(Maze *maze);
+
+void (*generateMaze)(Maze *maze);
 
 void drawMaze(Maze *maze, Vector2 pos, Player *player);
 

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "aldous_broder.h"
+#include "maze.h"
 #include "ui.h"
 #include "scores.h"
 
@@ -122,6 +122,12 @@ typedef struct GameState
     Score high_scores[11];
     FILE *high_scores_file;
 
+    // best dark times
+    float last_dark_time;
+    Time dark_times[11];
+    FILE *dark_times_file;
+
+    
     // mode
     GameMode mode;
 
