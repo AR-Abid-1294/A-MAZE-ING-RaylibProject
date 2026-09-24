@@ -19,6 +19,7 @@ typedef enum PageState
     GAME_OVER,
     MULTIVERSE_CONQUERED,
     CREDIT,
+    INFO,
     SETTINGS,
     HIGH_SCORES,
     BEST_TIMES
@@ -83,9 +84,20 @@ typedef struct GameState
     Texture2D abid_pic;
     Texture2D afif_pic;
 
-    // music buttons
+    // buttons
+
     Texture2D music_on_btn;
+    Texture2D music_hovered_btn;
     Texture2D music_off_btn;
+
+    Texture2D info_btn;
+    Texture2D info_hovered_btn;
+
+    Texture2D settings_btn;
+    Texture2D settings_hovered_btn;
+
+    Texture2D menu_btn;
+    Texture2D menu_hovered_btn;
 
     // mode selection buttons
     Texture2D best_of_us_btn;
@@ -141,6 +153,6 @@ void drawScore(GameState *gs);
 
 void drawDark(GameState *gs);
 
-
+void drawMenuButton();
 
 #endif

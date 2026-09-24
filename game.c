@@ -65,9 +65,16 @@ void initGameState(GameState *gs)
     gs->abid_pic = LoadTexture("Assets/Images/abid.png");
     gs->afif_pic = LoadTexture("Assets/Images/afif.png");
 
-    // Load Music Buttons
+    // Load Buttons
     gs->music_on_btn = LoadTexture("Assets/Buttons/music_on.png");
+    gs->music_hovered_btn = LoadTexture("Assets/Buttons/music_hovered.png");
     gs->music_off_btn = LoadTexture("Assets/Buttons/music_off.png");
+    gs->info_btn = LoadTexture("Assets/Buttons/info.png");
+    gs->info_hovered_btn = LoadTexture("Assets/Buttons/info_hovered.png");
+    gs->settings_btn = LoadTexture("Assets/Buttons/settings.png");
+    gs->settings_hovered_btn = LoadTexture("Assets/Buttons/settings_hovered.png");
+    gs->menu_btn = LoadTexture("Assets/Buttons/menu.png");
+    gs->menu_hovered_btn = LoadTexture("Assets/Buttons/menu_hovered.png");
 
     // Load Mode Selection Buttons
     gs->best_of_us_btn = LoadTexture("Assets/Mode Buttons/the_best_of_us.png");
@@ -134,9 +141,16 @@ void unloadGameState(GameState *gs)
     UnloadTexture(gs->abid_pic);
     UnloadTexture(gs->afif_pic);
 
-    // Unload Music Buttons
+    // Unload Buttons
     UnloadTexture(gs->music_on_btn);
+    UnloadTexture(gs->music_hovered_btn);
     UnloadTexture(gs->music_off_btn);
+    UnloadTexture(gs->settings_btn);
+    UnloadTexture(gs->settings_hovered_btn);
+    UnloadTexture(gs->info_btn);
+    UnloadTexture(gs->info_hovered_btn);
+    UnloadTexture(gs->menu_btn);
+    UnloadTexture(gs->menu_hovered_btn);
 
     // Unload Mode Selction Buttons
     UnloadTexture(gs->best_of_us_btn);
@@ -213,24 +227,20 @@ void drawMenu(GameState *gs)
         gs->page = CREDIT;
     }
 
-    // BEST TIMES/HIGH SCORES BUTTON
-    const char *best_times_btn_text;
-    if (gs->mode == BEST_OF_US)
-        best_times_btn_text = "BEST TIMES";
-    else if (gs->mode == MULTIVERSE || gs->mode == DARK_NIGHT || gs->mode == TIME_RUNS_OUT)
-        best_times_btn_text = "HIGH SCORES";
+    // LEADERBOARD BUTTON
+    const char *leaderboard_btn_text = "LEADERBOARD   ";
 
-    Button best_times_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 250 + 50 * 2, SCREENWIDTH / 5, 35},
-                             GetColor(0x00f0ffff),
-                             .stroke = 0, WHITE, best_times_btn_text, gs->btn_font, BLACK, 25, 1, 80};
-    drawButton(best_times_btn);
-    if (hovered(best_times_btn))
+    Button leaderboard_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 250 + 50 * 2, SCREENWIDTH / 5, 35},
+                              GetColor(0x00f0ffff),
+                              .stroke = 0, WHITE, leaderboard_btn_text, gs->btn_font, BLACK, 25, 1, 80};
+    drawButton(leaderboard_btn);
+    if (hovered(leaderboard_btn))
     {
-        best_times_btn.buttonColor = BLUE;
-        best_times_btn.textColor = WHITE;
-        drawButton(best_times_btn);
+        leaderboard_btn.buttonColor = BLUE;
+        leaderboard_btn.textColor = WHITE;
+        drawButton(leaderboard_btn);
     }
-    if (clicked(best_times_btn))
+    if (clicked(leaderboard_btn))
     {
         PlaySound(gs->click_sound1);
         if (gs->mode == BEST_OF_US)
@@ -315,28 +325,6 @@ void drawMenu(GameState *gs)
         gs->mode = INFINITY_WAR;
     }
 
-    // // GRAVITY GRAVE
-    // Rectangle gravity_grave_mode_btn = {17.5 * 6 + 180 * 5, 600, 180, 130};
-
-    // DrawTexturePro(gs->gravity_grave_btn, (Rectangle){0, 0, gs->gravity_grave_btn.width, gs->gravity_grave_btn.height}, gravity_grave_mode_btn, Vector2Zero(), 0, WHITE);
-
-    // if (clickedRec(gravity_grave_mode_btn))
-    // {
-    //     PlaySound(gs->click_sound1);
-    //     gs->mode = GRAVITY_GRAVE;
-    // }
-
-    // // ENDGAME
-    // Rectangle endgame_mode_btn = {17.5 * 7 + 180 * 6, 600, 180, 130};
-
-    // DrawTexturePro(gs->endgame_btn, (Rectangle){0, 0, gs->endgame_btn.width, gs->endgame_btn.height}, endgame_mode_btn, Vector2Zero(), 0, WHITE);
-
-    // if (clickedRec(endgame_mode_btn))
-    // {
-    //     PlaySound(gs->click_sound1);
-    //     gs->mode = ENDGAME;
-    // }
-
     // Selected Mode Pointer
     int i;
     if (gs->mode == BEST_OF_US)
@@ -365,10 +353,10 @@ void drawMenu(GameState *gs)
     DrawTexturePro(menu_sprite2, (Rectangle){0, 0, -menu_sprite2.width, menu_sprite2.height},
                    (Rectangle){1000, 200, 300, 300}, Vector2Zero(), 0, WHITE);
 
-    // Mute Music Button
-    Rectangle music_btn_rec = {SCREENWIDTH - 60, 20, 30, 30};
+    // MUSIC BUTTON
+    Rectangle music_btn_rec = {SCREENWIDTH - 40 * 3, 20, 20, 20};
 
-    Texture2D music_btn = gs->music_on ? gs->music_on_btn : gs->music_off_btn;
+    Texture2D music_btn = hoveredRec(music_btn_rec) ? gs->music_hovered_btn : (gs->music_on ? gs->music_on_btn : gs->music_off_btn);
 
     DrawTexturePro(music_btn, (Rectangle){0, 0, gs->music_on_btn.width, gs->music_on_btn.height}, music_btn_rec, Vector2Zero(), 0, WHITE);
 
@@ -387,8 +375,34 @@ void drawMenu(GameState *gs)
         }
     }
 
+    // INFO BUTTON
+    Rectangle info_btn_rec = {SCREENWIDTH - 40 * 2, 20, 20, 20};
+
+    Texture2D info_btn = hoveredRec(info_btn_rec) ? gs->info_hovered_btn : gs->info_btn;
+
+    DrawTexturePro(info_btn, (Rectangle){0, 0, gs->info_btn.width, gs->info_btn.height}, info_btn_rec, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(info_btn_rec))
+    {
+        PlaySound(gs->click_sound1);
+        gs->page = INFO;
+    }
+
+    // SETTINGS BUTTON
+    Rectangle settings_btn_rec = {SCREENWIDTH - 40, 20, 20, 20};
+
+    Texture2D settings_btn = hoveredRec(settings_btn_rec) ? gs->settings_hovered_btn : gs->settings_btn;
+
+    DrawTexturePro(settings_btn, (Rectangle){0, 0, gs->settings_btn.width, gs->settings_btn.height}, settings_btn_rec, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(settings_btn_rec))
+    {
+        PlaySound(gs->click_sound1);
+        gs->page = SETTINGS;
+    }
+
     // Change Mouse Cursor
-    if (hovered(play_btn) || hovered(credit_btn) || hovered(best_times_btn) || hovered(quit_btn) || hoveredRec(best_of_us_mode_btn) || hoveredRec(multiverse_mode_btn) || hoveredRec(dark_night_mode_btn) || hoveredRec(time_runs_out_mode_btn) || hoveredRec(infinity_war_mode_btn) || hoveredRec(music_btn_rec))
+    if (hovered(play_btn) || hovered(credit_btn) || hovered(leaderboard_btn) || hovered(quit_btn) || hoveredRec(best_of_us_mode_btn) || hoveredRec(multiverse_mode_btn) || hoveredRec(dark_night_mode_btn) || hoveredRec(time_runs_out_mode_btn) || hoveredRec(infinity_war_mode_btn) || hoveredRec(music_btn_rec) || hoveredRec(info_btn_rec) || hoveredRec(settings_btn_rec))
     {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
     }
@@ -436,18 +450,11 @@ void drawNameInput(GameState *gs)
     drawCard(input_card);
 
     // MENU BUTTON
-    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
-                       0, WHITE,
-                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
-    drawButton(menu_btn);
-    if (hovered(menu_btn))
-    {
-        menu_btn.buttonColor = BLUE;
-        menu_btn.shadow_opacity = 80;
-        drawButton(menu_btn);
-    }
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
 
-    if (clicked(menu_btn))
+    if (clickedRec(menu_btn_rec))
     {
         PlaySound(gs->click_sound1);
         gs->page = MENU;
@@ -485,7 +492,7 @@ void drawNameInput(GameState *gs)
         }
     }
 
-    if (hovered(menu_btn) || hovered(enter_btn))
+    if (hoveredRec(menu_btn_rec) || hovered(enter_btn))
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
     else
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
@@ -516,22 +523,55 @@ void drawCredit(GameState *gs)
     drawCard(afif_card);
 
     // MENU BUTTON
-    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
-                       0, WHITE,
-                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
-    drawButton(menu_btn);
-    if (hovered(menu_btn))
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
-        menu_btn.buttonColor = BLUE;
-        menu_btn.shadow_opacity = 80;
-        drawButton(menu_btn);
+        PlaySound(gs->click_sound1);
+        gs->page = MENU;
+    }
+
+    // Change Mouse Cursor
+    if (hoveredRec(menu_btn_rec))
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    }
     else
-    {
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+
+    EndDrawing();
+}
+
+void drawInfo(GameState *gs)
+{
+    BeginDrawing();
+    ClearBackground(GetColor(0x2e2e2eff));
+
+    // MENU BUTTON
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(menu_btn_rec))
+    {
+        PlaySound(gs->click_sound1);
+        gs->page = MENU;
     }
-    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
+
+    EndDrawing();
+}
+
+void drawSettings(GameState *gs)
+{
+    BeginDrawing();
+    ClearBackground(GetColor(0x2e2e2eff));
+
+    // MENU BUTTON
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(menu_btn_rec))
     {
         PlaySound(gs->click_sound1);
         gs->page = MENU;
@@ -561,23 +601,12 @@ void drawBestTimes(GameState *gs)
     }
 
     // MENU BUTTON
-    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
-                       0, WHITE,
-                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
-    drawButton(menu_btn);
-    if (hovered(menu_btn))
-    {
-        menu_btn.buttonColor = BLUE;
-        menu_btn.shadow_opacity = 80;
-        drawButton(menu_btn);
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    }
-    else
-    {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
+    // MENU BUTTON
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
 
-    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
+    if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound1);
         gs->page = MENU;
@@ -629,23 +658,11 @@ void drawHighScores(GameState *gs)
     }
 
     // MENU BUTTON
-    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
-                       0, WHITE,
-                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
-    drawButton(menu_btn);
-    if (hovered(menu_btn))
-    {
-        menu_btn.buttonColor = BLUE;
-        menu_btn.shadow_opacity = 80;
-        drawButton(menu_btn);
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    }
-    else
-    {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
 
-    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
+    if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound1);
         gs->page = MENU;
@@ -715,23 +732,11 @@ void drawLevels(GameState *gs)
     }
 
     // MENU BUTTON
-    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
-                       0, WHITE,
-                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
-    drawButton(menu_btn);
-    if (hovered(menu_btn))
-    {
-        menu_btn.buttonColor = BLUE;
-        menu_btn.shadow_opacity = 80;
-        drawButton(menu_btn);
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    }
-    else
-    {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
 
-    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
+    if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound1);
         gs->page = MENU;
@@ -914,26 +919,24 @@ void drawGame(GameState *gs)
     DrawTextEx(gs->title_font, title, (Vector2){(SCREENWIDTH - MeasureText(title, 50)) / 2, 20}, 50, 1, WHITE);
 
     // MENU BUTTON
-    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
-                       0, WHITE,
-                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
-    drawButton(menu_btn);
-    if (hovered(menu_btn))
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(menu_btn_rec))
     {
-        menu_btn.buttonColor = BLUE;
-        menu_btn.shadow_opacity = 80;
-        drawButton(menu_btn);
+        PlaySound(gs->click_sound1);
+        gs->page = MENU;
+    }
+
+    // Change Mouse Cursor
+    if (hoveredRec(menu_btn_rec))
+    {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
     }
     else
     {
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
-
-    if (clicked(menu_btn))
-    {
-        PlaySound(gs->click_sound1);
-        gs->page = MENU;
     }
 
     if (IsKeyPressed(KEY_BACKSPACE))
@@ -1025,23 +1028,11 @@ void drawTime(GameState *gs)
     ClearBackground(GetColor(0xddfbefff));
 
     // MENU BUTTON
-    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
-                       0, WHITE,
-                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
-    drawButton(menu_btn);
-    if (hovered(menu_btn))
-    {
-        menu_btn.buttonColor = BLUE;
-        menu_btn.shadow_opacity = 80;
-        drawButton(menu_btn);
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    }
-    else
-    {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
 
-    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
+    if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound1);
         gs->page = MENU;
@@ -1098,23 +1089,11 @@ void drawScore(GameState *gs)
     ClearBackground(GetColor(0xddfbefff));
 
     // MENU BUTTON
-    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
-                       0, WHITE,
-                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
-    drawButton(menu_btn);
-    if (hovered(menu_btn))
-    {
-        menu_btn.buttonColor = BLUE;
-        menu_btn.shadow_opacity = 80;
-        drawButton(menu_btn);
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    }
-    else
-    {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
 
-    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
+    if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound1);
         gs->page = MENU;
@@ -1186,23 +1165,11 @@ void drawMultiConq(GameState *gs)
     ClearBackground(GetColor(0xddfbefff));
 
     // MENU BUTTON
-    Button menu_btn = {(Rectangle){10, 10, 100, 40}, DARKBLUE,
-                       0, WHITE,
-                       "MENU", gs->btn_font, RAYWHITE, 20, 1, 0};
-    drawButton(menu_btn);
-    if (hovered(menu_btn))
-    {
-        menu_btn.buttonColor = BLUE;
-        menu_btn.shadow_opacity = 80;
-        drawButton(menu_btn);
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    }
-    else
-    {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
 
-    if (clicked(menu_btn) || IsKeyPressed(KEY_BACKSPACE))
+    if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound1);
         gs->page = MENU;
@@ -1292,6 +1259,14 @@ void updateGame(GameState *gs)
 
     case CREDIT:
         drawCredit(gs);
+        break;
+
+    case INFO:
+        drawInfo(gs);
+        break;
+
+    case SETTINGS:
+        drawSettings(gs);
         break;
 
     case BEST_TIMES:
