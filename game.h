@@ -99,6 +99,9 @@ typedef struct GameState
     Texture2D menu_btn;
     Texture2D menu_hovered_btn;
 
+    Texture2D nuke_btn;
+    Texture2D nuke_hovered_btn;
+
     // mode selection buttons
     Texture2D best_of_us_btn;
     Texture2D multiverse_btn;
@@ -113,21 +116,28 @@ typedef struct GameState
     int letter_count;
 
     // best times for THE BEST OF US mode
-    float last_time;
     Time best_times[11];
     FILE *best_times_file;
 
-    // high scores for THE MULTIVERSE OF MADMAZE
-    int last_score;
-    Score high_scores[11];
-    FILE *high_scores_file;
-
-    // best dark times
-    float last_dark_time;
+    // best times for THE DARK NIGHT
     Time dark_times[11];
     FILE *dark_times_file;
 
-    
+    // high scores for THE MULTIVERSE OF MADMAZE
+    Score high_scores[11];
+    FILE *high_scores_file;
+
+    // high scores for TIME RUNS OUT
+    Score out_scores[11];
+    FILE *out_scores_file;
+
+    // genral pointers
+    float last_time;
+    Time *times;
+
+    int last_score;
+    Score *scores;
+
     // mode
     GameMode mode;
 
