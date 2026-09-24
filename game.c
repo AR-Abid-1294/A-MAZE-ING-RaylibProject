@@ -420,23 +420,6 @@ void updateNameInput(GameState *gs)
         gs->letter_count--;
         gs->name[gs->letter_count] = '\0';
     }
-
-    if (IsKeyPressed(KEY_ENTER))
-    {
-        PlaySound(gs->click_sound1);
-
-        if (gs->mode == BEST_OF_US)
-        {
-            gs->page = PLAYING;
-            gs->start_time = GetTime();
-            initGameplay(gs);
-        }
-        else if (gs->mode == MULTIVERSE)
-        {
-            gs->page = LEVELS;
-            gs->last_score = 0;
-        }
-    }
 }
 
 void drawNameInput(GameState *gs)
@@ -484,7 +467,7 @@ void drawNameInput(GameState *gs)
             drawButton(enter_btn);
         }
 
-        if (clicked(enter_btn))
+        if (clicked(enter_btn) || IsKeyPressed(KEY_ENTER))
         {
             PlaySound(gs->click_sound1);
 
@@ -497,6 +480,7 @@ void drawNameInput(GameState *gs)
             else if (gs->mode == MULTIVERSE)
             {
                 gs->page = LEVELS;
+                gs->last_score = 0;
             }
         }
     }
@@ -788,7 +772,7 @@ void initGameplay(GameState *gs)
     gs->player.x = 0;
     gs->player.y = 0;
 
-    if (gs->mode == BEST_OF_US)
+    if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
         gs->level = 0;
     else if (gs->mode == MULTIVERSE)
         srand(4 + 19);
