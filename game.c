@@ -14,6 +14,10 @@ void initGameState(GameState *gs)
 
     srand(time(NULL));
 
+    generateMaze = generateMaze_aldous_broder;
+    gs->times = gs->best_times;
+    gs->scores = gs->high_scores;
+
     gs->page = MENU;
     gs->shouldQuit = false;
 
@@ -75,6 +79,7 @@ void initGameState(GameState *gs)
     gs->settings_hovered_btn = LoadTexture("Assets/Buttons/settings_hovered.png");
     gs->menu_btn = LoadTexture("Assets/Buttons/menu.png");
     gs->menu_hovered_btn = LoadTexture("Assets/Buttons/menu_hovered.png");
+    gs->nuke_btn = LoadTexture("Assets/Buttons/nuke.png");
 
     // Load Mode Selection Buttons
     gs->best_of_us_btn = LoadTexture("Assets/Mode Buttons/the_best_of_us.png");
@@ -97,11 +102,17 @@ void initGameState(GameState *gs)
         fscanf(gs->best_times_file, "%f %[^\n]", &gs->best_times[i].time, gs->best_times[i].player_name);
     fclose(gs->best_times_file);
 
-    // High Scores for THE MULTIVERSE OF MADMAZE
+    // Load High Scores for THE MULTIVERSE OF MADMAZE
     gs->high_scores_file = fopen("scores/High_Scores.txt", "r");
     for (int i = 0; i < 10; i++)
         fscanf(gs->high_scores_file, "%d %[^\n]", &gs->high_scores[i].score, gs->high_scores[i].player_name);
     fclose(gs->high_scores_file);
+
+    // Load Dark Times for the DARK NIGHT
+    gs->dark_times_file = fopen("scores/Dark_Nights.txt", "r");
+    for (int i = 0; i < 10; i++)
+        fscanf(gs->dark_times_file, "%f %[^\n]", &gs->dark_times[i].time, gs->dark_times[i].player_name);
+    fclose(gs->dark_times_file);
 
     PlayMusicStream(gs->bg_music);
 }
@@ -167,11 +178,17 @@ void unloadGameState(GameState *gs)
         fprintf(gs->best_times_file, "%f %s\n", gs->best_times[i].time, gs->best_times[i].player_name);
     fclose(gs->best_times_file);
 
-    // store High Scores of THE MULTIVERSE OF MADMAZE file
+    // Store High Scores of THE MULTIVERSE OF MADMAZE file
     gs->high_scores_file = fopen("scores/High_Scores.txt", "w");
     for (int i = 0; i < 10; i++)
         fprintf(gs->high_scores_file, "%d %s\n", gs->high_scores[i].score, gs->high_scores[i].player_name);
     fclose(gs->high_scores_file);
+
+    // Store Dark Times for THE DARK NIGHT
+    gs->dark_times_file = fopen("scores/Dark_Nights.txt", "w");
+    for (int i = 0; i < 10; i++)
+        fprintf(gs->dark_times_file, "%f %s\n", gs->dark_times[i].time, gs->dark_times[i].player_name);
+    fclose(gs->dark_times_file);
 
     destroyMaze(&gs->maze);
 
@@ -243,9 +260,9 @@ void drawMenu(GameState *gs)
     if (clicked(leaderboard_btn))
     {
         PlaySound(gs->click_sound1);
-        if (gs->mode == BEST_OF_US)
+        if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
             gs->page = BEST_TIMES;
-        else if (gs->mode == MULTIVERSE)
+        else if (gs->mode == MULTIVERSE || gs->mode == TIME_RUNS_OUT)
             gs->page = HIGH_SCORES;
     }
 
@@ -278,6 +295,7 @@ void drawMenu(GameState *gs)
         srand(52);
         PlaySound(gs->click_sound1);
         gs->mode = BEST_OF_US;
+        gs->times = gs->best_times;
     }
 
     // THE MULTIVERSE OF MADMAZE
@@ -289,6 +307,7 @@ void drawMenu(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->mode = MULTIVERSE;
+        gs->scores = gs->high_scores;
         gs->level = 1;
     }
 
@@ -301,6 +320,7 @@ void drawMenu(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->mode = TIME_RUNS_OUT;
+        gs->scores = gs->out_scores;
     }
 
     // THE DARK NIGHT
@@ -312,6 +332,7 @@ void drawMenu(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->mode = DARK_NIGHT;
+        gs->times = gs->dark_times;
     }
 
     // INFINITY WAR
@@ -590,18 +611,18 @@ void drawBestTimes(GameState *gs)
 {
 
     BeginDrawing();
-    ClearBackground(GetColor(0xdff7ffff));
+    ClearBackground(GetColor(0x2e2e2eff));
 
     for (int i = 0; i < 10; i++)
     {
         // Player Name
         Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->best_times[i].player_name), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->times[i].player_name), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
         drawCard(player_name_card);
 
         // Best Time
         Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-        const char *best_time_text = formatTime(gs->best_times[i].time);
+        const char *best_time_text = formatTime(gs->times[i].time);
         Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%s", best_time_text), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
         drawCard(best_times_card);
     }
@@ -618,26 +639,13 @@ void drawBestTimes(GameState *gs)
     }
 
     // NUKE BUTTON
-    Button nuke_btn = {(Rectangle){SCREENWIDTH - 10 - 100, 10, 100, 40}, DARKBLUE,
-                       0, WHITE,
-                       "NUKE", gs->btn_font, RAYWHITE, 20, 1, 0};
-    drawButton(nuke_btn);
-    if (hovered(nuke_btn))
-    {
-        nuke_btn.buttonColor = BLUE;
-        nuke_btn.shadow_opacity = 80;
-        drawButton(nuke_btn);
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    }
-    else
-    {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
+    Rectangle nuke_btn_rec = {SCREENWIDTH - 10 - 40, 40, 50, 50};
+    DrawTexturePro(gs->nuke_btn, (Rectangle){0, 0, gs->nuke_btn.width, gs->nuke_btn.height}, nuke_btn_rec, Vector2Zero(), 0, WHITE);
 
-    if (clicked(nuke_btn) || IsKeyPressed(KEY_BACKSPACE))
+    if (clickedRec(nuke_btn_rec))
     {
         PlaySound(gs->click_sound1);
-        nukeBestTimes(gs->best_times);
+        nukeBestTimes(gs->times);
     }
 
     EndDrawing();
@@ -646,7 +654,7 @@ void drawBestTimes(GameState *gs)
 void drawHighScores(GameState *gs)
 {
     BeginDrawing();
-    ClearBackground(GetColor(0xdff7ffff));
+    ClearBackground(GetColor(0x2e2e2eff));
 
     for (int i = 0; i < 10; i++)
     {
@@ -674,26 +682,13 @@ void drawHighScores(GameState *gs)
     }
 
     // NUKE BUTTON
-    Button nuke_btn = {(Rectangle){SCREENWIDTH - 10 - 100, 10, 100, 40}, DARKBLUE,
-                       0, WHITE,
-                       "NUKE", gs->btn_font, RAYWHITE, 20, 1, 0};
-    drawButton(nuke_btn);
-    if (hovered(nuke_btn))
-    {
-        nuke_btn.buttonColor = BLUE;
-        nuke_btn.shadow_opacity = 80;
-        drawButton(nuke_btn);
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    }
-    else
-    {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
+    Rectangle nuke_btn_rec = {SCREENWIDTH - 10 - 40, 40, 50, 50};
+    DrawTexturePro(gs->nuke_btn, (Rectangle){0, 0, gs->nuke_btn.width, gs->nuke_btn.height}, nuke_btn_rec, Vector2Zero(), 0, WHITE);
 
-    if (clicked(nuke_btn) || IsKeyPressed(KEY_BACKSPACE))
+    if (clickedRec(nuke_btn_rec))
     {
         PlaySound(gs->click_sound1);
-        nukeHighScores(gs->high_scores);
+        nukeHighScores(gs->scores);
     }
 
     EndDrawing();
@@ -792,7 +787,7 @@ void initGameplay(GameState *gs)
     }
 
     initializeMaze(&gs->maze, gs->level);
-    generateMaze_aldous_broder(&gs->maze);
+    generateMaze(&gs->maze);
 }
 
 void updateGameplay(GameState *gs)
@@ -1045,7 +1040,8 @@ void drawDark(GameState *gs)
         for (int x = 0; x < gs->maze.width; x++)
         {
             int distance2 = (x - gs->player.x) * (x - gs->player.x) + (y - gs->player.y) * (y - gs->player.y);
-            if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (distance2 > range * range))
+            // if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (distance2 > range * range))
+            if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (((x - gs->player.x) < -range || (x - gs->player.x) > range) || ((y - gs->player.y) < -range || (y - gs->player.y) > range)))
             {
                 DrawRectangle(pos.x, pos.y, gs->maze.cell_size, gs->maze.cell_size, BLACK);
             }
@@ -1182,16 +1178,16 @@ void drawScore(GameState *gs)
 
 void addTime(GameState *gs)
 {
-    strcpy(gs->best_times[10].player_name, gs->name);
-    gs->best_times[10].time = gs->last_time;
-    sortBestTimes(gs->best_times);
+    strcpy(gs->times[10].player_name, gs->name);
+    gs->times[10].time = gs->last_time;
+    sortBestTimes(gs->times);
 }
 
 void addScore(GameState *gs)
 {
-    strcpy(gs->high_scores[10].player_name, gs->name);
-    gs->high_scores[10].score = gs->last_score;
-    sortHighScores(gs->high_scores);
+    strcpy(gs->scores[10].player_name, gs->name);
+    gs->scores[10].score = gs->last_score;
+    sortHighScores(gs->scores);
 }
 
 void drawMultiConq(GameState *gs)
@@ -1283,9 +1279,11 @@ void updateGame(GameState *gs)
 
     case GAME_FINISH:
         if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
-            drawTime(gs);
-        else if (gs->mode == MULTIVERSE || gs->mode == TIME_RUNS_OUT)
-            drawScore(gs);
+            if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
+                drawTime(gs);
+            else if (gs->mode == MULTIVERSE || gs->mode == TIME_RUNS_OUT)
+                else if (gs->mode == MULTIVERSE || gs->mode == TIME_RUNS_OUT)
+                    drawScore(gs);
         break;
 
     case MULTIVERSE_CONQUERED:

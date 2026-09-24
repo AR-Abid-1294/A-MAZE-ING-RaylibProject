@@ -139,6 +139,97 @@ void removeFrontier(Maze *maze, int frontier_index)
     }
 }
 
+// algorithms
+
+//backtracker
+void generateMaze_backtracker(Maze *maze)
+{
+    maze->current_cell->cellState = VISITED;
+
+    shuffleDirections();
+
+    for (int i = 0; i < 4; i++)
+    {
+        int nx = maze->current_cell->x + directions[i][0];
+        int ny = maze->current_cell->y + directions[i][1];
+
+        if (isCellValid(nx, ny, *maze))
+        {
+            Cell *neighbor_cell = &maze->cells[ny][nx];
+
+            if (neighbor_cell->cellState == UNVISITED)
+            {
+                Cell *old_current_cell = maze->current_cell;
+                maze->current_cell = neighbor_cell;
+                breakWall(maze, old_current_cell, maze->current_cell);
+
+                generateMaze_backtracker(maze);
+                maze->current_cell = old_current_cell;
+            }
+        }
+    }
+}
+
+//prim
+void chooseRandFrontier(Maze *maze)
+{
+    int r = rand() % maze->frontier_count;
+    Cell *target_cell = maze->frontiers[r].univisited_cell;
+    if (target_cell->cellState == VISITED)
+    {
+        maze->frontier_count--;
+        removeFrontier(maze, r);
+    }
+    else
+    {
+        target_cell->cellState = VISITED;
+        breakWall(maze, maze->frontiers[r].visisted_cell, maze->frontiers[r].univisited_cell);
+        maze->frontier_count--;
+        removeFrontier(maze, r);
+        addFrontier(maze, target_cell);
+    }
+}
+
+void generateMaze_prim(Maze *maze)
+{
+    while (maze->frontier_count)
+    {
+        chooseRandFrontier(maze);
+    }
+}
+
+//aldous broder
+void generateMaze_aldous_broder(Maze *maze)
+{
+    while (maze->visited_count < maze->height * maze->width)
+    {
+        shuffleDirections();
+
+        Cell *neighbour_cell;
+
+        for (int i = 0; i < 4; i++)
+        {
+            int nx = maze->current_cell->x + directions[i][0];
+            int ny = maze->current_cell->y + directions[i][1];
+
+            if (isCellValid(nx, ny, *maze))
+            {
+                neighbour_cell = &maze->cells[ny][nx];
+                break;
+            }
+        }
+
+        if (neighbour_cell->cellState == UNVISITED)
+        {
+            neighbour_cell->cellState = VISITED;
+            maze->visited_count++;
+            breakWall(maze, maze->current_cell, neighbour_cell);
+        }
+
+        maze->current_cell = neighbour_cell;
+    }
+}
+
 void drawBorder(Rectangle rec, Direction dir, float thick, Color color)
 {
     Vector2 start, end;

@@ -101,6 +101,18 @@ void addFrontier(Maze *maze, Cell *cell);
 
 void removeFrontier(Maze *maze, int frontier_index);
 
+// algo
+
+void generateMaze_backtracker(Maze *maze);
+
+void chooseRandFrontier(Maze *maze);
+
+void generateMaze_prim(Maze *maze);
+
+void generateMaze_aldous_broder(Maze *maze);
+
+void (*generateMaze)(Maze *maze);
+
 void drawMaze(Maze *maze, Vector2 pos, Player *player);
 
 void destroyMaze(Maze *maze);
