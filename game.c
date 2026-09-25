@@ -266,7 +266,7 @@ void drawMenu(GameState *gs)
         play_btn.textColor = WHITE;
         drawButton(play_btn);
     }
-    if (clicked(play_btn))
+    if (clicked(play_btn) || IsKeyPressed(KEY_ENTER))
     {
         PlaySound(gs->click_sound);
         gs->page = NAME_INPUT;
@@ -558,7 +558,7 @@ void drawNameInput(GameState *gs)
                 if (gs->mode == TIME_RUNS_OUT)
                 {
                     gs->round = 1;
-                    gs->time_limit = 120;
+                    gs->time_limit = 12;
                 }
             }
         }
@@ -622,7 +622,7 @@ void drawCredit(GameState *gs)
     }
     else
     {
-        DrawRectangle(100,100,100,100,WHITE);
+        DrawRectangle(100, 100, 100, 100, WHITE);
     }
 
     // MENU BUTTON
@@ -1262,12 +1262,6 @@ void updateGameplay(GameState *gs)
         initGameplay(gs);
     }
 
-    // Game Over
-    if (gs->mode == TIME_RUNS_OUT && gs->time_limit - gs->current_time == 0)
-    {
-        gs->page = GAME_FINISH;
-    }
-
     // Game Finished
     if (gs->player.x == gs->maze.width - 1 && gs->player.y == gs->maze.height - 1)
     {
@@ -1333,7 +1327,7 @@ void drawGame(GameState *gs)
     if (gs->mode == BEST_OF_US)
     {
         title = "THE BEST OF US";
-        control_inst = "W/A/S/D or Arrow Keys for Movement | Space for New Maze | F for Auto Solve";
+        control_inst = "W/A/S/D or Arrow Keys for Movement | F for Auto Solve";
     }
     else if (gs->mode == MULTIVERSE)
     {
@@ -1415,6 +1409,32 @@ void drawGame(GameState *gs)
 
         // Score
         DrawTextEx(gs->btn_font, TextFormat("SCORE: %5d", gs->last_score), (Vector2){1190, 75}, 20, 1, WHITE);
+
+        // Game Over
+        if (gs->time_limit - gs->current_time <= 0)
+        {
+            PlaySound(gs->game_finish_sound);
+            gs->page = GAME_FINISH;
+        }
+
+        // FINISH BUTTON
+        Button finish_btn = {(Rectangle){SCREENWIDTH - 20 - 100, SCREENHEIGHT - 20 - 40, 100, 40}, DARKBLUE,
+                             0, WHITE,
+                             "FINISH", gs->btn_font, RAYWHITE, 20, 1, 0};
+        drawButton(finish_btn);
+        if (hovered(finish_btn) || hoveredRec(menu_btn_rec))
+        {
+            finish_btn.buttonColor = BLUE;
+            finish_btn.shadow_opacity = 80;
+            drawButton(finish_btn);
+        }
+
+        if (clicked(finish_btn))
+        {
+            PlaySound(gs->click_sound);
+            addScore(gs);
+            gs->page = GAME_FINISH;
+        }
     }
     else if (gs->mode == MULTIVERSE)
     {
@@ -1726,7 +1746,7 @@ void updateGame(GameState *gs)
     case GAME_FINISH:
         if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
             drawTime(gs);
-        else if (gs->mode == MULTIVERSE)
+        else if (gs->mode == MULTIVERSE || gs->mode == TIME_RUNS_OUT)
             drawScore(gs);
         break;
 
