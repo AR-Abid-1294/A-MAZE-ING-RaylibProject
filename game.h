@@ -47,7 +47,22 @@ typedef enum Info
     DARKNIGHT,
     TIMERUNSOUT,
     INFINITYWAR
-}Info;
+} Info;
+
+typedef enum Difficulty
+{
+    EASY,
+    MEDIUM,
+    HARD
+} Difficulty;
+
+typedef enum Algorithm
+{
+    BACKTRACKER_ALGO,
+    PRIM_ALGO,
+    ALDOUS_BRODER_ALGO
+
+} Algorithm;
 
 typedef struct GameState
 {
@@ -127,8 +142,11 @@ typedef struct GameState
     Texture2D gravity_grave_btn;
     Texture2D endgame_btn;
 
-    //info selection 
+    // info selection
     Info info;
+    //settings selection
+    Difficulty difficulty;
+    Algorithm algorithm;
 
     // name_input
     char name[20];

@@ -18,6 +18,8 @@ void initGameState(GameState *gs)
     gs->times = gs->best_times;
     gs->scores = gs->high_scores;
     gs->info = HOWTOPLAY;
+    gs->algorithm = ALDOUS_BRODER_ALGO;
+    gs->difficulty = MEDIUM;
 
     gs->page = MENU;
     gs->shouldQuit = false;
@@ -119,9 +121,9 @@ void initGameState(GameState *gs)
     fclose(gs->dark_times_file);
 
     // Load High Scores for TIME RUNS OUT
-    gs->out_scores_file = fopen("scores/Out_Scores.txt","r");
+    gs->out_scores_file = fopen("scores/Out_Scores.txt", "r");
     for (int i = 0; i < 10; i++)
-        fscanf(gs->out_scores_file,"%d %[^\n]", &gs->out_scores[i].score, gs->out_scores[i].player_name);
+        fscanf(gs->out_scores_file, "%d %[^\n]", &gs->out_scores[i].score, gs->out_scores[i].player_name);
     fclose(gs->out_scores_file);
 
     PlayMusicStream(gs->bg_music);
@@ -201,7 +203,7 @@ void unloadGameState(GameState *gs)
     fclose(gs->dark_times_file);
 
     // Store Scores for TIME RUNS OUT
-    gs->out_scores_file = fopen("scores/Out_Scores.txt","w");
+    gs->out_scores_file = fopen("scores/Out_Scores.txt", "w");
     for (int i = 0; i < 10; i++)
         fprintf(gs->out_scores_file, "%d %s\n", gs->out_scores[i].score, gs->out_scores[i].player_name);
     fclose(gs->out_scores_file);
@@ -602,49 +604,47 @@ void drawInfo(GameState *gs)
     }
 
     //  MAKING CARD
-    Rectangle info_card_rec = {SCREENWIDTH / 5 + 110,60, SCREENWIDTH * 4 / 5 - 150, SCREENHEIGHT - 40 - 80};
-    //texts
+    Rectangle info_card_rec = {SCREENWIDTH / 5 + 110, 60, SCREENWIDTH * 4 / 5 - 150, SCREENHEIGHT - 40 - 80};
+    // texts
     char text[300];
-    switch(gs->info)
+    switch (gs->info)
     {
-        case HOWTOPLAY:
-            strcpy(text,"ekhane how to play hobe");
-            break;
-        case BACKTRACKER:
-            strcpy(text,"ekhane backtracker");
-            break;
-        case PRIM:
-            strcpy(text,"ekhane badbaki1");
-            break;
-        case ALDOUSBRODER:
-            strcpy(text,"ekhane badbaki2");
-            break;
-        case BESTOFUS:
-            strcpy(text,"ekhane badbaki3");
-            break;
-        case MULTIVERSEOFMADMAZE:
-            strcpy(text,"ekhane badbaki4");
-            break;
-        case TIMERUNSOUT:
-            strcpy(text,"ekhane badbaki5");
-            break;
-        case DARKNIGHT:
-            strcpy(text,"ekhane badbaki6");
-            break;
-        case INFINITYWAR:
-            strcpy(text,"ekhane badbaki7");
-            break;
-        
-
+    case HOWTOPLAY:
+        strcpy(text, "ekhane how to play hobe");
+        break;
+    case BACKTRACKER:
+        strcpy(text, "ekhane backtracker");
+        break;
+    case PRIM:
+        strcpy(text, "ekhane badbaki1");
+        break;
+    case ALDOUSBRODER:
+        strcpy(text, "ekhane badbaki2");
+        break;
+    case BESTOFUS:
+        strcpy(text, "ekhane badbaki3");
+        break;
+    case MULTIVERSEOFMADMAZE:
+        strcpy(text, "ekhane badbaki4");
+        break;
+    case TIMERUNSOUT:
+        strcpy(text, "ekhane badbaki5");
+        break;
+    case DARKNIGHT:
+        strcpy(text, "ekhane badbaki6");
+        break;
+    case INFINITYWAR:
+        strcpy(text, "ekhane badbaki7");
+        break;
     }
-    Card info_card = {info_card_rec, WHITE, 0 , BLACK, text, gs->font1, BLACK, 20 ,1,20, 80, 10, 10 }; 
+    Card info_card = {info_card_rec, WHITE, 0, BLACK, text, gs->font1, BLACK, 20, 1, 20, 80, 10, 10};
 
-    //HOW TO PLAY BUTTON
+    // HOW TO PLAY BUTTON
     Button how_to_play_btn = {(Rectangle){50, 60, SCREENWIDTH / 5, 40},
-                       (gs->info ==HOWTOPLAY) ? DARKBLUE : GetColor(0xf0f0ffff) ,
-                       0, WHITE, "HOW TO PLAY    ", gs->btn_font, BLACK, 25, 1, 80};
+                              (gs->info == HOWTOPLAY) ? DARKBLUE : GetColor(0xf0f0ffff),
+                              0, WHITE, "HOW TO PLAY    ", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(how_to_play_btn);
-    const char *how_to_play_info = "ekhane kemne khelbo ota lekhbo"; //how?
+    const char *how_to_play_info = "ekhane kemne khelbo ota lekhbo"; // how?
     Card how_to_play_card = {};
     if (hovered(how_to_play_btn))
     {
@@ -656,19 +656,19 @@ void drawInfo(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->info = HOWTOPLAY;
-        //card
+        // card
     }
 
-    //algorithms
+    // algorithms
     Button algo_btn = {(Rectangle){50, 140, SCREENWIDTH / 5, 40},
                        GetColor(0x2e2e2eff),
                        0, WHITE, "ALGORITHMS:    ", gs->btn_font, WHITE, 25, 1, 80};
     drawButton(algo_btn);
 
-    //BACKTRAKER
+    // BACKTRAKER
     Button backtracker_btn = {(Rectangle){70, 200, SCREENWIDTH / 5 - 20, 40},
-                       (gs->info == BACKTRACKER) ?DARKBLUE: GetColor(0xf0f0ffff) ,
-                       0, WHITE, "1. BACKTRACKER       ", gs->btn_font, BLACK, 20, 1, 80};
+                              (gs->info == BACKTRACKER) ? DARKBLUE : GetColor(0xf0f0ffff),
+                              0, WHITE, "1. BACKTRACKER       ", gs->btn_font, BLACK, 20, 1, 80};
     drawButton(backtracker_btn);
     if (hovered(backtracker_btn))
     {
@@ -680,12 +680,12 @@ void drawInfo(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->info = BACKTRACKER;
-        //card
+        // card
     }
 
-    //PRIM
+    // PRIM
     Button prim_btn = {(Rectangle){70, 260, SCREENWIDTH / 5 - 20, 40},
-                       (gs->info == PRIM) ?DARKBLUE: GetColor(0xf0f0ffff),
+                       (gs->info == PRIM) ? DARKBLUE : GetColor(0xf0f0ffff),
                        0, WHITE, "2. PRIM                  ", gs->btn_font, BLACK, 20, 1, 80};
     drawButton(prim_btn);
     if (hovered(prim_btn))
@@ -698,13 +698,13 @@ void drawInfo(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->info = PRIM;
-        //card
+        // card
     }
 
-    //ALDOUS BRODER
+    // ALDOUS BRODER
     Button aldous_btn = {(Rectangle){70, 320, SCREENWIDTH / 5 - 20, 40},
-                       (gs->info == ALDOUSBRODER) ?DARKBLUE: GetColor(0xf0f0ffff),
-                       0, WHITE, "3. ALDOUS BRODER       ", gs->btn_font, BLACK, 20, 1, 80};
+                         (gs->info == ALDOUSBRODER) ? DARKBLUE : GetColor(0xf0f0ffff),
+                         0, WHITE, "3. ALDOUS BRODER       ", gs->btn_font, BLACK, 20, 1, 80};
     drawButton(aldous_btn);
     if (hovered(aldous_btn))
     {
@@ -716,19 +716,19 @@ void drawInfo(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->info = ALDOUSBRODER;
-        //card
+        // card
     }
 
-    //modes
+    // modes
     Button modes_btn = {(Rectangle){50, 400, SCREENWIDTH / 5, 40},
-                       GetColor(0x2e2e2eff),
-                       0, WHITE, "MODES:         ", gs->btn_font, WHITE, 25, 1, 80};
+                        GetColor(0x2e2e2eff),
+                        0, WHITE, "MODES:         ", gs->btn_font, WHITE, 25, 1, 80};
     drawButton(modes_btn);
 
-    //THE BEST OF US
+    // THE BEST OF US
     Button best_button = {(Rectangle){70, 460, SCREENWIDTH / 5 - 20, 40},
-                       (gs->info == BESTOFUS) ?DARKBLUE: GetColor(0xf0f0ffff),
-                       0, WHITE, "1.THE BEST OF US         ", gs->btn_font, BLACK, 19, 1, 80};
+                          (gs->info == BESTOFUS) ? DARKBLUE : GetColor(0xf0f0ffff),
+                          0, WHITE, "1.THE BEST OF US         ", gs->btn_font, BLACK, 19, 1, 80};
     drawButton(best_button);
     if (hovered(best_button))
     {
@@ -740,13 +740,13 @@ void drawInfo(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->info = BESTOFUS;
-        //card
+        // card
     }
 
-    //THE MULTIVERSE OF MADMAZE
+    // THE MULTIVERSE OF MADMAZE
     Button multiverse_button = {(Rectangle){70, 520, SCREENWIDTH / 5 - 20, 40},
-                       (gs->info == MULTIVERSEOFMADMAZE) ?DARKBLUE: GetColor(0xf0f0ffff),
-                       0, WHITE, "2. MULTIVERSE OF MADMAZE            ", gs->btn_font, BLACK, 13, 1, 80};
+                                (gs->info == MULTIVERSEOFMADMAZE) ? DARKBLUE : GetColor(0xf0f0ffff),
+                                0, WHITE, "2. MULTIVERSE OF MADMAZE            ", gs->btn_font, BLACK, 13, 1, 80};
     drawButton(multiverse_button);
     if (hovered(multiverse_button))
     {
@@ -758,13 +758,13 @@ void drawInfo(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->info = MULTIVERSEOFMADMAZE;
-        //card
+        // card
     }
 
-    //TIME RUNS OUT
+    // TIME RUNS OUT
     Button out_button = {(Rectangle){70, 580, SCREENWIDTH / 5 - 20, 40},
-                       (gs->info == TIMERUNSOUT) ?DARKBLUE: GetColor(0xf0f0ffff),
-                       0, WHITE, "3. TIME RUNS OUT          ", gs->btn_font, BLACK, 19, 1, 80};
+                         (gs->info == TIMERUNSOUT) ? DARKBLUE : GetColor(0xf0f0ffff),
+                         0, WHITE, "3. TIME RUNS OUT          ", gs->btn_font, BLACK, 19, 1, 80};
     drawButton(out_button);
     if (hovered(out_button))
     {
@@ -776,13 +776,13 @@ void drawInfo(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->info = TIMERUNSOUT;
-        //card
+        // card
     }
 
-    //THE DARK NIGHT
+    // THE DARK NIGHT
     Button dark_button = {(Rectangle){70, 640, SCREENWIDTH / 5 - 20, 40},
-                       (gs->info == DARKNIGHT) ?DARKBLUE: GetColor(0xf0f0ffff),
-                       0, WHITE, "4. THE DARK NIGHT      ", gs->btn_font, BLACK, 20, 1, 80};
+                          (gs->info == DARKNIGHT) ? DARKBLUE : GetColor(0xf0f0ffff),
+                          0, WHITE, "4. THE DARK NIGHT      ", gs->btn_font, BLACK, 20, 1, 80};
     drawButton(dark_button);
     if (hovered(dark_button))
     {
@@ -794,13 +794,13 @@ void drawInfo(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->info = DARKNIGHT;
-        //card
+        // card
     }
 
-    //INFINITY WAR
+    // INFINITY WAR
     Button infinity_button = {(Rectangle){70, 700, SCREENWIDTH / 5 - 20, 40},
-                       (gs->info == INFINITYWAR) ?DARKBLUE: GetColor(0xf0f0ffff),
-                       0, WHITE, "5. INFINITY WAR         ", gs->btn_font, BLACK, 20, 1, 80};
+                              (gs->info == INFINITYWAR) ? DARKBLUE : GetColor(0xf0f0ffff),
+                              0, WHITE, "5. INFINITY WAR         ", gs->btn_font, BLACK, 20, 1, 80};
     drawButton(infinity_button);
     if (hovered(infinity_button))
     {
@@ -812,10 +812,9 @@ void drawInfo(GameState *gs)
     {
         PlaySound(gs->click_sound1);
         gs->info = INFINITYWAR;
-        //card
+        // card
     }
     drawCard(info_card);
-
 
     EndDrawing();
 }
@@ -835,6 +834,54 @@ void drawSettings(GameState *gs)
         PlaySound(gs->click_sound1);
         gs->page = MENU;
     }
+
+    // Algorithms
+    Button algos_btn = {(Rectangle){SCREENWIDTH / 5, 90, SCREENWIDTH / 5+20, 50},
+                        GetColor(0x2e2efeff),
+                        0, WHITE, "Algorithms:        ", gs->btn_font, WHITE, 25, 1, 80};
+    drawButton(algos_btn);
+
+    //backtracker
+    Button backtracker_btn = {(Rectangle){SCREENWIDTH / 5 + 10 , 160, SCREENWIDTH / 5+10, 40},
+                        GetColor(0x2e0e2eff),
+                        0, WHITE, "1.Backtracker          ", gs->btn_font, WHITE, 23, 1, 80};
+    drawButton(backtracker_btn);
+
+    //prim
+    Button prim_btn = {(Rectangle){SCREENWIDTH / 5 + 10 , 220, SCREENWIDTH / 5+10, 40},
+                        GetColor(0x2e0e2eff),
+                        0, WHITE, "2.Prim                ", gs->btn_font, WHITE, 23, 1, 80};
+    drawButton(prim_btn);
+
+    //aldous broder
+    Button aldous_btn = {(Rectangle){SCREENWIDTH / 5 + 10 , 280, SCREENWIDTH / 5+10, 40},
+                        GetColor(0x2e0e2eff),
+                        0, WHITE, "3.Aldous Broder        ", gs->btn_font, WHITE, 23, 1, 80};
+    drawButton(aldous_btn);
+
+    // difficulty
+    Button diff_btn = {(Rectangle){SCREENWIDTH * 3 / 5, 90, SCREENWIDTH / 5 +20, 50},
+                        GetColor(0x2e2efeff),
+                        0, WHITE, "Difficulty:        ", gs->btn_font, WHITE, 25, 1, 80};
+    drawButton(diff_btn);
+
+    //easy
+    Button easy_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10 , 160, SCREENWIDTH / 5, 40},
+                        GetColor(0x2e0e2eff),
+                        0, WHITE, "1.Easy        ", gs->btn_font, WHITE, 25, 1, 80};
+    drawButton(easy_btn);
+
+    //medium
+    Button medium_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10 , 220, SCREENWIDTH / 5, 40},
+                        GetColor(0x2e0e2eff),
+                        0, WHITE, "2.Medium       ", gs->btn_font, WHITE, 25, 1, 80};
+    drawButton(medium_btn);
+
+    //hard
+    Button hard_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10 , 280, SCREENWIDTH / 5, 40},
+                        GetColor(0x2e0e2eff),
+                        0, WHITE, "3.Hard        ", gs->btn_font, WHITE, 25, 1, 80};
+    drawButton(hard_btn);
 
     EndDrawing();
 }
@@ -1284,19 +1331,17 @@ void drawDark(GameState *gs)
         for (int x = 0; x < gs->maze.width; x++)
         {
             int distance2 = (x - gs->player.x) * (x - gs->player.x) + (y - gs->player.y) * (y - gs->player.y);
-            if(gs->square_on)
+            if (gs->square_on)
             {
-                if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (((x - gs->player.x) < -(range-1) || (x - gs->player.x) > (range-1)) || ((y - gs->player.y) < -(range-1) || (y - gs->player.y) > (range-1))))
+                if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (((x - gs->player.x) < -(range - 1) || (x - gs->player.x) > (range - 1)) || ((y - gs->player.y) < -(range - 1) || (y - gs->player.y) > (range - 1))))
                 {
                     DrawRectangle(pos.x, pos.y, gs->maze.cell_size, gs->maze.cell_size, BLACK);
                 }
             }
-            else
-                if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (distance2 > range * range))
-                {
-                    DrawRectangle(pos.x, pos.y, gs->maze.cell_size, gs->maze.cell_size, BLACK);
-                }
-
+            else if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (distance2 > range * range))
+            {
+                DrawRectangle(pos.x, pos.y, gs->maze.cell_size, gs->maze.cell_size, BLACK);
+            }
 
             pos.x += gs->maze.cell_size;
         }
@@ -1304,7 +1349,7 @@ void drawDark(GameState *gs)
         pos.y += gs->maze.cell_size;
     }
 
-    Rectangle square_btn_rec = {SCREENWIDTH - 20 -80, 100, 40, 40};
+    Rectangle square_btn_rec = {SCREENWIDTH - 20 - 80, 100, 40, 40};
     Texture square_btn = (gs->square_on) ? gs->square_btn : gs->square_not_btn;
     DrawTexturePro(square_btn, (Rectangle){0, 0, square_btn.width, square_btn.height}, square_btn_rec, Vector2Zero(), 0, WHITE);
 
@@ -1320,7 +1365,6 @@ void drawDark(GameState *gs)
             gs->square_on = true;
         }
     }
-
 }
 
 void drawTime(GameState *gs)
