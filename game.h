@@ -102,6 +102,9 @@ typedef struct GameState
     Texture2D nuke_btn;
     Texture2D nuke_hovered_btn;
 
+    Texture2D square_btn;
+    Texture2D square_not_btn;
+
     // mode selection buttons
     Texture2D best_of_us_btn;
     Texture2D multiverse_btn;
@@ -122,6 +125,8 @@ typedef struct GameState
     // best times for THE DARK NIGHT
     Time dark_times[11];
     FILE *dark_times_file;
+
+    bool square_on;
 
     // high scores for THE MULTIVERSE OF MADMAZE
     Score high_scores[11];

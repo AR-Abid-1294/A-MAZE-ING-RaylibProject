@@ -80,6 +80,9 @@ void initGameState(GameState *gs)
     gs->menu_btn = LoadTexture("Assets/Buttons/menu.png");
     gs->menu_hovered_btn = LoadTexture("Assets/Buttons/menu_hovered.png");
     gs->nuke_btn = LoadTexture("Assets/Buttons/nuke.png");
+    gs->square_btn = LoadTexture("Assets/Buttons/square.png");
+    gs->square_not_btn = LoadTexture("Assets/Buttons/square_not.png");
+    gs->square_on = false;
 
     // Load Mode Selection Buttons
     gs->best_of_us_btn = LoadTexture("Assets/Mode Buttons/the_best_of_us.png");
@@ -113,6 +116,12 @@ void initGameState(GameState *gs)
     for (int i = 0; i < 10; i++)
         fscanf(gs->dark_times_file, "%f %[^\n]", &gs->dark_times[i].time, gs->dark_times[i].player_name);
     fclose(gs->dark_times_file);
+
+    // Load High Scores for TIME RUNS OUT
+    gs->out_scores_file = fopen("scores/Out_Scores.txt","r");
+    for (int i = 0; i < 10; i++)
+        fscanf(gs->out_scores_file,"%d %[^\n]", &gs->out_scores[i].score, gs->out_scores[i].player_name);
+    fclose(gs->out_scores_file);
 
     PlayMusicStream(gs->bg_music);
 }
@@ -189,6 +198,12 @@ void unloadGameState(GameState *gs)
     for (int i = 0; i < 10; i++)
         fprintf(gs->dark_times_file, "%f %s\n", gs->dark_times[i].time, gs->dark_times[i].player_name);
     fclose(gs->dark_times_file);
+
+    // Store Scores for TIME RUNS OUT
+    gs->out_scores_file = fopen("scores/Out_Scores.txt","w");
+    for (int i = 0; i < 10; i++)
+        fprintf(gs->out_scores_file, "%d %s\n", gs->out_scores[i].score, gs->out_scores[i].player_name);
+    fclose(gs->out_scores_file);
 
     destroyMaze(&gs->maze);
 
@@ -585,6 +600,172 @@ void drawInfo(GameState *gs)
         gs->page = MENU;
     }
 
+    //HOW TO PLAY BUTTON
+    Button how_to_play_btn = {(Rectangle){50, 60, SCREENWIDTH / 5, 40},
+                       GetColor(0xf0f0ffff),
+                       0, WHITE, "HOW TO PLAY    ", gs->btn_font, BLACK, 25, 1, 80};
+    drawButton(how_to_play_btn);
+    if (hovered(how_to_play_btn))
+    {
+        how_to_play_btn.buttonColor = DARKBLUE;
+        how_to_play_btn.textColor = WHITE;
+        drawButton(how_to_play_btn);
+    }
+    if (clicked(how_to_play_btn))
+    {
+        PlaySound(gs->click_sound1);
+        //card
+    }
+
+    //algorithms
+    Button algo_btn = {(Rectangle){50, 140, SCREENWIDTH / 5, 40},
+                       GetColor(0x2e2e2eff),
+                       0, WHITE, "ALGORITHMS:    ", gs->btn_font, WHITE, 25, 1, 80};
+    drawButton(algo_btn);
+
+    //BACKTRAKER
+    Button backtracker_btn = {(Rectangle){70, 200, SCREENWIDTH / 5 - 20, 40},
+                       GetColor(0xf0f0ffff),
+                       0, WHITE, "1. BACKTRACKER       ", gs->btn_font, BLACK, 20, 1, 80};
+    drawButton(backtracker_btn);
+    if (hovered(backtracker_btn))
+    {
+        backtracker_btn.buttonColor = DARKBLUE;
+        backtracker_btn.textColor = WHITE;
+        drawButton(backtracker_btn);
+    }
+    if (clicked(backtracker_btn))
+    {
+        PlaySound(gs->click_sound1);
+        //card
+    }
+
+    //PRIM
+    Button prim_btn = {(Rectangle){70, 260, SCREENWIDTH / 5 - 20, 40},
+                       GetColor(0xf0f0ffff),
+                       0, WHITE, "2. PRIM                  ", gs->btn_font, BLACK, 20, 1, 80};
+    drawButton(prim_btn);
+    if (hovered(prim_btn))
+    {
+        prim_btn.buttonColor = DARKBLUE;
+        prim_btn.textColor = WHITE;
+        drawButton(prim_btn);
+    }
+    if (clicked(prim_btn))
+    {
+        PlaySound(gs->click_sound1);
+        //aldous
+    }
+
+    //ALDOUS BRODER
+    Button aldous_btn = {(Rectangle){70, 320, SCREENWIDTH / 5 - 20, 40},
+                       GetColor(0xf0f0ffff),
+                       0, WHITE, "3. ALDOUS BRODER       ", gs->btn_font, BLACK, 20, 1, 80};
+    drawButton(aldous_btn);
+    if (hovered(aldous_btn))
+    {
+        aldous_btn.buttonColor = DARKBLUE;
+        aldous_btn.textColor = WHITE;
+        drawButton(aldous_btn);
+    }
+    if (clicked(aldous_btn))
+    {
+        PlaySound(gs->click_sound1);
+        //card
+    }
+
+    //modes
+    Button modes_btn = {(Rectangle){50, 400, SCREENWIDTH / 5, 40},
+                       GetColor(0x2e2e2eff),
+                       0, WHITE, "MODES:         ", gs->btn_font, WHITE, 25, 1, 80};
+    drawButton(modes_btn);
+
+    //THE BEST OF US
+    Button best_button = {(Rectangle){70, 460, SCREENWIDTH / 5 - 20, 40},
+                       GetColor(0xf0f0ffff),
+                       0, WHITE, "1.THE BEST OF US         ", gs->btn_font, BLACK, 19, 1, 80};
+    drawButton(best_button);
+    if (hovered(best_button))
+    {
+        best_button.buttonColor = DARKBLUE;
+        best_button.textColor = WHITE;
+        drawButton(best_button);
+    }
+    if (clicked(best_button))
+    {
+        PlaySound(gs->click_sound1);
+        //card
+    }
+
+    //THE MULTIVERSE OF MADMAZE
+    Button multiverse_button = {(Rectangle){70, 520, SCREENWIDTH / 5 - 20, 40},
+                       GetColor(0xf0f0ffff),
+                       0, WHITE, "2. MULTIVERSE OF MADMAZE            ", gs->btn_font, BLACK, 13, 1, 80};
+    drawButton(multiverse_button);
+    if (hovered(multiverse_button))
+    {
+        multiverse_button.buttonColor = DARKBLUE;
+        multiverse_button.textColor = WHITE;
+        drawButton(multiverse_button);
+    }
+    if (clicked(multiverse_button))
+    {
+        PlaySound(gs->click_sound1);
+        //card
+    }
+
+    //TIME RUNS OUT
+    Button out_button = {(Rectangle){70, 580, SCREENWIDTH / 5 - 20, 40},
+                       GetColor(0xf0f0ffff),
+                       0, WHITE, "3. TIME RUNS OUT          ", gs->btn_font, BLACK, 19, 1, 80};
+    drawButton(out_button);
+    if (hovered(out_button))
+    {
+        out_button.buttonColor = DARKBLUE;
+        out_button.textColor = WHITE;
+        drawButton(out_button);
+    }
+    if (clicked(out_button))
+    {
+        PlaySound(gs->click_sound1);
+        //card
+    }
+
+    //THE DARK NIGHT
+    Button dark_button = {(Rectangle){70, 640, SCREENWIDTH / 5 - 20, 40},
+                       GetColor(0xf0f0ffff),
+                       0, WHITE, "4. THE DARK NIGHT      ", gs->btn_font, BLACK, 20, 1, 80};
+    drawButton(dark_button);
+    if (hovered(dark_button))
+    {
+        dark_button.buttonColor = DARKBLUE;
+        dark_button.textColor = WHITE;
+        drawButton(dark_button);
+    }
+    if (clicked(dark_button))
+    {
+        PlaySound(gs->click_sound1);
+        //card
+    }
+
+    //INFINITY WAR
+    Button infinity_button = {(Rectangle){70, 700, SCREENWIDTH / 5 - 20, 40},
+                       GetColor(0xf0f0ffff),
+                       0, WHITE, "5. INFINITY WAR         ", gs->btn_font, BLACK, 20, 1, 80};
+    drawButton(infinity_button);
+    if (hovered(infinity_button))
+    {
+        infinity_button.buttonColor = DARKBLUE;
+        infinity_button.textColor = WHITE;
+        drawButton(infinity_button);
+    }
+    if (clicked(infinity_button))
+    {
+        PlaySound(gs->click_sound1);
+        //card
+    }
+
+
     EndDrawing();
 }
 
@@ -666,12 +847,12 @@ void drawHighScores(GameState *gs)
     {
         // Player Name
         Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->high_scores[i].player_name), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->scores[i].player_name), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
         drawCard(player_name_card);
 
         // Best Time
         Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-        const char *best_time_text = TextFormat("%03d", gs->high_scores[i].score);
+        const char *best_time_text = TextFormat("%03d", gs->scores[i].score);
         Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%s", best_time_text), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
         drawCard(best_times_card);
     }
@@ -1040,7 +1221,7 @@ void drawGame(GameState *gs)
 
     EndDrawing();
 }
-
+// Draw Dark Night
 void drawDark(GameState *gs)
 {
     Vector2 pos = {(SCREENWIDTH - gs->maze.width * gs->maze.cell_size) / 2,
@@ -1052,17 +1233,43 @@ void drawDark(GameState *gs)
         for (int x = 0; x < gs->maze.width; x++)
         {
             int distance2 = (x - gs->player.x) * (x - gs->player.x) + (y - gs->player.y) * (y - gs->player.y);
-            // if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (distance2 > range * range))
-            if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (((x - gs->player.x) < -range || (x - gs->player.x) > range) || ((y - gs->player.y) < -range || (y - gs->player.y) > range)))
+            if(gs->square_on)
             {
-                DrawRectangle(pos.x, pos.y, gs->maze.cell_size, gs->maze.cell_size, BLACK);
+                if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (((x - gs->player.x) < -(range-1) || (x - gs->player.x) > (range-1)) || ((y - gs->player.y) < -(range-1) || (y - gs->player.y) > (range-1))))
+                {
+                    DrawRectangle(pos.x, pos.y, gs->maze.cell_size, gs->maze.cell_size, BLACK);
+                }
             }
+            else
+                if (!(x == gs->maze.width - 1 && y == gs->maze.height - 1) && (distance2 > range * range))
+                {
+                    DrawRectangle(pos.x, pos.y, gs->maze.cell_size, gs->maze.cell_size, BLACK);
+                }
+
 
             pos.x += gs->maze.cell_size;
         }
         pos.x = startx;
         pos.y += gs->maze.cell_size;
     }
+
+    Rectangle square_btn_rec = {SCREENWIDTH - 20 -80, 100, 40, 40};
+    Texture square_btn = (gs->square_on) ? gs->square_btn : gs->square_not_btn;
+    DrawTexturePro(square_btn, (Rectangle){0, 0, square_btn.width, square_btn.height}, square_btn_rec, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(square_btn_rec))
+    {
+        PlaySound(gs->click_sound1);
+        if (gs->square_on)
+        {
+            gs->square_on = false;
+        }
+        else
+        {
+            gs->square_on = true;
+        }
+    }
+
 }
 
 void drawTime(GameState *gs)
