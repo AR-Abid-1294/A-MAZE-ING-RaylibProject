@@ -1,5 +1,37 @@
 #include "scores.h"
 
+void loadTimes(Time times[], const char *file_name)
+{
+    FILE *times_file = fopen(file_name, "r");
+    for (int i = 0; i < 10; i++)
+        fscanf(times_file, "%f %[^\n]", &times[i].time, times[i].player_name);
+    fclose(times_file);
+}
+
+void storeTimes(Time times[], const char *file_name)
+{
+    FILE *times_file = fopen(file_name, "w");
+    for (int i = 0; i < 10; i++)
+        fprintf(times_file, "%f %s\n", times[i].time, times[i].player_name);
+    fclose(times_file);
+}
+
+void loadScores(Score scores[], const char *file_name)
+{
+    FILE *scores_file = fopen(file_name, "r");
+    for (int i = 0; i < 10; i++)
+        fscanf(scores_file, "%d %[^\n]", &scores[i].score, scores[i].player_name);
+    fclose(scores_file);
+}
+
+void storeScores(Score scores[], const char *file_name)
+{
+    FILE *scores_file = fopen(file_name, "w");
+    for (int i = 0; i < 10; i++)
+        fprintf(scores_file, "%d %s\n", scores[i].score, scores[i].player_name);
+    fclose(scores_file);
+}
+
 // best times for THE BEST OF US mode
 
 /*void sortBestTimes(Time *times)

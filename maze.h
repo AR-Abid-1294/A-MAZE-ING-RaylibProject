@@ -47,6 +47,13 @@ typedef enum CellState
     CROSSED
 } CellState;
 
+typedef enum Difficulty
+{
+    EASY,
+    MEDIUM,
+    HARD
+} Difficulty;
+
 typedef struct Cell
 {
     CellState cellState;
@@ -87,6 +94,8 @@ typedef struct Maze
     // Maze width, height and cell size
     // for different levels of MULTIVERSE mode
     int levels[50][3];
+
+    Difficulty difficulty;
 } Maze;
 
 void shuffleDirections();

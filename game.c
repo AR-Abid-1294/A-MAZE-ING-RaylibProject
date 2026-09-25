@@ -15,11 +15,11 @@ void initGameState(GameState *gs)
     srand(time(NULL));
 
     generateMaze = generateMaze_aldous_broder;
-    gs->times = gs->best_times;
+    gs->times = gs->best_times_medium;
     gs->scores = gs->high_scores;
     gs->info = HOWTOPLAY;
     gs->algorithm = ALDOUS_BRODER_ALGO;
-    gs->difficulty = MEDIUM;
+    gs->maze.difficulty = MEDIUM;
 
     gs->page = MENU;
     gs->shouldQuit = false;
@@ -52,7 +52,7 @@ void initGameState(GameState *gs)
     gs->msg_font = LoadFontEx("Assets/Fonts/msg_font.ttf", 100, NULL, 0);
 
     // Load Sound Effects
-    gs->click_sound1 = LoadSound("Assets/Sound Effects/click_double_on.wav");
+    gs->click_sound = LoadSound("Assets/Sound Effects/click_double_on.wav");
     gs->movement_sound = LoadSound("Assets/Sound Effects/water_drop_synthetic.wav");
     gs->movement_blocked_sound = LoadSound("Assets/Sound Effects/cardboard_hit.wav");
     gs->game_finish_sound = LoadSound("Assets/Sound Effects/xylophone_positive_long.wav");
@@ -103,28 +103,22 @@ void initGameState(GameState *gs)
     // Load Leaderboard Data
 
     // Best Times for THE BEST OF US
-    gs->best_times_file = fopen("scores/Best_Times.txt", "r");
-    for (int i = 0; i < 10; i++)
-        fscanf(gs->best_times_file, "%f %[^\n]", &gs->best_times[i].time, gs->best_times[i].player_name);
-    fclose(gs->best_times_file);
+    loadTimes(gs->best_times_easy, "scores/Best_Times_easy.txt");
+    loadTimes(gs->best_times_medium, "scores/Best_Times_medium.txt");
+    loadTimes(gs->best_times_hard, "scores/Best_Times_hard.txt");
 
-    // Load High Scores for THE MULTIVERSE OF MADMAZE
-    gs->high_scores_file = fopen("scores/High_Scores.txt", "r");
-    for (int i = 0; i < 10; i++)
-        fscanf(gs->high_scores_file, "%d %[^\n]", &gs->high_scores[i].score, gs->high_scores[i].player_name);
-    fclose(gs->high_scores_file);
+    // High Scores for THE MULTIVERSE OF MADMAZE
+    loadScores(gs->high_scores, "scores/High_Scores.txt");
 
-    // Load Dark Times for the DARK NIGHT
-    gs->dark_times_file = fopen("scores/Dark_Nights.txt", "r");
-    for (int i = 0; i < 10; i++)
-        fscanf(gs->dark_times_file, "%f %[^\n]", &gs->dark_times[i].time, gs->dark_times[i].player_name);
-    fclose(gs->dark_times_file);
+    // Dark Times for the DARK NIGHT
+    loadTimes(gs->dark_times_easy, "scores/Dark_Times_easy.txt");
+    loadTimes(gs->dark_times_medium, "scores/Dark_Times_medium.txt");
+    loadTimes(gs->dark_times_hard, "scores/Dark_Times_hard.txt");
 
-    // Load High Scores for TIME RUNS OUT
-    gs->out_scores_file = fopen("scores/Out_Scores.txt", "r");
-    for (int i = 0; i < 10; i++)
-        fscanf(gs->out_scores_file, "%d %[^\n]", &gs->out_scores[i].score, gs->out_scores[i].player_name);
-    fclose(gs->out_scores_file);
+    // High Scores for TIME RUNS OUT
+    loadScores(gs->out_scores_easy, "scores/Out_Scores_easy.txt");
+    loadScores(gs->out_scores_medium, "scores/Out_Scores_medium.txt");
+    loadScores(gs->out_scores_hard, "scores/Out_Scores_hard.txt");
 
     PlayMusicStream(gs->bg_music);
 }
@@ -152,7 +146,7 @@ void unloadGameState(GameState *gs)
     UnloadFont(gs->msg_font);
 
     // Unload Sound Effects
-    UnloadSound(gs->click_sound1);
+    UnloadSound(gs->click_sound);
     UnloadSound(gs->movement_sound);
     UnloadSound(gs->movement_blocked_sound);
     UnloadSound(gs->game_finish_sound);
@@ -184,34 +178,68 @@ void unloadGameState(GameState *gs)
     UnloadTexture(gs->gravity_grave_btn);
     UnloadTexture(gs->endgame_btn);
 
-    // Store Best Times of THE BEST OF US in external file
-    gs->best_times_file = fopen("scores/Best_Times.txt", "w");
-    for (int i = 0; i < 10; i++)
-        fprintf(gs->best_times_file, "%f %s\n", gs->best_times[i].time, gs->best_times[i].player_name);
-    fclose(gs->best_times_file);
+    // Store Leaderboard Data
 
-    // Store High Scores of THE MULTIVERSE OF MADMAZE file
-    gs->high_scores_file = fopen("scores/High_Scores.txt", "w");
-    for (int i = 0; i < 10; i++)
-        fprintf(gs->high_scores_file, "%d %s\n", gs->high_scores[i].score, gs->high_scores[i].player_name);
-    fclose(gs->high_scores_file);
+    // Best Times for THE BEST OF
+    storeTimes(gs->best_times_easy, "scores/Best_Times_easy.txt");
+    storeTimes(gs->best_times_medium, "scores/Best_Times_medium.txt");
+    storeTimes(gs->best_times_hard, "scores/Best_Times_hard.txt");
 
-    // Store Dark Times for THE DARK NIGHT
-    gs->dark_times_file = fopen("scores/Dark_Nights.txt", "w");
-    for (int i = 0; i < 10; i++)
-        fprintf(gs->dark_times_file, "%f %s\n", gs->dark_times[i].time, gs->dark_times[i].player_name);
-    fclose(gs->dark_times_file);
+    // High Scores for THE MULTIVERSE OF MADMAZE
+    storeScores(gs->high_scores, "scores/High_Scores.txt");
 
-    // Store Scores for TIME RUNS OUT
-    gs->out_scores_file = fopen("scores/Out_Scores.txt", "w");
-    for (int i = 0; i < 10; i++)
-        fprintf(gs->out_scores_file, "%d %s\n", gs->out_scores[i].score, gs->out_scores[i].player_name);
-    fclose(gs->out_scores_file);
+    // Dark Times for the DARK NIGHT
+    storeTimes(gs->dark_times_easy, "scores/Dark_Times_easy.txt");
+    storeTimes(gs->dark_times_medium, "scores/Dark_Times_medium.txt");
+    storeTimes(gs->dark_times_hard, "scores/Dark_Times_hard.txt");
+
+    // High Scores for TIME RUNS OUT
+    storeScores(gs->out_scores_easy, "scores/Out_Scores_easy.txt");
+    storeScores(gs->out_scores_medium, "scores/Out_Scores_medium.txt");
+    storeScores(gs->out_scores_hard, "scores/Out_Scores_hard.txt");
 
     destroyMaze(&gs->maze);
 
     CloseAudioDevice();
     CloseWindow();
+}
+
+void updateSettings(GameState *gs)
+{
+    if (gs->mode == BEST_OF_US)
+    {
+        if (gs->maze.difficulty == EASY)
+            gs->times = gs->best_times_easy;
+        else if (gs->maze.difficulty == MEDIUM)
+            gs->times = gs->best_times_medium;
+        else if (gs->maze.difficulty == HARD)
+            gs->times = gs->best_times_hard;
+    }
+
+    else if (gs->mode == MULTIVERSE)
+    {
+        gs->scores = gs->high_scores;
+    }
+
+    else if (gs->mode == TIME_RUNS_OUT)
+    {
+        if (gs->maze.difficulty == EASY)
+            gs->scores = gs->out_scores_easy;
+        else if (gs->maze.difficulty == MEDIUM)
+            gs->scores = gs->out_scores_medium;
+        else if (gs->maze.difficulty == HARD)
+            gs->scores = gs->out_scores_hard;
+    }
+
+    else if (gs->mode == DARK_NIGHT)
+    {
+        if (gs->maze.difficulty == EASY)
+            gs->times = gs->dark_times_easy;
+        else if (gs->maze.difficulty == MEDIUM)
+            gs->times = gs->dark_times_medium;
+        else if (gs->maze.difficulty == HARD)
+            gs->times = gs->dark_times_hard;
+    }
 }
 
 // draw and update different pages
@@ -239,7 +267,7 @@ void drawMenu(GameState *gs)
     }
     if (clicked(play_btn))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = NAME_INPUT;
         gs->name[0] = '\0';
         gs->letter_count = 0;
@@ -258,7 +286,7 @@ void drawMenu(GameState *gs)
     }
     if (clicked(credit_btn))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = CREDIT;
     }
 
@@ -277,7 +305,7 @@ void drawMenu(GameState *gs)
     }
     if (clicked(leaderboard_btn))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
             gs->page = BEST_TIMES;
         else if (gs->mode == MULTIVERSE || gs->mode == TIME_RUNS_OUT)
@@ -297,7 +325,7 @@ void drawMenu(GameState *gs)
     }
     if (clicked(quit_btn))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->shouldQuit = true;
     }
 
@@ -311,9 +339,9 @@ void drawMenu(GameState *gs)
     if (clickedRec(best_of_us_mode_btn))
     {
         srand(52);
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->mode = BEST_OF_US;
-        gs->times = gs->best_times;
+        gs->times = gs->best_times_medium;
     }
 
     // THE MULTIVERSE OF MADMAZE
@@ -323,7 +351,7 @@ void drawMenu(GameState *gs)
 
     if (clickedRec(multiverse_mode_btn))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->mode = MULTIVERSE;
         gs->scores = gs->high_scores;
         gs->level = 1;
@@ -336,9 +364,9 @@ void drawMenu(GameState *gs)
 
     if (clickedRec(time_runs_out_mode_btn))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->mode = TIME_RUNS_OUT;
-        gs->scores = gs->out_scores;
+        gs->scores = gs->out_scores_medium;
     }
 
     // THE DARK NIGHT
@@ -348,9 +376,9 @@ void drawMenu(GameState *gs)
 
     if (clickedRec(dark_night_mode_btn))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->mode = DARK_NIGHT;
-        gs->times = gs->dark_times;
+        gs->times = gs->dark_times_medium;
     }
 
     // INFINITY WAR
@@ -360,7 +388,7 @@ void drawMenu(GameState *gs)
 
     if (clickedRec(infinity_war_mode_btn))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->mode = INFINITY_WAR;
     }
 
@@ -401,7 +429,7 @@ void drawMenu(GameState *gs)
 
     if (clickedRec(music_btn_rec))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         if (gs->music_on)
         {
             SetMusicVolume(gs->bg_music, 0);
@@ -423,7 +451,7 @@ void drawMenu(GameState *gs)
 
     if (clickedRec(info_btn_rec))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = INFO;
     }
 
@@ -436,7 +464,7 @@ void drawMenu(GameState *gs)
 
     if (clickedRec(settings_btn_rec))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = SETTINGS;
     }
 
@@ -495,7 +523,7 @@ void drawNameInput(GameState *gs)
 
     if (clickedRec(menu_btn_rec))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = MENU;
     }
 
@@ -515,17 +543,15 @@ void drawNameInput(GameState *gs)
 
         if (clicked(enter_btn) || IsKeyPressed(KEY_ENTER))
         {
-            PlaySound(gs->click_sound1);
+            PlaySound(gs->click_sound);
+            gs->last_score = 0;
 
             if (gs->mode == MULTIVERSE)
-            {
                 gs->page = LEVELS;
-                gs->last_score = 0;
-            }
+
             else
             {
                 gs->page = PLAYING;
-                gs->start_time = GetTime();
                 initGameplay(gs);
 
                 if (gs->mode == TIME_RUNS_OUT)
@@ -574,7 +600,7 @@ void drawCredit(GameState *gs)
 
     if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = MENU;
     }
 
@@ -599,7 +625,7 @@ void drawInfo(GameState *gs)
 
     if (clickedRec(menu_btn_rec))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = MENU;
     }
 
@@ -654,7 +680,7 @@ void drawInfo(GameState *gs)
     }
     if (clicked(how_to_play_btn))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->info = HOWTOPLAY;
         // card
     }
@@ -678,7 +704,7 @@ void drawInfo(GameState *gs)
     }
     if (clicked(backtracker_btn))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->info = BACKTRACKER;
         // card
     }
@@ -696,7 +722,7 @@ void drawInfo(GameState *gs)
     }
     if (clicked(prim_btn))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->info = PRIM;
         // card
     }
@@ -714,7 +740,7 @@ void drawInfo(GameState *gs)
     }
     if (clicked(aldous_btn))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->info = ALDOUSBRODER;
         // card
     }
@@ -738,7 +764,7 @@ void drawInfo(GameState *gs)
     }
     if (clicked(best_button))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->info = BESTOFUS;
         // card
     }
@@ -756,7 +782,7 @@ void drawInfo(GameState *gs)
     }
     if (clicked(multiverse_button))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->info = MULTIVERSEOFMADMAZE;
         // card
     }
@@ -774,7 +800,7 @@ void drawInfo(GameState *gs)
     }
     if (clicked(out_button))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->info = TIMERUNSOUT;
         // card
     }
@@ -792,7 +818,7 @@ void drawInfo(GameState *gs)
     }
     if (clicked(dark_button))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->info = DARKNIGHT;
         // card
     }
@@ -810,7 +836,7 @@ void drawInfo(GameState *gs)
     }
     if (clicked(infinity_button))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->info = INFINITYWAR;
         // card
     }
@@ -831,57 +857,87 @@ void drawSettings(GameState *gs)
 
     if (clickedRec(menu_btn_rec))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = MENU;
     }
 
     // Algorithms
-    Button algos_btn = {(Rectangle){SCREENWIDTH / 5, 90, SCREENWIDTH / 5+20, 50},
+    Button algos_btn = {(Rectangle){SCREENWIDTH / 5, 90, SCREENWIDTH / 5 + 20, 50},
                         GetColor(0x2e2efeff),
                         0, WHITE, "Algorithms:        ", gs->btn_font, WHITE, 25, 1, 80};
     drawButton(algos_btn);
 
-    //backtracker
-    Button backtracker_btn = {(Rectangle){SCREENWIDTH / 5 + 10 , 160, SCREENWIDTH / 5+10, 40},
-                        GetColor(0x2e0e2eff),
-                        0, WHITE, "1.Backtracker          ", gs->btn_font, WHITE, 23, 1, 80};
+    // backtracker
+    Button backtracker_btn = {(Rectangle){SCREENWIDTH / 5 + 10, 160, SCREENWIDTH / 5 + 10, 40},
+                              GetColor(0x2e0e2eff),
+                              0, WHITE, "Backtracker          ", gs->btn_font, WHITE, 23, 1, 80};
     drawButton(backtracker_btn);
+    if (clicked(backtracker_btn))
+    {
+        PlaySound(gs->click_sound);
+        generateMaze = generateMaze_backtracker;
+    }
 
-    //prim
-    Button prim_btn = {(Rectangle){SCREENWIDTH / 5 + 10 , 220, SCREENWIDTH / 5+10, 40},
-                        GetColor(0x2e0e2eff),
-                        0, WHITE, "2.Prim                ", gs->btn_font, WHITE, 23, 1, 80};
+    // prim
+    Button prim_btn = {(Rectangle){SCREENWIDTH / 5 + 10, 220, SCREENWIDTH / 5 + 10, 40},
+                       GetColor(0x2e0e2eff),
+                       0, WHITE, "Prim                ", gs->btn_font, WHITE, 23, 1, 80};
     drawButton(prim_btn);
+    if (clicked(prim_btn))
+    {
+        PlaySound(gs->click_sound);
+        generateMaze = generateMaze_prim;
+    }
 
-    //aldous broder
-    Button aldous_btn = {(Rectangle){SCREENWIDTH / 5 + 10 , 280, SCREENWIDTH / 5+10, 40},
-                        GetColor(0x2e0e2eff),
-                        0, WHITE, "3.Aldous Broder        ", gs->btn_font, WHITE, 23, 1, 80};
-    drawButton(aldous_btn);
+    // aldous broder
+    Button aldous_broder_btn = {(Rectangle){SCREENWIDTH / 5 + 10, 280, SCREENWIDTH / 5 + 10, 40},
+                                GetColor(0x2e0e2eff),
+                                0, WHITE, "Aldous Broder        ", gs->btn_font, WHITE, 23, 1, 80};
+    drawButton(aldous_broder_btn);
+    if (clicked(aldous_broder_btn))
+    {
+        PlaySound(gs->click_sound);
+        generateMaze = generateMaze_aldous_broder;
+    }
 
     // difficulty
-    Button diff_btn = {(Rectangle){SCREENWIDTH * 3 / 5, 90, SCREENWIDTH / 5 +20, 50},
-                        GetColor(0x2e2efeff),
-                        0, WHITE, "Difficulty:        ", gs->btn_font, WHITE, 25, 1, 80};
+    Button diff_btn = {(Rectangle){SCREENWIDTH * 3 / 5, 90, SCREENWIDTH / 5 + 20, 50},
+                       GetColor(0x2e2efeff),
+                       0, WHITE, "Difficulty:        ", gs->btn_font, WHITE, 25, 1, 80};
     drawButton(diff_btn);
 
-    //easy
-    Button easy_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10 , 160, SCREENWIDTH / 5, 40},
-                        GetColor(0x2e0e2eff),
-                        0, WHITE, "1.Easy        ", gs->btn_font, WHITE, 25, 1, 80};
+    // easy
+    Button easy_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10, 160, SCREENWIDTH / 5, 40},
+                       GetColor(0x2e0e2eff),
+                       0, WHITE, "Easy        ", gs->btn_font, WHITE, 25, 1, 80};
     drawButton(easy_btn);
+    if (clicked(easy_btn))
+    {
+        PlaySound(gs->click_sound);
+        gs->maze.difficulty = EASY;
+    }
 
-    //medium
-    Button medium_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10 , 220, SCREENWIDTH / 5, 40},
-                        GetColor(0x2e0e2eff),
-                        0, WHITE, "2.Medium       ", gs->btn_font, WHITE, 25, 1, 80};
+    // medium
+    Button medium_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10, 220, SCREENWIDTH / 5, 40},
+                         GetColor(0x2e0e2eff),
+                         0, WHITE, "2.Medium       ", gs->btn_font, WHITE, 25, 1, 80};
     drawButton(medium_btn);
+    if (clicked(medium_btn))
+    {
+        PlaySound(gs->click_sound);
+        gs->maze.difficulty = MEDIUM;
+    }
 
-    //hard
-    Button hard_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10 , 280, SCREENWIDTH / 5, 40},
-                        GetColor(0x2e0e2eff),
-                        0, WHITE, "3.Hard        ", gs->btn_font, WHITE, 25, 1, 80};
+    // hard
+    Button hard_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10, 280, SCREENWIDTH / 5, 40},
+                       GetColor(0x2e0e2eff),
+                       0, WHITE, "3.Hard        ", gs->btn_font, WHITE, 25, 1, 80};
     drawButton(hard_btn);
+    if (clicked(hard_btn))
+    {
+        PlaySound(gs->click_sound);
+        gs->maze.difficulty = HARD;
+    }
 
     EndDrawing();
 }
@@ -913,7 +969,7 @@ void drawBestTimes(GameState *gs)
 
     if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = MENU;
     }
 
@@ -923,7 +979,7 @@ void drawBestTimes(GameState *gs)
 
     if (clickedRec(nuke_btn_rec))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         nukeBestTimes(gs->times);
     }
 
@@ -962,7 +1018,7 @@ void drawHighScores(GameState *gs)
 
     if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = MENU;
     }
 
@@ -972,7 +1028,7 @@ void drawHighScores(GameState *gs)
 
     if (clickedRec(nuke_btn_rec))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         nukeHighScores(gs->scores);
     }
 
@@ -1012,7 +1068,7 @@ void drawLevels(GameState *gs)
 
             if (clicked(level_btn))
             {
-                PlaySound(gs->click_sound1);
+                PlaySound(gs->click_sound);
                 gs->level = level_no;
                 gs->page = PLAYING;
                 initGameplay(gs);
@@ -1029,7 +1085,7 @@ void drawLevels(GameState *gs)
 
     if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = MENU;
     }
 
@@ -1068,15 +1124,16 @@ void initGameplay(GameState *gs)
     gs->player.x = 0;
     gs->player.y = 0;
 
+    gs->start_time = GetTime();
+
     if (gs->mode == MULTIVERSE)
         srand(4 + 19);
     else
     {
         gs->level = 0;
-        if (gs->mode == TIME_RUNS_OUT)
-            gs->round = 1;
     }
 
+    destroyMaze(&gs->maze);
     initializeMaze(&gs->maze, gs->level);
     generateMaze(&gs->maze);
 }
@@ -1142,18 +1199,20 @@ void updateGameplay(GameState *gs)
     // Generate New Maze
     if (IsKeyPressed(KEY_SPACE) && (gs->mode == DARK_NIGHT || gs->mode == INFINITY_WAR))
     {
-        gs->start_time = GetTime();
-
-        PlaySound(gs->click_sound1);
-
-        destroyMaze(&gs->maze);
+        PlaySound(gs->click_sound);
         initGameplay(gs);
+    }
+
+    // Game Over
+    if (gs->mode == TIME_RUNS_OUT && gs->time_limit - gs->current_time == 0)
+    {
+        gs->page = GAME_FINISH;
     }
 
     // Game Finished
     if (gs->player.x == gs->maze.width - 1 && gs->player.y == gs->maze.height - 1)
     {
-        gs->last_time = GetTime() - gs->start_time;
+        gs->last_time = gs->current_time;
         PlaySound(gs->game_finish_sound);
         if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
         {
@@ -1164,7 +1223,7 @@ void updateGameplay(GameState *gs)
         else if (gs->mode == MULTIVERSE)
         {
             gs->last_score += gs->maze.height * gs->maze.width * 5;
-            destroyMaze(&gs->maze);
+
             if (gs->level < 50)
             {
                 gs->level++;
@@ -1172,14 +1231,28 @@ void updateGameplay(GameState *gs)
             }
             else
             {
+                destroyMaze(&gs->maze);
                 gs->page = MULTIVERSE_CONQUERED;
             }
         }
 
         else if (gs->mode == TIME_RUNS_OUT)
         {
-            if (gs->round)
-                gs->round++;
+            gs->last_score += gs->round * 50 + (gs->time_limit - gs->current_time) * 5;
+            gs->round++;
+
+            if (gs->round <= 5)
+                gs->time_limit -= 10;
+            else
+                gs->time_limit -= 5;
+
+            initGameplay(gs);
+        }
+
+        else if (gs->mode == INFINITY_WAR)
+        {
+            PlaySound(gs->click_sound);
+            initGameplay(gs);
         }
     }
 }
@@ -1235,7 +1308,7 @@ void drawGame(GameState *gs)
 
     if (clickedRec(menu_btn_rec))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = MENU;
     }
 
@@ -1251,18 +1324,17 @@ void drawGame(GameState *gs)
 
     if (IsKeyPressed(KEY_BACKSPACE))
     {
-        if (gs->mode == BEST_OF_US)
-            gs->page = MENU;
-        else if (gs->mode == MULTIVERSE)
+        if (gs->mode == MULTIVERSE)
             gs->page = LEVELS;
+        else
+            gs->page = MENU;
     }
 
     // BRAND NEW MAZE
-    double current_time = GetTime() - gs->start_time;
     // const char *new_maze_msg = "BRAND NEW MAZE";
     // Card new_maze_card = {(Rectangle){(SCREENWIDTH - 500) / 2, (SCREENHEIGHT - 100) / 2, 500, 100},
     //                       DARKBLUE, 0, WHITE, new_maze_msg, gs->msg_font, WHITE, 50, 1, 20, 80, 10, 10};
-    // if (current_time <= 1)
+    // if (gs->current_time <= 1)
     // {
     //     drawCard(new_maze_card);
     // }
@@ -1270,19 +1342,20 @@ void drawGame(GameState *gs)
     if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
     {
         // Time Spent
-        const char *time_text = formatTime(current_time);
+        const char *time_text = formatTime(gs->current_time);
         DrawTextEx(gs->btn_font, time_text, (Vector2){1250, 15}, 20, 1, WHITE);
     }
     else if (gs->mode == TIME_RUNS_OUT)
     {
-        // Time Left
-        const char *time_text = formatTime(gs->time_limit - current_time);
-        DrawTextEx(gs->btn_font, time_text, (Vector2){1250, 15}, 20, 1, WHITE);
+        // Round
+        DrawTextEx(gs->btn_font, TextFormat("ROUND: %2d", gs->round), (Vector2){1190, 15}, 20, 1, WHITE);
 
-        if (gs->time_limit - current_time == 0)
-        {
-            gs->page = GAME_FINISH;
-        }
+        // Time Left
+        const char *time_text = TextFormat("TIME: %s", formatTime(gs->time_limit - gs->current_time));
+        DrawTextEx(gs->btn_font, time_text, (Vector2){1190, 45}, 20, 1, WHITE);
+
+        // Score
+        DrawTextEx(gs->btn_font, TextFormat("SCORE: %5d", gs->last_score), (Vector2){1190, 75}, 20, 1, WHITE);
     }
     else if (gs->mode == MULTIVERSE)
     {
@@ -1297,7 +1370,7 @@ void drawGame(GameState *gs)
                              0, WHITE,
                              "FINISH", gs->btn_font, RAYWHITE, 20, 1, 0};
         drawButton(finish_btn);
-        if (hovered(finish_btn))
+        if (hovered(finish_btn) || hoveredRec(menu_btn_rec))
         {
             finish_btn.buttonColor = BLUE;
             finish_btn.shadow_opacity = 80;
@@ -1311,7 +1384,7 @@ void drawGame(GameState *gs)
 
         if (clicked(finish_btn))
         {
-            PlaySound(gs->click_sound1);
+            PlaySound(gs->click_sound);
             addScore(gs);
             gs->page = GAME_FINISH;
         }
@@ -1355,7 +1428,7 @@ void drawDark(GameState *gs)
 
     if (clickedRec(square_btn_rec))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         if (gs->square_on)
         {
             gs->square_on = false;
@@ -1379,7 +1452,7 @@ void drawTime(GameState *gs)
 
     if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = MENU;
     }
 
@@ -1417,10 +1490,9 @@ void drawTime(GameState *gs)
     if (clicked(replay_btn))
     {
 
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = PLAYING;
         initGameplay(gs);
-        gs->start_time = GetTime();
     }
 
     drawButton(replay_btn);
@@ -1440,7 +1512,7 @@ void drawScore(GameState *gs)
 
     if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = MENU;
     }
 
@@ -1478,11 +1550,10 @@ void drawScore(GameState *gs)
     if (clicked(replay_btn))
     {
 
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->last_score = 0;
         gs->page = LEVELS;
         initGameplay(gs);
-        gs->start_time = GetTime();
     }
 
     drawButton(replay_btn);
@@ -1516,7 +1587,7 @@ void drawMultiConq(GameState *gs)
 
     if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = MENU;
     }
 
@@ -1554,10 +1625,9 @@ void drawMultiConq(GameState *gs)
     if (clicked(replay_btn))
     {
 
-        PlaySound(gs->click_sound1);
+        PlaySound(gs->click_sound);
         gs->page = PLAYING;
         initGameplay(gs);
-        gs->start_time = GetTime();
     }
 
     drawButton(replay_btn);
@@ -1570,6 +1640,9 @@ void updateGame(GameState *gs)
 
     UpdateMusicStream(gs->bg_music);
     gs->player.sprite_index = (int)(GetTime() / 0.1) % 12;
+    gs->current_time = GetTime() - gs->start_time;
+
+    updateSettings(gs);
 
     switch (gs->page)
     {

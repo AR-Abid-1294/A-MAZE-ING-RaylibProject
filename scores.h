@@ -7,7 +7,7 @@
 typedef struct Score
 {
     char player_name[30];
-    int score;    
+    int score;
 } Score;
 
 typedef struct Time
@@ -16,20 +16,20 @@ typedef struct Time
     float time;
 } Time;
 
+void loadTimes(Time times[], const char *file_name);
 
+void storeTimes(Time times[], const char *file_name);
 
+void loadScores(Score scores[], const char *file_name);
+
+void storeScores(Score scores[], const char *file_name);
 
 void sortHighScores(Score *scores);
-
-void loadHighScores(Score *scores, FILE *file);
-
-void storeHighScores(Score *scores, FILE *file);
 
 void sortBestTimes(Time *times);
 
 void nukeBestTimes(Time *times);
 
 void nukeHighScores(Score *scores);
-
 
 #endif

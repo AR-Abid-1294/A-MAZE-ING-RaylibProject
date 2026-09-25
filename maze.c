@@ -25,9 +25,27 @@ void initializeMaze(Maze *maze, int level)
 {
     if (level == 0)
     {
-        maze->height = MAZEHEIGHT;
-        maze->width = MAZEWIDTH;
-        maze->cell_size = CELLSIZE;
+        if (maze->difficulty == MEDIUM)
+        {
+            maze->width = MAZEWIDTH;
+            maze->height = MAZEHEIGHT;
+            maze->cell_size = CELLSIZE;
+        }
+
+        else if (maze->difficulty == EASY)
+        {
+            maze->width = 17;
+            maze->height = 13;
+            maze->cell_size = 50;
+        }
+
+        else if (maze->difficulty == HARD)
+        {
+            maze->width = 58;
+            maze->height = 42;
+            maze->cell_size = 15;
+        }
+
         maze->wall_thickness = WALL_THICK;
     }
     else
@@ -112,7 +130,6 @@ void breakWall(Maze *maze, Cell *cell1, Cell *cell2)
     }
 }
 
-
 void addFrontier(Maze *maze, Cell *cell)
 {
     for (int i = 0; i < 4; i++)
@@ -141,7 +158,7 @@ void removeFrontier(Maze *maze, int frontier_index)
 
 // algorithms
 
-//backtracker
+// backtracker
 void generateMaze_backtracker(Maze *maze)
 {
     maze->current_cell->cellState = VISITED;
@@ -170,7 +187,7 @@ void generateMaze_backtracker(Maze *maze)
     }
 }
 
-//prim
+// prim
 void chooseRandFrontier(Maze *maze)
 {
     int r = rand() % maze->frontier_count;
@@ -198,7 +215,7 @@ void generateMaze_prim(Maze *maze)
     }
 }
 
-//aldous broder
+// aldous broder
 void generateMaze_aldous_broder(Maze *maze)
 {
     while (maze->visited_count < maze->height * maze->width)
@@ -305,8 +322,22 @@ void destroyMaze(Maze *maze)
 {
     for (int i = 0; i < maze->height; i++)
     {
-        free(maze->cells[i]);
+        if (maze->cells[i] != NULL)
+        {
+            free(maze->cells[i]);
+            maze->cells[i] = NULL;
+        }
     }
-    free(maze->cells);
-    free(maze->frontiers);
+
+    if (maze->cells != NULL)
+    {
+        free(maze->cells);
+        maze->cells = NULL;
+    }
+
+    if (maze->frontiers != NULL)
+    {
+        free(maze->frontiers);
+        maze->cells = NULL;
+    }
 }

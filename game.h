@@ -49,19 +49,11 @@ typedef enum Info
     INFINITYWAR
 } Info;
 
-typedef enum Difficulty
-{
-    EASY,
-    MEDIUM,
-    HARD
-} Difficulty;
-
 typedef enum Algorithm
 {
     BACKTRACKER_ALGO,
     PRIM_ALGO,
     ALDOUS_BRODER_ALGO
-
 } Algorithm;
 
 typedef struct GameState
@@ -99,7 +91,7 @@ typedef struct GameState
     Font msg_font;
 
     // sound effects
-    Sound click_sound1;
+    Sound click_sound;
     Sound movement_sound;
     Sound movement_blocked_sound;
     Sound game_finish_sound;
@@ -144,8 +136,7 @@ typedef struct GameState
 
     // info selection
     Info info;
-    //settings selection
-    Difficulty difficulty;
+    // settings selection
     Algorithm algorithm;
 
     // name_input
@@ -153,24 +144,27 @@ typedef struct GameState
     int letter_count;
 
     // best times for THE BEST OF US mode
-    Time best_times[11];
-    FILE *best_times_file;
+    Time best_times_easy[11];
+    Time best_times_medium[11];
+    Time best_times_hard[11];
 
     // best times for THE DARK NIGHT
-    Time dark_times[11];
-    FILE *dark_times_file;
+    Time dark_times_easy[11];
+    Time dark_times_medium[11];
+    Time dark_times_hard[11];
 
     bool square_on;
 
     // high scores for THE MULTIVERSE OF MADMAZE
     Score high_scores[11];
-    FILE *high_scores_file;
 
     // high scores for TIME RUNS OUT
-    Score out_scores[11];
-    FILE *out_scores_file;
+    Score out_scores_easy[11];
+    Score out_scores_medium[11];
+    Score out_scores_hard[11];
 
     // genral pointers
+    double current_time;
     double last_time;
     Time *times;
 
@@ -196,6 +190,7 @@ void unloadGameState(GameState *gs);
 
 // update game logic
 void updateGame(GameState *gs);
+void updateSettings(GameState *gs);
 void drawMenu(GameState *gs);
 void updateNameInput(GameState *gs);
 void drawNameInput(GameState *gs);
