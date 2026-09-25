@@ -20,6 +20,7 @@ void initGameState(GameState *gs)
     gs->info = HOWTOPLAY;
     gs->algorithm = ALDOUS_BRODER_ALGO;
     gs->maze.difficulty = MEDIUM;
+    gs->dev = true;
 
     gs->page = MENU;
     gs->shouldQuit = false;
@@ -276,7 +277,7 @@ void drawMenu(GameState *gs)
     // CREDIT BUTTON
     Button credit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 250 + 50, SCREENWIDTH / 5, 35},
                          GetColor(0x00f0ffff),
-                         0, WHITE, "CREDIT", gs->btn_font, BLACK, 25, 1, 80};
+                         0, WHITE, "CREDITS", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(credit_btn);
     if (hovered(credit_btn))
     {
@@ -574,24 +575,55 @@ void drawNameInput(GameState *gs)
 void drawCredit(GameState *gs)
 {
     BeginDrawing();
-    ClearBackground(GetColor(0xffefb3ff));
+    ClearBackground(GetColor(0x2e2e2eff));
     SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 
-    // Abid Part
-    Rectangle abid_pic_rec = (Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT * (1.5 / 10), SCREENWIDTH * (3.0 / 10), SCREENHEIGHT / 2.0};
-    drawTextureShadowed(gs->abid_pic, abid_pic_rec);
+    Rectangle developers_rec = {60, 0, SCREENWIDTH / 2 - 40, 60};
+    Button developers_button = {developers_rec,
+                                (gs->dev) ? GetColor(0x2e2e2eff) : WHITE,
+                                0, GetColor(0x2e2e2eff), "DEVELOPERS ", gs->font2,
+                                (gs->dev) ? WHITE : DARKGRAY, 35, 1, 0};
+    if (clicked(developers_button))
+    {
+        PlaySound(gs->click_sound);
+        gs->dev = true;
+    }
+    drawButton(developers_button);
 
-    const char *abid_credit = "Md Abidur Rahman\n2505019\n";
-    Card abid_card = {(Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, abid_credit, gs->font1, RAYWHITE, 30, 1, 20, 80, 10, 10};
-    drawCard(abid_card);
+    Rectangle resources_rec = {60 + SCREENWIDTH / 2 - 40, 0, SCREENWIDTH / 2 - 20, 60};
+    Button resources_button = {resources_rec,
+                               (!gs->dev) ? GetColor(0x2e2e2eff) : WHITE,
+                               0, GetColor(0x2e2e2eff), "RESOURCES ", gs->font2,
+                               (!gs->dev) ? WHITE : DARKGRAY, 35, 1, 0};
+    if (clicked(resources_button))
+    {
+        PlaySound(gs->click_sound);
+        gs->dev = false;
+    }
+    drawButton(resources_button);
 
-    // Afif Part
-    Rectangle afif_pic_rec = (Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT * (1.5 / 10), SCREENWIDTH * (3.0 / 10), SCREENHEIGHT / 2.0};
-    drawTextureShadowed(gs->afif_pic, afif_pic_rec);
+    if (gs->dev)
+    {
+        // Abid Part
+        Rectangle abid_pic_rec = (Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT * (1.5 / 10), SCREENWIDTH * (3.0 / 10), SCREENHEIGHT / 2.0};
+        drawTextureShadowed(gs->abid_pic, abid_pic_rec);
 
-    const char *afif_credit = "S.M. Afif Iqbal\n2505004\n";
-    Card afif_card = {(Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, afif_credit, gs->font1, RAYWHITE, 30, 1, 20, 80, 10, 10};
-    drawCard(afif_card);
+        const char *abid_credit = "Md Abidur Rahman\n2505019\n";
+        Card abid_card = {(Rectangle){SCREENWIDTH * (6.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, abid_credit, gs->font1, RAYWHITE, 30, 1, 20, 80, 10, 10};
+        drawCard(abid_card);
+
+        // Afif Part
+        Rectangle afif_pic_rec = (Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT * (1.5 / 10), SCREENWIDTH * (3.0 / 10), SCREENHEIGHT / 2.0};
+        drawTextureShadowed(gs->afif_pic, afif_pic_rec);
+
+        const char *afif_credit = "S.M. Afif Iqbal\n2505004\n";
+        Card afif_card = {(Rectangle){SCREENWIDTH * (1.0 / 10), SCREENHEIGHT * (6.5 / 10), SCREENWIDTH * (3.0 / 10), 100}, GetColor(0x013e37ff), 0, WHITE, afif_credit, gs->font1, RAYWHITE, 30, 1, 20, 80, 10, 10};
+        drawCard(afif_card);
+    }
+    else
+    {
+        DrawRectangle(100,100,100,100,WHITE);
+    }
 
     // MENU BUTTON
     Rectangle menu_btn_rec = {20, 20, 20, 20};
@@ -863,81 +895,108 @@ void drawSettings(GameState *gs)
 
     // Algorithms
     Button algos_btn = {(Rectangle){SCREENWIDTH / 5, 90, SCREENWIDTH / 5 + 20, 50},
-                        GetColor(0x2e2efeff),
-                        0, WHITE, "Algorithms:        ", gs->btn_font, WHITE, 25, 1, 80};
+                        GetColor(0xffe2b8ff),
+                        0, WHITE, "Algorithms:        ", gs->btn_font, GetColor(0x053d3aff), 25, 1, 80};
     drawButton(algos_btn);
 
     // backtracker
     Button backtracker_btn = {(Rectangle){SCREENWIDTH / 5 + 10, 160, SCREENWIDTH / 5 + 10, 40},
-                              GetColor(0x2e0e2eff),
+                              (gs->algorithm == BACKTRACKER_ALGO) ? BLUE : GetColor(0xff6b5bff),
                               0, WHITE, "Backtracker          ", gs->btn_font, WHITE, 23, 1, 80};
-    drawButton(backtracker_btn);
     if (clicked(backtracker_btn))
     {
         PlaySound(gs->click_sound);
         generateMaze = generateMaze_backtracker;
+        gs->algorithm = BACKTRACKER_ALGO;
     }
+    if (hovered(backtracker_btn))
+    {
+        backtracker_btn.buttonColor = SKYBLUE;
+    }
+    drawButton(backtracker_btn);
 
     // prim
     Button prim_btn = {(Rectangle){SCREENWIDTH / 5 + 10, 220, SCREENWIDTH / 5 + 10, 40},
-                       GetColor(0x2e0e2eff),
+                       (gs->algorithm == PRIM_ALGO) ? BLUE : GetColor(0xff6b5bff),
                        0, WHITE, "Prim                ", gs->btn_font, WHITE, 23, 1, 80};
-    drawButton(prim_btn);
     if (clicked(prim_btn))
     {
         PlaySound(gs->click_sound);
         generateMaze = generateMaze_prim;
+        gs->algorithm = PRIM_ALGO;
     }
+    if (hovered(prim_btn))
+    {
+        prim_btn.buttonColor = SKYBLUE;
+    }
+    drawButton(prim_btn);
 
     // aldous broder
     Button aldous_broder_btn = {(Rectangle){SCREENWIDTH / 5 + 10, 280, SCREENWIDTH / 5 + 10, 40},
-                                GetColor(0x2e0e2eff),
+                                (gs->algorithm == ALDOUS_BRODER_ALGO) ? BLUE : GetColor(0xff6b5bff),
                                 0, WHITE, "Aldous Broder        ", gs->btn_font, WHITE, 23, 1, 80};
-    drawButton(aldous_broder_btn);
     if (clicked(aldous_broder_btn))
     {
         PlaySound(gs->click_sound);
         generateMaze = generateMaze_aldous_broder;
+        gs->algorithm = ALDOUS_BRODER_ALGO;
     }
+    if (hovered(aldous_broder_btn))
+    {
+        aldous_broder_btn.buttonColor = SKYBLUE;
+    }
+    drawButton(aldous_broder_btn);
 
     // difficulty
     Button diff_btn = {(Rectangle){SCREENWIDTH * 3 / 5, 90, SCREENWIDTH / 5 + 20, 50},
-                       GetColor(0x2e2efeff),
-                       0, WHITE, "Difficulty:        ", gs->btn_font, WHITE, 25, 1, 80};
+                       GetColor(0xffe2b8ff),
+                       0, WHITE, "Difficulty:        ", gs->btn_font, GetColor(0x053d3aff), 25, 1, 80};
     drawButton(diff_btn);
 
     // easy
     Button easy_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10, 160, SCREENWIDTH / 5, 40},
-                       GetColor(0x2e0e2eff),
+                       (gs->maze.difficulty == EASY) ? BLUE : GetColor(0xff6b5bff),
                        0, WHITE, "Easy        ", gs->btn_font, WHITE, 25, 1, 80};
-    drawButton(easy_btn);
     if (clicked(easy_btn))
     {
         PlaySound(gs->click_sound);
         gs->maze.difficulty = EASY;
     }
+    if (hovered(easy_btn))
+    {
+        easy_btn.buttonColor = SKYBLUE;
+    }
+    drawButton(easy_btn);
 
     // medium
     Button medium_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10, 220, SCREENWIDTH / 5, 40},
-                         GetColor(0x2e0e2eff),
-                         0, WHITE, "2.Medium       ", gs->btn_font, WHITE, 25, 1, 80};
-    drawButton(medium_btn);
+                         (gs->maze.difficulty == MEDIUM) ? BLUE : GetColor(0xff6b5bff),
+                         0, WHITE, "Medium       ", gs->btn_font, WHITE, 25, 1, 80};
     if (clicked(medium_btn))
     {
         PlaySound(gs->click_sound);
         gs->maze.difficulty = MEDIUM;
     }
+    if (hovered(medium_btn))
+    {
+        medium_btn.buttonColor = SKYBLUE;
+    }
+    drawButton(medium_btn);
 
     // hard
     Button hard_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10, 280, SCREENWIDTH / 5, 40},
-                       GetColor(0x2e0e2eff),
-                       0, WHITE, "3.Hard        ", gs->btn_font, WHITE, 25, 1, 80};
-    drawButton(hard_btn);
+                       (gs->maze.difficulty == HARD) ? BLUE : GetColor(0xff6b5bff),
+                       0, WHITE, "Hard        ", gs->btn_font, WHITE, 25, 1, 80};
     if (clicked(hard_btn))
     {
         PlaySound(gs->click_sound);
         gs->maze.difficulty = HARD;
     }
+    if (hovered(hard_btn))
+    {
+        hard_btn.buttonColor = SKYBLUE;
+    }
+    drawButton(hard_btn);
 
     EndDrawing();
 }

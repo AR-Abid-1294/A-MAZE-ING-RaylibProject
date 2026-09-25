@@ -138,6 +138,8 @@ typedef struct GameState
     Info info;
     // settings selection
     Algorithm algorithm;
+    // credit selection
+    bool dev;
 
     // name_input
     char name[20];
