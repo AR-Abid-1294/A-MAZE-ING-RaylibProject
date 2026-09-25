@@ -36,6 +36,19 @@ typedef enum GameMode
     ENDGAME
 } GameMode;
 
+typedef enum Info
+{
+    HOWTOPLAY,
+    BACKTRACKER,
+    PRIM,
+    ALDOUSBRODER,
+    BESTOFUS,
+    MULTIVERSEOFMADMAZE,
+    DARKNIGHT,
+    TIMERUNSOUT,
+    INFINITYWAR
+}Info;
+
 typedef struct GameState
 {
     PageState page;
@@ -113,6 +126,9 @@ typedef struct GameState
     Texture2D time_runs_out_btn;
     Texture2D gravity_grave_btn;
     Texture2D endgame_btn;
+
+    //info selection 
+    Info info;
 
     // name_input
     char name[20];

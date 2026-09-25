@@ -17,6 +17,7 @@ void initGameState(GameState *gs)
     generateMaze = generateMaze_aldous_broder;
     gs->times = gs->best_times;
     gs->scores = gs->high_scores;
+    gs->info = HOWTOPLAY;
 
     gs->page = MENU;
     gs->shouldQuit = false;
@@ -600,11 +601,51 @@ void drawInfo(GameState *gs)
         gs->page = MENU;
     }
 
+    //  MAKING CARD
+    Rectangle info_card_rec = {SCREENWIDTH / 5 + 110,60, SCREENWIDTH * 4 / 5 - 150, SCREENHEIGHT - 40 - 80};
+    //texts
+    char text[300];
+    switch(gs->info)
+    {
+        case HOWTOPLAY:
+            strcpy(text,"ekhane how to play hobe");
+            break;
+        case BACKTRACKER:
+            strcpy(text,"ekhane backtracker");
+            break;
+        case PRIM:
+            strcpy(text,"ekhane badbaki1");
+            break;
+        case ALDOUSBRODER:
+            strcpy(text,"ekhane badbaki2");
+            break;
+        case BESTOFUS:
+            strcpy(text,"ekhane badbaki3");
+            break;
+        case MULTIVERSEOFMADMAZE:
+            strcpy(text,"ekhane badbaki4");
+            break;
+        case TIMERUNSOUT:
+            strcpy(text,"ekhane badbaki5");
+            break;
+        case DARKNIGHT:
+            strcpy(text,"ekhane badbaki6");
+            break;
+        case INFINITYWAR:
+            strcpy(text,"ekhane badbaki7");
+            break;
+        
+
+    }
+    Card info_card = {info_card_rec, WHITE, 0 , BLACK, text, gs->font1, BLACK, 20 ,1,20, 80, 10, 10 }; 
+
     //HOW TO PLAY BUTTON
     Button how_to_play_btn = {(Rectangle){50, 60, SCREENWIDTH / 5, 40},
-                       GetColor(0xf0f0ffff),
+                       (gs->info ==HOWTOPLAY) ? DARKBLUE : GetColor(0xf0f0ffff) ,
                        0, WHITE, "HOW TO PLAY    ", gs->btn_font, BLACK, 25, 1, 80};
     drawButton(how_to_play_btn);
+    const char *how_to_play_info = "ekhane kemne khelbo ota lekhbo"; //how?
+    Card how_to_play_card = {};
     if (hovered(how_to_play_btn))
     {
         how_to_play_btn.buttonColor = DARKBLUE;
@@ -614,6 +655,7 @@ void drawInfo(GameState *gs)
     if (clicked(how_to_play_btn))
     {
         PlaySound(gs->click_sound1);
+        gs->info = HOWTOPLAY;
         //card
     }
 
@@ -625,7 +667,7 @@ void drawInfo(GameState *gs)
 
     //BACKTRAKER
     Button backtracker_btn = {(Rectangle){70, 200, SCREENWIDTH / 5 - 20, 40},
-                       GetColor(0xf0f0ffff),
+                       (gs->info == BACKTRACKER) ?DARKBLUE: GetColor(0xf0f0ffff) ,
                        0, WHITE, "1. BACKTRACKER       ", gs->btn_font, BLACK, 20, 1, 80};
     drawButton(backtracker_btn);
     if (hovered(backtracker_btn))
@@ -637,12 +679,13 @@ void drawInfo(GameState *gs)
     if (clicked(backtracker_btn))
     {
         PlaySound(gs->click_sound1);
+        gs->info = BACKTRACKER;
         //card
     }
 
     //PRIM
     Button prim_btn = {(Rectangle){70, 260, SCREENWIDTH / 5 - 20, 40},
-                       GetColor(0xf0f0ffff),
+                       (gs->info == PRIM) ?DARKBLUE: GetColor(0xf0f0ffff),
                        0, WHITE, "2. PRIM                  ", gs->btn_font, BLACK, 20, 1, 80};
     drawButton(prim_btn);
     if (hovered(prim_btn))
@@ -654,12 +697,13 @@ void drawInfo(GameState *gs)
     if (clicked(prim_btn))
     {
         PlaySound(gs->click_sound1);
-        //aldous
+        gs->info = PRIM;
+        //card
     }
 
     //ALDOUS BRODER
     Button aldous_btn = {(Rectangle){70, 320, SCREENWIDTH / 5 - 20, 40},
-                       GetColor(0xf0f0ffff),
+                       (gs->info == ALDOUSBRODER) ?DARKBLUE: GetColor(0xf0f0ffff),
                        0, WHITE, "3. ALDOUS BRODER       ", gs->btn_font, BLACK, 20, 1, 80};
     drawButton(aldous_btn);
     if (hovered(aldous_btn))
@@ -671,6 +715,7 @@ void drawInfo(GameState *gs)
     if (clicked(aldous_btn))
     {
         PlaySound(gs->click_sound1);
+        gs->info = ALDOUSBRODER;
         //card
     }
 
@@ -682,7 +727,7 @@ void drawInfo(GameState *gs)
 
     //THE BEST OF US
     Button best_button = {(Rectangle){70, 460, SCREENWIDTH / 5 - 20, 40},
-                       GetColor(0xf0f0ffff),
+                       (gs->info == BESTOFUS) ?DARKBLUE: GetColor(0xf0f0ffff),
                        0, WHITE, "1.THE BEST OF US         ", gs->btn_font, BLACK, 19, 1, 80};
     drawButton(best_button);
     if (hovered(best_button))
@@ -694,12 +739,13 @@ void drawInfo(GameState *gs)
     if (clicked(best_button))
     {
         PlaySound(gs->click_sound1);
+        gs->info = BESTOFUS;
         //card
     }
 
     //THE MULTIVERSE OF MADMAZE
     Button multiverse_button = {(Rectangle){70, 520, SCREENWIDTH / 5 - 20, 40},
-                       GetColor(0xf0f0ffff),
+                       (gs->info == MULTIVERSEOFMADMAZE) ?DARKBLUE: GetColor(0xf0f0ffff),
                        0, WHITE, "2. MULTIVERSE OF MADMAZE            ", gs->btn_font, BLACK, 13, 1, 80};
     drawButton(multiverse_button);
     if (hovered(multiverse_button))
@@ -711,12 +757,13 @@ void drawInfo(GameState *gs)
     if (clicked(multiverse_button))
     {
         PlaySound(gs->click_sound1);
+        gs->info = MULTIVERSEOFMADMAZE;
         //card
     }
 
     //TIME RUNS OUT
     Button out_button = {(Rectangle){70, 580, SCREENWIDTH / 5 - 20, 40},
-                       GetColor(0xf0f0ffff),
+                       (gs->info == TIMERUNSOUT) ?DARKBLUE: GetColor(0xf0f0ffff),
                        0, WHITE, "3. TIME RUNS OUT          ", gs->btn_font, BLACK, 19, 1, 80};
     drawButton(out_button);
     if (hovered(out_button))
@@ -728,12 +775,13 @@ void drawInfo(GameState *gs)
     if (clicked(out_button))
     {
         PlaySound(gs->click_sound1);
+        gs->info = TIMERUNSOUT;
         //card
     }
 
     //THE DARK NIGHT
     Button dark_button = {(Rectangle){70, 640, SCREENWIDTH / 5 - 20, 40},
-                       GetColor(0xf0f0ffff),
+                       (gs->info == DARKNIGHT) ?DARKBLUE: GetColor(0xf0f0ffff),
                        0, WHITE, "4. THE DARK NIGHT      ", gs->btn_font, BLACK, 20, 1, 80};
     drawButton(dark_button);
     if (hovered(dark_button))
@@ -745,12 +793,13 @@ void drawInfo(GameState *gs)
     if (clicked(dark_button))
     {
         PlaySound(gs->click_sound1);
+        gs->info = DARKNIGHT;
         //card
     }
 
     //INFINITY WAR
     Button infinity_button = {(Rectangle){70, 700, SCREENWIDTH / 5 - 20, 40},
-                       GetColor(0xf0f0ffff),
+                       (gs->info == INFINITYWAR) ?DARKBLUE: GetColor(0xf0f0ffff),
                        0, WHITE, "5. INFINITY WAR         ", gs->btn_font, BLACK, 20, 1, 80};
     drawButton(infinity_button);
     if (hovered(infinity_button))
@@ -762,8 +811,10 @@ void drawInfo(GameState *gs)
     if (clicked(infinity_button))
     {
         PlaySound(gs->click_sound1);
+        gs->info = INFINITYWAR;
         //card
     }
+    drawCard(info_card);
 
 
     EndDrawing();
