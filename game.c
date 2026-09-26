@@ -70,6 +70,7 @@ void initGameState(GameState *gs)
     SetSoundVolume(gs->movement_blocked_sound, 1.5);
 
     // Load Images
+    gs->title_pic = LoadTexture("Assets/Images/Amazeing1.png");
     gs->abid_pic = LoadTexture("Assets/Images/abid.png");
     gs->afif_pic = LoadTexture("Assets/Images/afif.png");
 
@@ -83,6 +84,10 @@ void initGameState(GameState *gs)
     gs->settings_hovered_btn = LoadTexture("Assets/Buttons/settings_hovered.png");
     gs->menu_btn = LoadTexture("Assets/Buttons/menu.png");
     gs->menu_hovered_btn = LoadTexture("Assets/Buttons/menu_hovered.png");
+    gs->menu_from_game_btn = LoadTexture("Assets/Buttons/menu_from_game.png");
+    gs->menu_hovered_from_game_btn = LoadTexture("Assets/Buttons/menu_hovered_from_game.png");
+    gs->finish_btn = LoadTexture("Assets/Buttons/finish.png");
+    gs->finish_hovered_btn = LoadTexture("Assets/Buttons/finish_hovered.png");
     gs->nuke_btn = LoadTexture("Assets/Buttons/nuke.png");
     gs->square_btn = LoadTexture("Assets/Buttons/square.png");
     gs->square_not_btn = LoadTexture("Assets/Buttons/square_not.png");
@@ -156,6 +161,7 @@ void unloadGameState(GameState *gs)
     UnloadMusicStream(gs->bg_music);
 
     // Unload Images
+    UnloadTexture(gs->title_pic);
     UnloadTexture(gs->abid_pic);
     UnloadTexture(gs->afif_pic);
 
@@ -169,6 +175,8 @@ void unloadGameState(GameState *gs)
     UnloadTexture(gs->info_hovered_btn);
     UnloadTexture(gs->menu_btn);
     UnloadTexture(gs->menu_hovered_btn);
+    UnloadTexture(gs->menu_from_game_btn);
+    UnloadTexture(gs->menu_hovered_from_game_btn);
 
     // Unload Mode Selction Buttons
     UnloadTexture(gs->best_of_us_btn);
@@ -250,22 +258,19 @@ void drawMenu(GameState *gs)
     BeginDrawing();
     ClearBackground(GetColor(0x2e2e2eff));
 
-    // TITLE
-    const char *title = "A MAZE ING";
-    Vector2 title_pos = {(SCREENWIDTH - MeasureText(title, 100)) / 2, 15};
-    drawText(gs->title_font, title, title_pos, 100, 1, WHITE, 80);
+    Rectangle title_rec = {300, 0, 800, 150};
+    DrawTexturePro(gs->title_pic, (Rectangle){0, 0, gs->title_pic.width, gs->title_pic.height}, title_rec, Vector2Zero(), 0, WHITE);
 
     // PLAY BUTTON
     Button play_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 250, SCREENWIDTH / 5, 35},
                        GetColor(0x00f0ffff),
                        0, WHITE, "PLAY", gs->btn_font, BLACK, 25, 1, 80};
-    drawButton(play_btn);
     if (hovered(play_btn))
     {
         play_btn.buttonColor = BLUE;
         play_btn.textColor = WHITE;
-        drawButton(play_btn);
     }
+    drawButton(play_btn);
     if (clicked(play_btn) || IsKeyPressed(KEY_ENTER))
     {
         PlaySound(gs->click_sound);
@@ -278,13 +283,12 @@ void drawMenu(GameState *gs)
     Button credit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 250 + 50, SCREENWIDTH / 5, 35},
                          GetColor(0x00f0ffff),
                          0, WHITE, "CREDITS", gs->btn_font, BLACK, 25, 1, 80};
-    drawButton(credit_btn);
     if (hovered(credit_btn))
     {
         credit_btn.buttonColor = BLUE;
         credit_btn.textColor = WHITE;
-        drawButton(credit_btn);
     }
+    drawButton(credit_btn);
     if (clicked(credit_btn))
     {
         PlaySound(gs->click_sound);
@@ -297,13 +301,12 @@ void drawMenu(GameState *gs)
     Button leaderboard_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 250 + 50 * 2, SCREENWIDTH / 5, 35},
                               GetColor(0x00f0ffff),
                               .stroke = 0, WHITE, leaderboard_btn_text, gs->btn_font, BLACK, 25, 1, 80};
-    drawButton(leaderboard_btn);
     if (hovered(leaderboard_btn))
     {
         leaderboard_btn.buttonColor = BLUE;
         leaderboard_btn.textColor = WHITE;
-        drawButton(leaderboard_btn);
     }
+    drawButton(leaderboard_btn);
     if (clicked(leaderboard_btn))
     {
         PlaySound(gs->click_sound);
@@ -317,13 +320,12 @@ void drawMenu(GameState *gs)
     Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), 250 + 50 * 3, SCREENWIDTH / 5, 35},
                        GetColor(0xff6b5bff),
                        0, WHITE, "QUIT", gs->btn_font, BLACK, 25, 1, 80};
-    drawButton(quit_btn);
     if (hovered(quit_btn))
     {
         quit_btn.buttonColor = GetColor(0xff0055ff);
         quit_btn.textColor = WHITE;
-        drawButton(quit_btn);
     }
+    drawButton(quit_btn);
     if (clicked(quit_btn))
     {
         PlaySound(gs->click_sound);
@@ -507,14 +509,14 @@ void updateNameInput(GameState *gs)
 void drawNameInput(GameState *gs)
 {
     BeginDrawing();
-    ClearBackground(GetColor(0xfff4d6ff));
+    ClearBackground(GetColor(0x2e2e2eff));
 
     const char *instruct = "ENTER YOUR NAME";
-    DrawTextEx(gs->font1, instruct, (Vector2){(SCREENWIDTH - MeasureText(instruct, 30)) / 2.0, SCREENHEIGHT / 2.0 - 150}, 30, 1, BLACK);
+    DrawTextEx(gs->font1, instruct, (Vector2){(SCREENWIDTH - MeasureText(instruct, 30)) / 2.0, SCREENHEIGHT / 2.0 - 150}, 30, 1, WHITE);
 
     Card input_card = {(Rectangle){SCREENWIDTH * (1.0 / 5), SCREENHEIGHT * (1.0 / 2) - 100, SCREENWIDTH * (3.0 / 5), 100},
-                       GetColor(0x263baaff),
-                       0, WHITE, gs->name, gs->font1, GetColor(0xfff4d6ff), 80, 1, 10, 80, 5, 5};
+                       GetColor(0xff6b5bff),
+                       0, WHITE, gs->name, gs->font1, GetColor(0x2e2e2eff), 80, 1, 10, 80, 5, 5};
     drawCard(input_card);
 
     // MENU BUTTON
@@ -529,7 +531,7 @@ void drawNameInput(GameState *gs)
     }
 
     // ENTER button
-    Button enter_btn = {(Rectangle){(SCREENWIDTH - 100) / 2, SCREENHEIGHT / 2.0 + 20, 100, 40}, GetColor(0x2e2e2eff), 0, RAYWHITE, "ENTER", gs->btn_font, WHITE, 20, 1, 0};
+    Button enter_btn = {(Rectangle){(SCREENWIDTH - 100) / 2, SCREENHEIGHT / 2.0 + 20, 100, 40}, GetColor(0xe7edebff), 0, RAYWHITE, "ENTER ", gs->btn_font, GetColor(0x69a481ff), 20, 1, 0};
 
     if (gs->letter_count)
     {
@@ -537,8 +539,8 @@ void drawNameInput(GameState *gs)
 
         if (hovered(enter_btn))
         {
-            enter_btn.buttonColor = BLACK;
-            enter_btn.textColor = WHITE;
+            enter_btn.buttonColor = GetColor(0xb7f7d4ff);
+            enter_btn.textColor = BLACK;
             drawButton(enter_btn);
         }
 
@@ -564,7 +566,8 @@ void drawNameInput(GameState *gs)
         }
     }
 
-    if (hoveredRec(menu_btn_rec) || hovered(enter_btn))
+    // Change Mouse Cursor
+    if (hoveredRec(menu_btn_rec) || (gs->letter_count && hovered(enter_btn)))
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
     else
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
@@ -576,7 +579,6 @@ void drawCredit(GameState *gs)
 {
     BeginDrawing();
     ClearBackground(GetColor(0x2e2e2eff));
-    SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 
     Rectangle developers_rec = {60, 0, SCREENWIDTH / 2 - 40, 60};
     Button developers_button = {developers_rec,
@@ -655,7 +657,7 @@ void drawInfo(GameState *gs)
     Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
     DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
 
-    if (clickedRec(menu_btn_rec))
+    if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound);
         gs->page = MENU;
@@ -887,7 +889,7 @@ void drawSettings(GameState *gs)
     Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
     DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
 
-    if (clickedRec(menu_btn_rec))
+    if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
     {
         PlaySound(gs->click_sound);
         gs->page = MENU;
@@ -901,7 +903,7 @@ void drawSettings(GameState *gs)
 
     // backtracker
     Button backtracker_btn = {(Rectangle){SCREENWIDTH / 5 + 10, 160, SCREENWIDTH / 5 + 10, 40},
-                              (gs->algorithm == BACKTRACKER_ALGO) ? BLUE : GetColor(0xff6b5bff),
+                              (gs->algorithm == BACKTRACKER_ALGO) ? SKYBLUE : GetColor(0xff6b5bff),
                               0, WHITE, "Backtracker          ", gs->btn_font, WHITE, 23, 1, 80};
     if (clicked(backtracker_btn))
     {
@@ -917,7 +919,7 @@ void drawSettings(GameState *gs)
 
     // prim
     Button prim_btn = {(Rectangle){SCREENWIDTH / 5 + 10, 220, SCREENWIDTH / 5 + 10, 40},
-                       (gs->algorithm == PRIM_ALGO) ? BLUE : GetColor(0xff6b5bff),
+                       (gs->algorithm == PRIM_ALGO) ? SKYBLUE : GetColor(0xff6b5bff),
                        0, WHITE, "Prim                ", gs->btn_font, WHITE, 23, 1, 80};
     if (clicked(prim_btn))
     {
@@ -933,7 +935,7 @@ void drawSettings(GameState *gs)
 
     // aldous broder
     Button aldous_broder_btn = {(Rectangle){SCREENWIDTH / 5 + 10, 280, SCREENWIDTH / 5 + 10, 40},
-                                (gs->algorithm == ALDOUS_BRODER_ALGO) ? BLUE : GetColor(0xff6b5bff),
+                                (gs->algorithm == ALDOUS_BRODER_ALGO) ? SKYBLUE : GetColor(0xff6b5bff),
                                 0, WHITE, "Aldous Broder        ", gs->btn_font, WHITE, 23, 1, 80};
     if (clicked(aldous_broder_btn))
     {
@@ -955,7 +957,7 @@ void drawSettings(GameState *gs)
 
     // easy
     Button easy_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10, 160, SCREENWIDTH / 5, 40},
-                       (gs->maze.difficulty == EASY) ? BLUE : GetColor(0xff6b5bff),
+                       (gs->maze.difficulty == EASY) ? SKYBLUE : GetColor(0xff6b5bff),
                        0, WHITE, "Easy        ", gs->btn_font, WHITE, 25, 1, 80};
     if (clicked(easy_btn))
     {
@@ -970,7 +972,7 @@ void drawSettings(GameState *gs)
 
     // medium
     Button medium_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10, 220, SCREENWIDTH / 5, 40},
-                         (gs->maze.difficulty == MEDIUM) ? BLUE : GetColor(0xff6b5bff),
+                         (gs->maze.difficulty == MEDIUM) ? SKYBLUE : GetColor(0xff6b5bff),
                          0, WHITE, "Medium       ", gs->btn_font, WHITE, 25, 1, 80};
     if (clicked(medium_btn))
     {
@@ -985,7 +987,7 @@ void drawSettings(GameState *gs)
 
     // hard
     Button hard_btn = {(Rectangle){SCREENWIDTH * 3 / 5 + 10, 280, SCREENWIDTH / 5, 40},
-                       (gs->maze.difficulty == HARD) ? BLUE : GetColor(0xff6b5bff),
+                       (gs->maze.difficulty == HARD) ? SKYBLUE : GetColor(0xff6b5bff),
                        0, WHITE, "Hard        ", gs->btn_font, WHITE, 25, 1, 80};
     if (clicked(hard_btn))
     {
@@ -1003,15 +1005,37 @@ void drawSettings(GameState *gs)
 
 void drawBestTimes(GameState *gs)
 {
-
     BeginDrawing();
     ClearBackground(GetColor(0x2e2e2eff));
+
+    // TITLE
+    const char *title;
+    if (gs->mode == BEST_OF_US)
+    {
+        if (gs->maze.difficulty == EASY)
+            title = "THE BEST OF US (EASY)";
+        else if (gs->maze.difficulty == MEDIUM)
+            title = "THE BEST OF US (MEDIUM)";
+        else if (gs->maze.difficulty == HARD)
+            title = "THE BEST OF US (HARD)";
+    }
+    else if (gs->mode == DARK_NIGHT)
+    {
+        if (gs->maze.difficulty == EASY)
+            title = "THE DARK NIGHT (EASY)";
+        else if (gs->maze.difficulty == MEDIUM)
+            title = "THE DARK NIGHT (MEDIUM)";
+        else if (gs->maze.difficulty == HARD)
+            title = "THE DARK NIGHT (HARD)";
+    }
+
+    DrawTextEx(gs->title_font, title, (Vector2){(SCREENWIDTH - MeasureText(title, 50)) / 2, 20}, 50, 1, WHITE);
 
     for (int i = 0; i < 10; i++)
     {
         // Player Name
         Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->times[i].player_name), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->times[i].player_name), gs->font1, GetColor(0x00000ff), 25, 1, -15, 80, -5, 5};
         drawCard(player_name_card);
 
         // Best Time
@@ -1056,11 +1080,29 @@ void drawHighScores(GameState *gs)
     BeginDrawing();
     ClearBackground(GetColor(0x2e2e2eff));
 
+    // TITLE
+    const char *title;
+    if (gs->mode == MULTIVERSE)
+    {
+        title = "THE MULTIVERSE OF MADMAZE";
+    }
+    else if (gs->mode == TIME_RUNS_OUT)
+    {
+        if (gs->maze.difficulty == EASY)
+            title = "TIME RUNS OUT (EASY)";
+        else if (gs->maze.difficulty == MEDIUM)
+            title = "TIME RUNS OUT (MEDIUM)";
+        else if (gs->maze.difficulty == HARD)
+            title = "TIME RUNS OUT (HARD)";
+    }
+
+    DrawTextEx(gs->title_font, title, (Vector2){(SCREENWIDTH - MeasureText(title, 50)) / 2, 20}, 50, 1, WHITE);
+
     for (int i = 0; i < 10; i++)
     {
         // Player Name
         Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->scores[i].player_name), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->scores[i].player_name), gs->font1, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
         drawCard(player_name_card);
 
         // Best Time
@@ -1356,7 +1398,7 @@ void drawGame(GameState *gs)
 
     // MENU BUTTON
     Rectangle menu_btn_rec = {20, 20, 20, 20};
-    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_from_game_btn : gs->menu_from_game_btn;
     DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
 
     if (clickedRec(menu_btn_rec))
@@ -1365,22 +1407,38 @@ void drawGame(GameState *gs)
         gs->page = MENU;
     }
 
-    // Change Mouse Cursor
-    if (hoveredRec(menu_btn_rec))
-    {
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    }
-    else
-    {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
-
     if (IsKeyPressed(KEY_BACKSPACE))
     {
         if (gs->mode == MULTIVERSE)
             gs->page = LEVELS;
         else
             gs->page = MENU;
+    }
+
+    // FINISH BUTTON
+    Rectangle finish_btn_rec = {SCREENWIDTH - 20 - 20, SCREENHEIGHT - 20 - 20, 20, 20};
+
+    if (gs->mode == MULTIVERSE || gs->mode == TIME_RUNS_OUT)
+    {
+        Texture finish_btn = hoveredRec(finish_btn_rec) ? gs->finish_hovered_btn : gs->finish_btn;
+        DrawTexturePro(finish_btn, (Rectangle){0, 0, finish_btn.width, finish_btn.height}, finish_btn_rec, Vector2Zero(), 0, WHITE);
+
+        if (clickedRec(finish_btn_rec))
+        {
+            PlaySound(gs->click_sound);
+            addScore(gs);
+            gs->page = GAME_FINISH;
+        }
+    }
+
+    // Change Mouse Cursor
+    if (((gs->mode == MULTIVERSE || gs->mode == TIME_RUNS_OUT) && hoveredRec(finish_btn_rec)) || hoveredRec(menu_btn_rec))
+    {
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    }
+    else
+    {
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
 
     // BRAND NEW MAZE
@@ -1416,25 +1474,6 @@ void drawGame(GameState *gs)
             PlaySound(gs->game_finish_sound);
             gs->page = GAME_FINISH;
         }
-
-        // FINISH BUTTON
-        Button finish_btn = {(Rectangle){SCREENWIDTH - 20 - 100, SCREENHEIGHT - 20 - 40, 100, 40}, DARKBLUE,
-                             0, WHITE,
-                             "FINISH", gs->btn_font, RAYWHITE, 20, 1, 0};
-        drawButton(finish_btn);
-        if (hovered(finish_btn) || hoveredRec(menu_btn_rec))
-        {
-            finish_btn.buttonColor = BLUE;
-            finish_btn.shadow_opacity = 80;
-            drawButton(finish_btn);
-        }
-
-        if (clicked(finish_btn))
-        {
-            PlaySound(gs->click_sound);
-            addScore(gs);
-            gs->page = GAME_FINISH;
-        }
     }
     else if (gs->mode == MULTIVERSE)
     {
@@ -1443,34 +1482,11 @@ void drawGame(GameState *gs)
 
         // Score
         DrawTextEx(gs->btn_font, TextFormat("SCORE: %5d", gs->last_score), (Vector2){1175, 45}, 20, 1, WHITE);
-
-        // FINISH BUTTON
-        Button finish_btn = {(Rectangle){SCREENWIDTH - 20 - 100, SCREENHEIGHT - 20 - 40, 100, 40}, DARKBLUE,
-                             0, WHITE,
-                             "FINISH", gs->btn_font, RAYWHITE, 20, 1, 0};
-        drawButton(finish_btn);
-        if (hovered(finish_btn) || hoveredRec(menu_btn_rec))
-        {
-            finish_btn.buttonColor = BLUE;
-            finish_btn.shadow_opacity = 80;
-            drawButton(finish_btn);
-            SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-        }
-        else
-        {
-            SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-        }
-
-        if (clicked(finish_btn))
-        {
-            PlaySound(gs->click_sound);
-            addScore(gs);
-            gs->page = GAME_FINISH;
-        }
     }
 
     EndDrawing();
 }
+
 // Draw Dark Night
 void drawDark(GameState *gs)
 {
@@ -1522,7 +1538,7 @@ void drawDark(GameState *gs)
 void drawTime(GameState *gs)
 {
     BeginDrawing();
-    ClearBackground(GetColor(0xddfbefff));
+    ClearBackground(GetColor(0x2e2e2eff));
 
     // MENU BUTTON
     Rectangle menu_btn_rec = {20, 20, 20, 20};
@@ -1537,11 +1553,11 @@ void drawTime(GameState *gs)
 
     // Time Card
     const char *time_card_text = TextFormat("%3s\n%s", gs->name, formatTime(gs->last_time));
-    Card time_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 100, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, time_card_text, gs->font1, WHITE, 40, 1, 10, 80, 10, 10};
+    Card time_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 100, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0xd0e6fdff), 0, BLACK, time_card_text, gs->font1, BLACK, 40, 1, 10, 80, 10, 10};
 
     drawCard(time_card);
 
-    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 + 30, 140, 50}, GetColor(0xff6b5bff), 0, BLACK, "QUIT GAME", gs->btn_font, WHITE, 15, 1, 0};
+    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 + 30, 140, 50}, GetColor(0xff6b5bff), 0, BLACK, "QUIT GAME  ", gs->btn_font, WHITE, 15, 1, 0};
 
     drawButton(quit_btn);
 
@@ -1557,7 +1573,7 @@ void drawTime(GameState *gs)
         gs->shouldQuit = true;
     }
 
-    Button replay_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5) + 160, SCREENHEIGHT / 2 + 30, 120, 50}, DARKGREEN, 0, BLACK, "REPLAY", gs->btn_font, WHITE, 15, 1, 0};
+    Button replay_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5) + 160, SCREENHEIGHT / 2 + 30, 120, 50}, DARKGREEN, 0, BLACK, "REPLAY ", gs->btn_font, WHITE, 15, 1, 0};
 
     if (hovered(replay_btn))
     {
@@ -1582,7 +1598,7 @@ void drawTime(GameState *gs)
 void drawScore(GameState *gs)
 {
     BeginDrawing();
-    ClearBackground(GetColor(0xddfbefff));
+    ClearBackground(GetColor(0x2e2e2eff));
 
     // MENU BUTTON
     Rectangle menu_btn_rec = {20, 20, 20, 20};
@@ -1597,11 +1613,11 @@ void drawScore(GameState *gs)
 
     // Score Card
     const char *score_card_text = TextFormat("%2s\n%d", gs->name, gs->last_score);
-    Card score_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 100, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0x2f4858ff), 0, BLACK, score_card_text, gs->font1, WHITE, 40, 1, 10, 80, 10, 10};
+    Card score_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 100, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0xd0e6fdff), 0, BLACK, score_card_text, gs->font1, BLACK, 40, 1, 10, 80, 10, 10};
 
     drawCard(score_card);
 
-    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 + 30, 140, 50}, GetColor(0xff6b5bff), 0, BLACK, "QUIT GAME", gs->btn_font, WHITE, 15, 1, 0};
+    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 + 30, 140, 50}, GetColor(0xff6b5bff), 0, BLACK, "QUIT GAME  ", gs->btn_font, WHITE, 15, 1, 0};
 
     drawButton(quit_btn);
 
@@ -1617,7 +1633,7 @@ void drawScore(GameState *gs)
         gs->shouldQuit = true;
     }
 
-    Button replay_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5) + 160, SCREENHEIGHT / 2 + 30, 120, 50}, DARKGREEN, 0, BLACK, "REPLAY", gs->btn_font, WHITE, 15, 1, 0};
+    Button replay_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5) + 160, SCREENHEIGHT / 2 + 30, 120, 50}, DARKGREEN, 0, BLACK, "REPLAY ", gs->btn_font, WHITE, 15, 1, 0};
 
     if (hovered(replay_btn))
     {
@@ -1657,7 +1673,7 @@ void addScore(GameState *gs)
 void drawMultiConq(GameState *gs)
 {
     BeginDrawing();
-    ClearBackground(GetColor(0xddfbefff));
+    ClearBackground(GetColor(0x2e2e2eff));
 
     // MENU BUTTON
     Rectangle menu_btn_rec = {20, 20, 20, 20};
@@ -1672,11 +1688,11 @@ void drawMultiConq(GameState *gs)
 
     // Congrats Card
     const char *congo_text = "       Jhapana!!\n  Tu si great ho..\nTohfa qabul karo.";
-    Card congo_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 120, SCREENWIDTH * (1.0 / 5), 120}, GetColor(0x2f4858ff), 0, BLACK, congo_text, gs->font1, WHITE, 30, 1, 10, 80, 10, 10};
+    Card congo_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 120, SCREENWIDTH * (1.0 / 5), 120}, GetColor(0xd0e6fdff), 0, BLACK, congo_text, gs->font1, BLACK, 30, 1, 10, 80, 10, 10};
 
     drawCard(congo_card);
 
-    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 + 30, 140, 50}, GetColor(0xff6b5bff), 0, BLACK, "QUIT GAME", gs->btn_font, WHITE, 15, 1, 0};
+    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 + 30, 140, 50}, GetColor(0xff6b5bff), 0, BLACK, "QUIT GAME  ", gs->btn_font, WHITE, 15, 1, 0};
 
     drawButton(quit_btn);
 
@@ -1692,7 +1708,7 @@ void drawMultiConq(GameState *gs)
         gs->shouldQuit = true;
     }
 
-    Button replay_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5) + 160, SCREENHEIGHT / 2 + 30, 120, 50}, DARKGREEN, 0, BLACK, "REPLAY", gs->btn_font, WHITE, 15, 1, 0};
+    Button replay_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5) + 160, SCREENHEIGHT / 2 + 30, 120, 50}, DARKGREEN, 0, BLACK, "REPLAY ", gs->btn_font, WHITE, 15, 1, 0};
 
     if (hovered(replay_btn))
     {

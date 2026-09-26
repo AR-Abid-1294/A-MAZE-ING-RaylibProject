@@ -67,12 +67,12 @@ typedef struct GameState
     // player
     Player player;
 
-    // ball
-    Vector2 ball_pos0;
-    Vector2 ball_pos;
-    double ball_radius;
-    double sprite_side;
-    Vector2 ball_speed;
+    // // ball
+    // Vector2 ball_pos0;
+    // Vector2 ball_pos;
+    // double ball_radius;
+    // double sprite_side;
+    // Vector2 ball_speed;
 
     // assets
     Texture2D wall_texture;
@@ -101,6 +101,7 @@ typedef struct GameState
     bool music_on;
 
     // images
+    Texture2D title_pic;
     Texture2D abid_pic;
     Texture2D afif_pic;
 
@@ -118,6 +119,12 @@ typedef struct GameState
 
     Texture2D menu_btn;
     Texture2D menu_hovered_btn;
+
+    Texture2D menu_from_game_btn;
+    Texture2D menu_hovered_from_game_btn;
+
+    Texture2D finish_btn;
+    Texture2D finish_hovered_btn;
 
     Texture2D nuke_btn;
     Texture2D nuke_hovered_btn;
