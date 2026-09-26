@@ -666,7 +666,7 @@ void drawInfo(GameState *gs)
     //  MAKING CARD
     Rectangle info_card_rec = {SCREENWIDTH / 5 + 110, 60, SCREENWIDTH * 4 / 5 - 150, SCREENHEIGHT - 40 - 80};
     // texts
-    char text[300];
+    char text[800];
     switch (gs->info)
     {
     case HOWTOPLAY:
