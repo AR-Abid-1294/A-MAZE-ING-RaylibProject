@@ -89,6 +89,8 @@ void initGameState(GameState *gs)
     gs->finish_btn = LoadTexture("Assets/Buttons/finish.png");
     gs->finish_hovered_btn = LoadTexture("Assets/Buttons/finish_hovered.png");
     gs->nuke_btn = LoadTexture("Assets/Buttons/nuke.png");
+    gs->search_btn = LoadTexture("Assets/Buttons/search.png");
+    gs->search_hovered_btn = LoadTexture("Assets/Buttons/search_hovered.png");
     gs->square_btn = LoadTexture("Assets/Buttons/square.png");
     gs->square_not_btn = LoadTexture("Assets/Buttons/square_not.png");
     gs->square_on = false;
@@ -105,6 +107,10 @@ void initGameState(GameState *gs)
     // Name Input
     gs->name[0] = '\0';
     gs->letter_count = 0;
+
+    // Search Name Input
+    gs->search_name[0] = '\0';
+    gs->search_letter_count = 0;
 
     // Load Leaderboard Data
 
@@ -488,8 +494,8 @@ void updateNameInput(GameState *gs)
     while (letter)
     {
         if (gs->letter_count < 19 && ((letter >= 'A' && letter <= 'Z') ||
-                                      (letter >= 'a' && letter <= 'z')) ||
-            letter == ' ' || letter == '.')
+                                      (letter >= 'a' && letter <= 'z') ||
+                                      letter == ' ' || letter == '.'))
         {
             gs->name[gs->letter_count] = (char)letter;
             gs->name[gs->letter_count + 1] = '\0';
@@ -563,6 +569,84 @@ void drawNameInput(GameState *gs)
                     gs->time_limit = 12;
                 }
             }
+        }
+    }
+
+    // Change Mouse Cursor
+    if (hoveredRec(menu_btn_rec) || (gs->letter_count && hovered(enter_btn)))
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    else
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+
+    EndDrawing();
+}
+
+void updateSearchNameInput(GameState *gs)
+{
+    int letter = GetCharPressed();
+    while (letter)
+    {
+        if (gs->search_letter_count < 19 && ((letter >= 'A' && letter <= 'Z') ||
+                                             (letter >= 'a' && letter <= 'z') ||
+                                             letter == ' ' || letter == '.'))
+        {
+            gs->search_name[gs->search_letter_count] = (char)letter;
+            gs->search_name[gs->search_letter_count + 1] = '\0';
+            gs->search_letter_count++;
+        }
+
+        letter = GetCharPressed();
+    }
+
+    if (IsKeyPressed(KEY_BACKSPACE) && gs->search_letter_count)
+    {
+        gs->search_letter_count--;
+        gs->search_name[gs->search_letter_count] = '\0';
+    }
+}
+
+void drawSearchNameInput(GameState *gs)
+{
+    BeginDrawing();
+    ClearBackground(GetColor(0x2e2e2eff));
+
+    const char *instruct = "  ENTER THE NAME TO SEARCH";
+    DrawTextEx(gs->font1, instruct, (Vector2){(SCREENWIDTH - MeasureText(instruct, 30)) / 2.0, SCREENHEIGHT / 2.0 - 150}, 30, 1, WHITE);
+
+    Card input_card = {(Rectangle){SCREENWIDTH * (1.0 / 5), SCREENHEIGHT * (1.0 / 2) - 100, SCREENWIDTH * (3.0 / 5), 100},
+                       GetColor(0xff6b5bff),
+                       0, WHITE, gs->search_name, gs->font1, GetColor(0x2e2e2eff), 80, 1, 10, 80, 5, 5};
+    drawCard(input_card);
+
+    // MENU BUTTON
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(menu_btn_rec))
+    {
+        PlaySound(gs->click_sound);
+        gs->page = MENU;
+    }
+
+    // ENTER button
+    Button enter_btn = {(Rectangle){(SCREENWIDTH - 100) / 2, SCREENHEIGHT / 2.0 + 20, 100, 40}, GetColor(0xe7edebff), 0, RAYWHITE, "ENTER ", gs->btn_font, GetColor(0x69a481ff), 20, 1, 0};
+
+    if (gs->search_letter_count)
+    {
+        drawButton(enter_btn);
+
+        if (hovered(enter_btn))
+        {
+            enter_btn.buttonColor = GetColor(0xb7f7d4ff);
+            enter_btn.textColor = BLACK;
+            drawButton(enter_btn);
+        }
+
+        if (clicked(enter_btn) || IsKeyPressed(KEY_ENTER))
+        {
+            PlaySound(gs->click_sound);
+            gs->page = SEARCH_HIGH_SCORES;
         }
     }
 
@@ -1133,6 +1217,22 @@ void drawHighScores(GameState *gs)
         nukeHighScores(gs->scores);
     }
 
+    // SEARCH BUTTON
+    Rectangle search_btn_rec = {SCREENWIDTH - 10 - 150, 40, 50, 50};
+    DrawTexturePro(gs->search_btn, (Rectangle){0, 0, gs->search_btn.width, gs->search_btn.height}, search_btn_rec, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(search_btn_rec))
+    {
+        PlaySound(gs->click_sound);
+        gs->page = SEARCH_NAME_INPUT;
+        gs->search_name[0] = '\0';
+        gs->search_letter_count = 0;
+    }
+    if (hoveredRec(search_btn_rec))
+    {
+        DrawTexturePro(gs->search_hovered_btn, (Rectangle){0, 0, gs->search_hovered_btn.width, gs->search_hovered_btn.height}, search_btn_rec, Vector2Zero(), 0, WHITE);
+    }
+
     // Change mouse cursor
     if (hoveredRec(menu_btn_rec) || hoveredRec(nuke_btn_rec))
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
@@ -1647,7 +1747,7 @@ void drawScore(GameState *gs)
 
         PlaySound(gs->click_sound);
         gs->last_score = 0;
-        if(gs->mode == MULTIVERSE)
+        if (gs->mode == MULTIVERSE)
             gs->page = LEVELS;
         else
             gs->page = PLAYING;
@@ -1661,15 +1761,15 @@ void drawScore(GameState *gs)
 
 void addTime(GameState *gs)
 {
-    strcpy(gs->times[10].player_name, gs->name);
-    gs->times[10].time = gs->last_time;
+    strcpy(gs->times[100].player_name, gs->name);
+    gs->times[100].time = gs->last_time;
     sortBestTimes(gs->times);
 }
 
 void addScore(GameState *gs)
 {
-    strcpy(gs->scores[10].player_name, gs->name);
-    gs->scores[10].score = gs->last_score;
+    strcpy(gs->scores[100].player_name, gs->name);
+    gs->scores[100].score = gs->last_score;
     sortHighScores(gs->scores);
 }
 
@@ -1733,6 +1833,81 @@ void drawMultiConq(GameState *gs)
     EndDrawing();
 }
 
+void drawSearchHighScore(GameState *gs)
+{
+    BeginDrawing();
+    ClearBackground(GetColor(0x2e2e2eff));
+
+    // TITLE
+    const char *title;
+    if (gs->mode == MULTIVERSE)
+    {
+        title = "THE MULTIVERSE OF MADMAZE";
+    }
+    else if (gs->mode == TIME_RUNS_OUT)
+    {
+        if (gs->maze.difficulty == EASY)
+            title = "TIME RUNS OUT (EASY)";
+        else if (gs->maze.difficulty == MEDIUM)
+            title = "TIME RUNS OUT (MEDIUM)";
+        else if (gs->maze.difficulty == HARD)
+            title = "TIME RUNS OUT (HARD)";
+    }
+    DrawTextEx(gs->title_font, title, (Vector2){(SCREENWIDTH - MeasureText(title, 50)) / 2, 20}, 50, 1, WHITE);
+
+    for (int i = 0, j = 0; i < 5;)
+    {
+        if (j < 100)
+        {
+            if (strcmp(gs->search_name, gs->scores[j].player_name))
+                j++;
+            else
+            {
+                // player
+                Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
+                Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->scores[j].player_name), gs->font1, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+                drawCard(player_name_card);
+
+                // score -> Best Time
+                Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
+                const char *best_time_text = TextFormat("%03d", gs->scores[j].score);
+                Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%s", best_time_text), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
+                drawCard(best_times_card);
+
+                i++;
+                j++;
+            }
+        }
+        else
+        {
+            // player
+            Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
+            Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->search_name), gs->font1, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+            drawCard(player_name_card);
+
+            // score -> Best Time
+            Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
+            Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n "), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
+            drawCard(best_times_card);
+
+            i++;
+        }
+    }
+
+    // MENU BUTTON
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
+    {
+        PlaySound(gs->click_sound);
+        gs->page = MENU;
+    }
+
+    EndDrawing();
+}
+
 void updateGame(GameState *gs)
 {
 
@@ -1751,6 +1926,11 @@ void updateGame(GameState *gs)
     case NAME_INPUT:
         updateNameInput(gs);
         drawNameInput(gs);
+        break;
+
+    case SEARCH_NAME_INPUT:
+        updateSearchNameInput(gs);
+        drawSearchNameInput(gs);
         break;
 
     case LEVELS:
@@ -1791,6 +1971,10 @@ void updateGame(GameState *gs)
 
     case HIGH_SCORES:
         drawHighScores(gs);
+        break;
+
+    case SEARCH_HIGH_SCORES:
+        drawSearchHighScore(gs);
         break;
 
     default:

@@ -13,6 +13,7 @@ typedef enum PageState
 {
     MENU,
     NAME_INPUT,
+    SEARCH_NAME_INPUT,
     PLAYING,
     LEVELS,
     GAME_FINISH,
@@ -22,7 +23,8 @@ typedef enum PageState
     INFO,
     SETTINGS,
     HIGH_SCORES,
-    BEST_TIMES
+    BEST_TIMES,
+    SEARCH_HIGH_SCORES
 } PageState;
 
 typedef enum GameMode
@@ -129,6 +131,9 @@ typedef struct GameState
     Texture2D nuke_btn;
     Texture2D nuke_hovered_btn;
 
+    Texture2D search_btn;
+    Texture2D search_hovered_btn;
+
     Texture2D square_btn;
     Texture2D square_not_btn;
 
@@ -152,25 +157,29 @@ typedef struct GameState
     char name[20];
     int letter_count;
 
+    //search_name_input;
+    char search_name[20];
+    int search_letter_count;
+
     // best times for THE BEST OF US mode
-    Time best_times_easy[11];
-    Time best_times_medium[11];
-    Time best_times_hard[11];
+    Time best_times_easy[101];
+    Time best_times_medium[101];
+    Time best_times_hard[101];
 
     // best times for THE DARK NIGHT
-    Time dark_times_easy[11];
-    Time dark_times_medium[11];
-    Time dark_times_hard[11];
+    Time dark_times_easy[101];
+    Time dark_times_medium[101];
+    Time dark_times_hard[101];
 
     bool square_on;
 
     // high scores for THE MULTIVERSE OF MADMAZE
-    Score high_scores[11];
+    Score high_scores[101];
 
     // high scores for TIME RUNS OUT
-    Score out_scores_easy[11];
-    Score out_scores_medium[11];
-    Score out_scores_hard[11];
+    Score out_scores_easy[101];
+    Score out_scores_medium[101];
+    Score out_scores_hard[101];
 
     // genral pointers
     double current_time;
@@ -215,5 +224,7 @@ void drawTime(GameState *gs);
 void drawScore(GameState *gs);
 
 void drawDark(GameState *gs);
+
+void drawSearchHighScore(GameState *gs);
 
 #endif
