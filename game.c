@@ -1647,7 +1647,10 @@ void drawScore(GameState *gs)
 
         PlaySound(gs->click_sound);
         gs->last_score = 0;
-        gs->page = LEVELS;
+        if(gs->mode == MULTIVERSE)
+            gs->page = LEVELS;
+        else
+            gs->page = PLAYING;
         initGameplay(gs);
     }
 
