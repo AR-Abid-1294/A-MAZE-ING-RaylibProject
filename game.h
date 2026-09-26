@@ -157,7 +157,7 @@ typedef struct GameState
     char name[20];
     int letter_count;
 
-    //search_name_input;
+    // search_name_input;
     char search_name[20];
     int search_letter_count;
 
@@ -225,6 +225,6 @@ void drawScore(GameState *gs);
 
 void drawDark(GameState *gs);
 
-void drawSearchHighScore(GameState *gs);
+void drawSearchHighScores(GameState *gs);
 
 #endif
