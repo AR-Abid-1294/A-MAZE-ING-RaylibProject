@@ -373,37 +373,3 @@ void markAll(Maze *maze, CellState state)
         }
     }
 }
-
-void findPath(Maze *maze, Cell *cell)
-{
-    cell->cellState = CHECKED;
-
-    shuffleDirections();
-
-    for (int i = 0; i < 4; i++)
-    {
-        int nx = cell->x + directions[i][0];
-        int ny = cell->y + directions[i][1];
-
-        if (isCellValid(*maze, nx, ny))
-        {
-            Cell *neighbor_cell = &maze->cells[ny][nx];
-
-            if (neighbor_cell->cellState == UNVISITED)
-            {
-                Cell *old_current_cell = cell;
-                cell = neighbor_cell;
-                breakWall(maze, old_current_cell, cell);
-
-                generateMaze_backtracker(maze);
-                cell = old_current_cell;
-            }
-        }
-    }
-}
-
-void solveMaze(Maze *maze)
-{
-    markAll(maze, UNCHECKED);
-    findPath(maze, &maze->cells[0][0]);
-}

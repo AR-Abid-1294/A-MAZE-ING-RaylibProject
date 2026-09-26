@@ -1276,7 +1276,7 @@ void updateGameplay(GameState *gs)
 
     if (movement_attempt)
     {
-        if (isCellValid(x, y, gs->maze))
+        if (isCellValid(gs->maze, x, y))
         {
             Cell cell_new = gs->maze.cells[y][x];
             if (isCellAllowed(cell_old, cell_new))
