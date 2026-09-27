@@ -95,9 +95,30 @@ void initializeMaze(Maze *maze, int level)
     maze->frontier_count = 2;
 }
 
-bool isCellValid(int x, int y, Maze maze)
+bool isCellValid(Maze maze, int x, int y)
 {
     return ((x >= 0 && x <= maze.width - 1) && (y >= 0 && y <= maze.height - 1));
+}
+
+bool isWall(Maze maze, Cell cell1, Cell cell2)
+{
+    if (cell1.x == cell2.x)
+    {
+        if (cell1.y - cell2.y == 1)
+            return cell1.up_wall;
+
+        else if (cell2.y - cell1.y == 1)
+            return cell2.up_wall;
+    }
+
+    else if (cell1.y == cell2.y)
+    {
+        if (cell1.x - cell2.x == 1)
+            return cell1.left_wall;
+
+        else if (cell2.x - cell1.x == 1)
+            return cell2.left_wall;
+    }
 }
 
 void breakWall(Maze *maze, Cell *cell1, Cell *cell2)
@@ -136,7 +157,7 @@ void addFrontier(Maze *maze, Cell *cell)
     {
         int x = cell->x + directions[i][0];
         int y = cell->y + directions[i][1];
-        if (isCellValid(x, y, *maze))
+        if (isCellValid(*maze, x, y))
         {
             Cell *neighbor_cell = &maze->cells[y][x];
             if (neighbor_cell->cellState == UNVISITED)
@@ -170,7 +191,7 @@ void generateMaze_backtracker(Maze *maze)
         int nx = maze->current_cell->x + directions[i][0];
         int ny = maze->current_cell->y + directions[i][1];
 
-        if (isCellValid(nx, ny, *maze))
+        if (isCellValid(*maze, nx, ny))
         {
             Cell *neighbor_cell = &maze->cells[ny][nx];
 
@@ -229,7 +250,7 @@ void generateMaze_aldous_broder(Maze *maze)
             int nx = maze->current_cell->x + directions[i][0];
             int ny = maze->current_cell->y + directions[i][1];
 
-            if (isCellValid(nx, ny, *maze))
+            if (isCellValid(*maze, nx, ny))
             {
                 neighbour_cell = &maze->cells[ny][nx];
                 break;
@@ -339,5 +360,16 @@ void destroyMaze(Maze *maze)
     {
         free(maze->frontiers);
         maze->cells = NULL;
+    }
+}
+
+void markAll(Maze *maze, CellState state)
+{
+    for (int i = 0; i < maze->height; i++)
+    {
+        for (int j = 0; j < maze->width; j++)
+        {
+            maze->cells[i][j].cellState = state;
+        }
     }
 }

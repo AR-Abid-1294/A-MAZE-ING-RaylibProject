@@ -44,7 +44,10 @@ typedef enum CellState
     VISITED,
     // during maze solving
     UNCROSSED,
-    CROSSED
+    CROSSED,
+    // during auto solving
+    UNCHECKED,
+    CHECKED
 } CellState;
 
 typedef enum Difficulty
@@ -102,7 +105,9 @@ void shuffleDirections();
 
 void initializeMaze(Maze *maze, int level);
 
-bool isCellValid(int x, int y, Maze maze);
+bool isCellValid(Maze maze, int x, int y);
+
+bool isWall(Maze maze, Cell cell1, Cell cell2);
 
 void breakWall(Maze *maze, Cell *cell1, Cell *cell2);
 
@@ -110,7 +115,7 @@ void addFrontier(Maze *maze, Cell *cell);
 
 void removeFrontier(Maze *maze, int frontier_index);
 
-// algo
+// Different Maze Generation Algorithms
 
 void generateMaze_backtracker(Maze *maze);
 
@@ -125,5 +130,13 @@ void (*generateMaze)(Maze *maze);
 void drawMaze(Maze *maze, Vector2 pos, Player *player);
 
 void destroyMaze(Maze *maze);
+
+// Maze Solving Algorithms
+
+void markAll(Maze *maze, CellState state);
+
+void findPath(Maze *maze, Cell *cell);
+
+void solveMaze(Maze *maze);
 
 #endif
