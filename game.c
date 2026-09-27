@@ -1651,6 +1651,7 @@ void updateGameplay(GameState *gs)
             {
                 destroyMaze(&gs->maze);
                 gs->page = MULTIVERSE_CONQUERED;
+                addScore(gs);
             }
         }
 
@@ -1669,7 +1670,6 @@ void updateGameplay(GameState *gs)
 
         else if (gs->mode == INFINITY_WAR)
         {
-            PlaySound(gs->click_sound);
             initGameplay(gs);
         }
     }
@@ -1795,6 +1795,7 @@ void drawGame(GameState *gs)
         if (gs->time_limit - gs->current_time <= 0)
         {
             PlaySound(gs->game_finish_sound);
+            addScore(gs);
             gs->page = GAME_FINISH;
         }
     }

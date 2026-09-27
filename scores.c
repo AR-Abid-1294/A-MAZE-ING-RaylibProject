@@ -53,7 +53,7 @@ void storeScores(Score scores[], const char *file_name)
 // afif koreche check korte
 void sortBestTimes(Time *times)
 {
-    for (int i = 0; i < 101; i++)
+    for (int i = 0; i < 100; i++)
         for (int j = i + 1; j < 101; j++)
             if (times[j].time < times[i].time)
             {
