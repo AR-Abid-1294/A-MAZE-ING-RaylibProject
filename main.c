@@ -9,6 +9,7 @@ int main()
     initGameState(&gs);
 
     // Game Loop
+
     while (!WindowShouldClose() && !gs.shouldQuit)
         updateGame(&gs);
 

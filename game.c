@@ -105,6 +105,7 @@ void initGameState(GameState *gs)
     gs->search_hovered_btn = LoadTexture("Assets/Buttons/search_hovered.png");
     gs->square_btn = LoadTexture("Assets/Buttons/square.png");
     gs->square_not_btn = LoadTexture("Assets/Buttons/square_not.png");
+    gs->sad_emoji = LoadTexture("Assets/Images/sad.png");
     gs->square_on = false;
 
     // Load Mode Selection Buttons
@@ -214,6 +215,7 @@ void unloadGameState(GameState *gs)
     UnloadTexture(gs->search_hovered_btn);
     UnloadTexture(gs->square_btn);
     UnloadTexture(gs->square_not_btn);
+    UnloadTexture(gs->sad_emoji);
 
     // Unload Mode Selction Buttons
     UnloadTexture(gs->best_of_us_btn);
@@ -1384,8 +1386,9 @@ void drawSearchBestTimes(GameState *gs)
     {
         char *not_found = "Tomar dara holo nah!!!   ";
         char *try_to_win = "EKBAR JITE DEKHAO!!";
-        DrawTextEx(gs->title_font, not_found, (Vector2){(SCREENWIDTH - MeasureText(not_found, 50)) / 2, 20 + 200}, 50, 1, RED);
-        DrawTextEx(gs->title_font, try_to_win, (Vector2){(SCREENWIDTH - MeasureText(try_to_win, 50)) / 2, 20 + 200 + 70}, 50, 1, SKYBLUE);
+        DrawTextEx(gs->title_font, not_found, (Vector2){(SCREENWIDTH - MeasureText(not_found, 50)) / 2 - 30, 20 + 200}, 50, 1, RED);
+        DrawTextEx(gs->title_font, try_to_win, (Vector2){(SCREENWIDTH - MeasureText(try_to_win, 50)) / 2 - 30, 20 + 200 + 70}, 50, 1, SKYBLUE);
+        DrawTexturePro(gs->sad_emoji, (Rectangle){0, 0, gs->sad_emoji.width, gs->sad_emoji.height}, (Rectangle){SCREENWIDTH * 3 / 5 + 100, 310, 60, 60}, (Vector2){30, 30}, 30.0, WHITE);
     }
 
     // MENU BUTTON
@@ -1466,8 +1469,11 @@ void drawSearchHighScores(GameState *gs)
     }
     if (!flag)
     {
-        char *not_found = "tomar dara holo nah";
-        DrawTextEx(gs->title_font, not_found, (Vector2){(SCREENWIDTH - MeasureText(not_found, 50)) / 2, 20 + 200}, 50, 1, RED);
+        char *not_found = "Tomar dara holo nah!!!   ";
+        char *try_to_win = "EKBAR JITE DEKHAO!!";
+        DrawTextEx(gs->title_font, not_found, (Vector2){(SCREENWIDTH - MeasureText(not_found, 50)) / 2 - 30, 20 + 200}, 50, 1, RED);
+        DrawTextEx(gs->title_font, try_to_win, (Vector2){(SCREENWIDTH - MeasureText(try_to_win, 50)) / 2 - 30, 20 + 200 + 70}, 50, 1, SKYBLUE);
+        DrawTexturePro(gs->sad_emoji, (Rectangle){0, 0, gs->sad_emoji.width, gs->sad_emoji.height}, (Rectangle){SCREENWIDTH * 3 / 5 + 100, 310, 60, 60}, (Vector2){30, 30}, 30.0, WHITE);
     }
 
     // MENU BUTTON
@@ -1711,27 +1717,27 @@ void drawGame(GameState *gs)
     if (gs->mode == BEST_OF_US)
     {
         title = "THE BEST OF US";
-        control_inst = "W/A/S/D or Arrow Keys for Movement | F for Auto Solve";
+        control_inst = " W/A/S/D or Arrow Keys for Movement";
     }
     else if (gs->mode == MULTIVERSE)
     {
         title = "THE MULTIVERSE OF MADMAZE";
-        control_inst = "W/A/S/D or Arrow Keys for Movement | F for Auto Solve";
+        control_inst = " W/A/S/D or Arrow Keys for Movement";
     }
     else if (gs->mode == TIME_RUNS_OUT)
     {
         title = "TIME RUNS OUT";
-        control_inst = "W/A/S/D or Arrow Keys for Movement | F for Auto Solve";
+        control_inst = " W/A/S/D or Arrow Keys for Movement";
     }
     else if (gs->mode == DARK_NIGHT)
     {
-        title = "DARK NIGHT";
-        control_inst = "W/A/S/D or Arrow Keys for Movement | Space for New Maze | F for Auto Solve";
+        title = "THE DARK NIGHT";
+        control_inst = " W/A/S/D or Arrow Keys for Movement | Space for New Maze";
     }
     else if (gs->mode == INFINITY_WAR)
     {
         title = "INFINITY WAR";
-        control_inst = "W/A/S/D or Arrow Keys for Movement | Space for New Maze | F for Auto Solve";
+        control_inst = " W/A/S/D or Arrow Keys for Movement | Space for New Maze";
     }
 
     DrawTextEx(gs->title_font, title, (Vector2){(SCREENWIDTH - MeasureText(title, 50)) / 2, 20}, 50, 1, WHITE);
@@ -1815,7 +1821,7 @@ void drawGame(GameState *gs)
         {
             PlaySound(gs->game_finish_sound);
             addScore(gs);
-            gs->page = GAME_FINISH;
+            gs->page = GAME_OVER;
         }
     }
     else if (gs->mode == MULTIVERSE)
@@ -1993,7 +1999,80 @@ void drawScore(GameState *gs)
         if (gs->mode == MULTIVERSE)
             gs->page = LEVELS;
         else
+        {
+            gs->round = 1;
+            gs->time_limit = 120;
             gs->page = PLAYING;
+        }
+        initGameplay(gs);
+    }
+
+    drawButton(replay_btn);
+
+    EndDrawing();
+}
+// DRAW GAME OVER WHEN TIME RUNS OUT
+void drawGameOver(GameState *gs)
+{
+    BeginDrawing();
+    ClearBackground(GetColor(0x2e2e2eff));
+
+    // MENU BUTTON
+    Rectangle menu_btn_rec = {20, 20, 20, 20};
+    Texture menu_btn = hoveredRec(menu_btn_rec) ? gs->menu_hovered_btn : gs->menu_btn;
+    DrawTexturePro(menu_btn, (Rectangle){0, 0, menu_btn.width, menu_btn.height}, menu_btn_rec, Vector2Zero(), 0, WHITE);
+
+    if (clickedRec(menu_btn_rec) || IsKeyPressed(KEY_BACKSPACE))
+    {
+        PlaySound(gs->click_sound);
+        gs->page = MENU;
+    }
+
+    // Score Card
+    const char *score_card_text = TextFormat("%2s\n%d", gs->name, gs->last_score);
+    Card score_card = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 - 250, SCREENWIDTH * (1.0 / 5), 100}, GetColor(0xd0e6fdff), 0, BLACK, score_card_text, gs->font1, BLACK, 40, 1, 10, 80, 10, 10};
+
+    drawCard(score_card);
+
+    char *not_found = "Tomar dara holo nah!!!   ";
+    char *try_to_win = "EKBAR JITE DEKHAO!!";
+    DrawTextEx(gs->title_font, not_found, (Vector2){(SCREENWIDTH - MeasureText(not_found, 50)) / 2 - 10, 300}, 50, 1, RED);
+    DrawTextEx(gs->title_font, try_to_win, (Vector2){(SCREENWIDTH - MeasureText(try_to_win, 50)) / 2 - 10, 300 + 70}, 50, 1, SKYBLUE);
+    DrawTexturePro(gs->sad_emoji, (Rectangle){0, 0, gs->sad_emoji.width, gs->sad_emoji.height}, (Rectangle){SCREENWIDTH * 3 / 5 + 100, 390, 60, 60}, (Vector2){30, 30}, 30.0, WHITE);
+
+    Button quit_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5), SCREENHEIGHT / 2 + 70, 140, 50}, GetColor(0xff6b5bff), 0, BLACK, "QUIT GAME  ", gs->btn_font, WHITE, 15, 1, 0};
+
+    drawButton(quit_btn);
+
+    if (hovered(quit_btn))
+    {
+        quit_btn.buttonColor = GetColor(0xff0055ff);
+        quit_btn.shadow_opacity = 80;
+        drawButton(quit_btn);
+    }
+
+    if (clicked(quit_btn))
+    {
+        gs->shouldQuit = true;
+    }
+
+    Button replay_btn = {(Rectangle){SCREENWIDTH * (2.0 / 5) + 160, SCREENHEIGHT / 2 + 70, 120, 50}, DARKGREEN, 0, BLACK, "REPLAY ", gs->btn_font, WHITE, 15, 1, 0};
+
+    if (hovered(replay_btn))
+    {
+        replay_btn.buttonColor = GREEN;
+        replay_btn.shadow_opacity = 80;
+        drawButton(replay_btn);
+    }
+
+    if (clicked(replay_btn))
+    {
+
+        PlaySound(gs->click_sound);
+        gs->last_score = 0;
+        gs->round = 1;
+        gs->time_limit = 120;
+        gs->page = PLAYING;
         initGameplay(gs);
     }
 
@@ -2110,6 +2189,10 @@ void updateGame(GameState *gs)
             drawTime(gs);
         else if (gs->mode == MULTIVERSE || gs->mode == TIME_RUNS_OUT)
             drawScore(gs);
+        break;
+
+    case GAME_OVER:
+        drawGameOver(gs);
         break;
 
     case MULTIVERSE_CONQUERED:

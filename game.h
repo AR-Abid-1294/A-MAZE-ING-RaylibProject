@@ -148,6 +148,8 @@ typedef struct GameState
     Texture2D square_btn;
     Texture2D square_not_btn;
 
+    Texture2D sad_emoji;
+
     // mode selection buttons
     Texture2D best_of_us_btn;
     Texture2D multiverse_btn;
@@ -233,6 +235,7 @@ void addTime(GameState *gs);
 void addScore(GameState *gs);
 void drawTime(GameState *gs);
 void drawScore(GameState *gs);
+void drawGameOver(GameState *gs);
 
 void drawDark(GameState *gs);
 
