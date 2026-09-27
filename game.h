@@ -107,6 +107,16 @@ typedef struct GameState
     Texture2D abid_pic;
     Texture2D afif_pic;
 
+    Texture2D how_to_play_info;
+    Texture2D backtracker_info;
+    Texture2D prim_info;
+    Texture2D aldous_broder_info;
+    Texture2D best_of_us_info;
+    Texture2D multiverse_info;
+    Texture2D dark_night_info;
+    Texture2D infinity_war_info;
+    Texture2D time_runs_out_info;
+
     // buttons
 
     Texture2D music_on_btn;

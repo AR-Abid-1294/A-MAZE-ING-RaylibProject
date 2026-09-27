@@ -119,6 +119,8 @@ bool isWall(Maze maze, Cell cell1, Cell cell2)
         else if (cell2.x - cell1.x == 1)
             return cell2.left_wall;
     }
+
+    return true;
 }
 
 void breakWall(Maze *maze, Cell *cell1, Cell *cell2)
