@@ -141,7 +141,6 @@ typedef struct GameState
     Texture2D finish_hovered_btn;
 
     Texture2D nuke_btn;
-    Texture2D nuke_hovered_btn;
 
     Texture2D search_btn;
     Texture2D search_hovered_btn;

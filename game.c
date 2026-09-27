@@ -192,6 +192,7 @@ void unloadGameState(GameState *gs)
     UnloadTexture(gs->dark_night_info);
     UnloadTexture(gs->infinity_war_info);
     UnloadTexture(gs->time_runs_out_info);
+    UnloadTexture(gs->resources_pic);
 
     // Unload Buttons
     UnloadTexture(gs->music_on_btn);
@@ -205,6 +206,14 @@ void unloadGameState(GameState *gs)
     UnloadTexture(gs->menu_hovered_btn);
     UnloadTexture(gs->menu_from_game_btn);
     UnloadTexture(gs->menu_hovered_from_game_btn);
+
+    UnloadTexture(gs->finish_btn);
+    UnloadTexture(gs->finish_hovered_btn);
+    UnloadTexture(gs->nuke_btn);
+    UnloadTexture(gs->search_btn);
+    UnloadTexture(gs->search_hovered_btn);
+    UnloadTexture(gs->square_btn);
+    UnloadTexture(gs->square_not_btn);
 
     // Unload Mode Selction Buttons
     UnloadTexture(gs->best_of_us_btn);
