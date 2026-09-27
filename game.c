@@ -59,7 +59,7 @@ void initGameState(GameState *gs)
     gs->game_finish_sound = LoadSound("Assets/Sound Effects/xylophone_positive_long.wav");
 
     // Load Music
-    gs->bg_music = LoadMusicStream("Assets/Music/Mingle Game Song.mp3");
+    gs->bg_music = LoadMusicStream("Assets/Music/Sakura-Girl-Motivation-chosic.com_.mp3");
     gs->bg_music.looping = true;
     gs->music_on = true;
 
@@ -83,6 +83,8 @@ void initGameState(GameState *gs)
     gs->dark_night_info = LoadTexture("Assets/Images/dark_night.png");
     gs->infinity_war_info = LoadTexture("Assets/Images/infinity_war.png");
     gs->time_runs_out_info = LoadTexture("Assets/Images/time_runs_out.png");
+
+    gs->resources_pic = LoadTexture("Assets/Images/resources.png");
 
     // Load Buttons
     gs->music_on_btn = LoadTexture("Assets/Buttons/music_on.png");
@@ -586,7 +588,7 @@ void drawNameInput(GameState *gs)
                 if (gs->mode == TIME_RUNS_OUT)
                 {
                     gs->round = 1;
-                    gs->time_limit = 12;
+                    gs->time_limit = 120;
                 }
             }
         }
@@ -684,11 +686,17 @@ void drawCredit(GameState *gs)
     BeginDrawing();
     ClearBackground(GetColor(0x2e2e2eff));
 
-    Rectangle developers_rec = {60, 0, SCREENWIDTH / 2 - 40, 60};
+    Rectangle developers_rec = {SCREENWIDTH / 2 - 200, SCREENHEIGHT - 100, 200, 40};
     Button developers_button = {developers_rec,
-                                (gs->dev) ? GetColor(0x2e2e2eff) : WHITE,
-                                0, GetColor(0x2e2e2eff), "DEVELOPERS ", gs->font2,
-                                (gs->dev) ? WHITE : DARKGRAY, 35, 1, 0};
+                                (gs->dev) ? GetColor(0xff0055ff) : GetColor(0xff6b5bff),
+                                0, GetColor(0x2e2e2eff), "DEVELOPERS ", gs->btn_font,
+                                (gs->dev) ? WHITE : BLACK, 20, 1, (gs->dev) ? 50 : 0};
+
+    if (hovered(developers_button))
+    {
+        developers_button.buttonColor = GetColor(0xff0055ff);
+        developers_button.textColor = WHITE;
+    }
     if (clicked(developers_button))
     {
         PlaySound(gs->click_sound);
@@ -696,11 +704,17 @@ void drawCredit(GameState *gs)
     }
     drawButton(developers_button);
 
-    Rectangle resources_rec = {60 + SCREENWIDTH / 2 - 40, 0, SCREENWIDTH / 2 - 20, 60};
+    Rectangle resources_rec = {SCREENWIDTH / 2, SCREENHEIGHT - 100, 200, 40};
     Button resources_button = {resources_rec,
-                               (!gs->dev) ? GetColor(0x2e2e2eff) : WHITE,
-                               0, GetColor(0x2e2e2eff), "RESOURCES ", gs->font2,
-                               (!gs->dev) ? WHITE : DARKGRAY, 35, 1, 0};
+                               !(gs->dev) ? GetColor(0xff0055ff) : GetColor(0xff6b5bff),
+                               0, GetColor(0x2e2e2eff), "RESOURCES ", gs->btn_font,
+                               !(gs->dev) ? WHITE : BLACK, 20, 1, !(gs->dev) ? 50 : 0};
+
+    if (hovered(resources_button))
+    {
+        resources_button.buttonColor = GetColor(0xff0055ff);
+        resources_button.textColor = WHITE;
+    }
     if (clicked(resources_button))
     {
         PlaySound(gs->click_sound);
@@ -728,7 +742,7 @@ void drawCredit(GameState *gs)
     }
     else
     {
-        DrawRectangle(100, 100, 100, 100, WHITE);
+        drawTextureShadowed(gs->resources_pic, (Rectangle){200, SCREENHEIGHT * (1.5 / 10), 1000, 500});
     }
 
     // MENU BUTTON
@@ -743,7 +757,7 @@ void drawCredit(GameState *gs)
     }
 
     // Change Mouse Cursor
-    if (hoveredRec(menu_btn_rec))
+    if (hoveredRec(menu_btn_rec) || hovered(developers_button) || hovered(resources_button))
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
     else
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);

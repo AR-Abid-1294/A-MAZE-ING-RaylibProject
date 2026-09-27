@@ -117,6 +117,8 @@ typedef struct GameState
     Texture2D infinity_war_info;
     Texture2D time_runs_out_info;
 
+    Texture2D resources_pic;
+
     // buttons
 
     Texture2D music_on_btn;
