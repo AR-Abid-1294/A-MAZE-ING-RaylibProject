@@ -695,10 +695,10 @@ void drawCredit(GameState *gs)
     BeginDrawing();
     ClearBackground(GetColor(0x2e2e2eff));
 
-    Rectangle developers_rec = {SCREENWIDTH / 2 - 200, SCREENHEIGHT - 100, 200, 40};
+    Rectangle developers_rec = {SCREENWIDTH / 2 - 240, SCREENHEIGHT - 100, 200, 40};
     Button developers_button = {developers_rec,
                                 (gs->dev) ? GetColor(0xff0055ff) : GetColor(0xff6b5bff),
-                                0, GetColor(0x2e2e2eff), "DEVELOPERS ", gs->btn_font,
+                                0, GetColor(0x2e2e2eff), "DEVELOPERS  ", gs->btn_font,
                                 (gs->dev) ? WHITE : BLACK, 20, 1, (gs->dev) ? 50 : 0};
 
     if (hovered(developers_button))
@@ -713,7 +713,7 @@ void drawCredit(GameState *gs)
     }
     drawButton(developers_button);
 
-    Rectangle resources_rec = {SCREENWIDTH / 2, SCREENHEIGHT - 100, 200, 40};
+    Rectangle resources_rec = {SCREENWIDTH / 2 + 40, SCREENHEIGHT - 100, 200, 40};
     Button resources_button = {resources_rec,
                                !(gs->dev) ? GetColor(0xff0055ff) : GetColor(0xff6b5bff),
                                0, GetColor(0x2e2e2eff), "RESOURCES ", gs->btn_font,
@@ -1339,6 +1339,7 @@ void drawSearchBestTimes(GameState *gs)
 
     DrawTextEx(gs->title_font, title, (Vector2){(SCREENWIDTH - MeasureText(title, 50)) / 2, 20}, 50, 1, WHITE);
 
+    int flag = 0;
     for (int i = 0, j = 0; i < 5;)
     {
         if (j < 100)
@@ -1360,22 +1361,31 @@ void drawSearchBestTimes(GameState *gs)
 
                 i++;
                 j++;
+                flag = 1;
             }
         }
         else
         {
-            // player
-            Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-            Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->search_name), gs->font1, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
-            drawCard(player_name_card);
+            // // player
+            // Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
+            // Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->search_name), gs->font1, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+            // drawCard(player_name_card);
 
-            // time -> Best Time
-            Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-            Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n "), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
-            drawCard(best_times_card);
+            // // time -> Best Time
+            // Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
+            // Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n "), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
+            // drawCard(best_times_card);
 
             i++;
         }
+    }
+
+    if (!flag)
+    {
+        char *not_found = "Tomar dara holo nah!!!   ";
+        char *try_to_win = "EKBAR JITE DEKHAO!!";
+        DrawTextEx(gs->title_font, not_found, (Vector2){(SCREENWIDTH - MeasureText(not_found, 50)) / 2, 20 + 200}, 50, 1, RED);
+        DrawTextEx(gs->title_font, try_to_win, (Vector2){(SCREENWIDTH - MeasureText(try_to_win, 50)) / 2, 20 + 200 + 70}, 50, 1, SKYBLUE);
     }
 
     // MENU BUTTON
