@@ -69,13 +69,6 @@ typedef struct GameState
     // player
     Player player;
 
-    // // ball
-    // Vector2 ball_pos0;
-    // Vector2 ball_pos;
-    // double ball_radius;
-    // double sprite_side;
-    // Vector2 ball_speed;
-
     // assets
     Texture2D wall_texture;
     Texture2D player_sprite;

@@ -32,24 +32,6 @@ void storeScores(Score scores[], const char *file_name)
     fclose(scores_file);
 }
 
-// best times for THE BEST OF US mode
-
-/*void sortBestTimes(Time *times)
-{
-    for (int i = 0; i < 10; i++)
-    {
-        for (int j = 0; j < 10-i; j++)
-        {
-            if (times[j].time > times[j + 1].time)
-            {
-                Time temp = times[j];
-                times[j] = times[j + 1];
-                times[j + 1] = temp;
-            }
-        }
-    }
-}*/
-
 // afif koreche check korte
 void sortBestTimes(Time *times)
 {
@@ -72,23 +54,6 @@ void nukeBestTimes(Time *times)
     }
 }
 
-// highest score for the multiverse of madmaze
-
-/*void sortHighScores(Score *scores)
-{
-    for (int i = 0; i < 9; i++)
-    {
-        for (int j = 0; j < 9-i; j++)
-        {
-            if (scores[j].score < scores[j + 1].score)
-            {
-                Score temp = scores[j];
-                scores[j] = scores[j + 1];
-                scores[j + 1] = temp;
-            }
-        }
-    }
-}*/
 void sortHighScores(Score *scores)
 {
     for (int i = 0; i < 101; i++)

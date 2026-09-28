@@ -4,7 +4,7 @@
 
 #include "game.h"
 
-// set up initial game state, load assets
+// Set up initial game state, load assets
 void initGameState(GameState *gs)
 {
 
@@ -290,7 +290,7 @@ void updateSettings(GameState *gs)
     }
 }
 
-// draw and update different pages
+// Draw and update different pages
 
 void drawMenu(GameState *gs)
 {
@@ -1373,16 +1373,6 @@ void drawSearchBestTimes(GameState *gs)
         }
         else
         {
-            // // player
-            // Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-            // Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->search_name), gs->font1, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
-            // drawCard(player_name_card);
-
-            // // time -> Best Time
-            // Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-            // Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n "), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
-            // drawCard(best_times_card);
-
             i++;
         }
     }
@@ -1403,7 +1393,7 @@ void drawSearchBestTimes(GameState *gs)
         drawCard(player_name_card);
 
         // rank
-        Rectangle rank_rec = {550, (SCREENHEIGHT - 500) / 2 , 250, 45};
+        Rectangle rank_rec = {550, (SCREENHEIGHT - 500) / 2, 250, 45};
         Card rank_card = {rank_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\nRank"), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -15, 80, -5, 5};
         drawCard(rank_card);
 
@@ -1468,7 +1458,6 @@ void drawSearchHighScores(GameState *gs)
                 Card rank_card = {rank_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%d", j + 1), gs->font1, GetColor(0xffe2b8ff), 25, 1, -15, 80, -5, 5};
                 drawCard(rank_card);
 
-
                 // score
                 Rectangle best_times_rec = {850, (SCREENHEIGHT - 500) / 2 + 60 + 60 * i, 300, 45};
                 const char *best_time_text = TextFormat("%03d", gs->scores[j].score);
@@ -1482,16 +1471,6 @@ void drawSearchHighScores(GameState *gs)
         }
         else
         {
-            // // player
-            // Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-            // Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->search_name), gs->font1, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
-            // drawCard(player_name_card);
-
-            // // score -> Best Time
-            // Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 * i, 450, 45};
-            // Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n "), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
-            // drawCard(best_times_card);
-
             i++;
         }
     }
@@ -1511,7 +1490,7 @@ void drawSearchHighScores(GameState *gs)
         drawCard(player_name_card);
 
         // rank
-        Rectangle rank_rec = {550, (SCREENHEIGHT - 500) / 2 , 250, 45};
+        Rectangle rank_rec = {550, (SCREENHEIGHT - 500) / 2, 250, 45};
         Card rank_card = {rank_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\nRank"), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -15, 80, -5, 5};
         drawCard(rank_card);
 
@@ -1833,15 +1812,6 @@ void drawGame(GameState *gs)
     {
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
-
-    // BRAND NEW MAZE
-    // const char *new_maze_msg = "BRAND NEW MAZE";
-    // Card new_maze_card = {(Rectangle){(SCREENWIDTH - 500) / 2, (SCREENHEIGHT - 100) / 2, 500, 100},
-    //                       DARKBLUE, 0, WHITE, new_maze_msg, gs->msg_font, WHITE, 50, 1, 20, 80, 10, 10};
-    // if (gs->current_time <= 1)
-    // {
-    //     drawCard(new_maze_card);
-    // }
 
     if (gs->mode == BEST_OF_US || gs->mode == DARK_NIGHT)
     {

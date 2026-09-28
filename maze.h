@@ -42,12 +42,6 @@ typedef enum CellState
     // during maze generation
     UNVISITED,
     VISITED,
-    // during maze solving
-    UNCROSSED,
-    CROSSED,
-    // during auto solving
-    UNCHECKED,
-    CHECKED
 } CellState;
 
 typedef enum Difficulty
@@ -130,13 +124,5 @@ void (*generateMaze)(Maze *maze);
 void drawMaze(Maze *maze, Vector2 pos, Player *player);
 
 void destroyMaze(Maze *maze);
-
-// Maze Solving Algorithms
-
-void markAll(Maze *maze, CellState state);
-
-void findPath(Maze *maze, Cell *cell);
-
-void solveMaze(Maze *maze);
 
 #endif
