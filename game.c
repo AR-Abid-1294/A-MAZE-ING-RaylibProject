@@ -570,7 +570,7 @@ void drawNameInput(GameState *gs)
     }
 
     // ENTER button
-    Button enter_btn = {(Rectangle){(SCREENWIDTH - 100) / 2, SCREENHEIGHT / 2.0 + 20, 100, 40}, GetColor(0xe7edebff), 0, RAYWHITE, "ENTER ", gs->btn_font, GetColor(0x69a481ff), 20, 1, 0};
+    Button enter_btn = {(Rectangle){(SCREENWIDTH - 100) / 2, SCREENHEIGHT / 2.0 + 20, 100, 40}, GetColor(0x00f0ffff), 0, RAYWHITE, "ENTER ", gs->btn_font, BLACK, 20, 1, 0};
 
     if (gs->letter_count)
     {
@@ -578,8 +578,8 @@ void drawNameInput(GameState *gs)
 
         if (hovered(enter_btn))
         {
-            enter_btn.buttonColor = GetColor(0xb7f7d4ff);
-            enter_btn.textColor = BLACK;
+            enter_btn.buttonColor = BLUE;
+            enter_btn.textColor = WHITE;
             drawButton(enter_btn);
         }
 
@@ -1351,12 +1351,17 @@ void drawSearchBestTimes(GameState *gs)
             else
             {
                 // player
-                Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 + 60 * i, 450, 45};
+                Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 + 60 * i, 300, 45};
                 Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->times[j].player_name), gs->font1, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
                 drawCard(player_name_card);
 
+                // rank
+                Rectangle rank_rec = {550, (SCREENHEIGHT - 500) / 2 + 60 + 60 * i, 250, 45};
+                Card rank_card = {rank_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%d", j + 1), gs->font1, GetColor(0xffe2b8ff), 25, 1, -15, 80, -5, 5};
+                drawCard(rank_card);
+
                 // time -> Best Time
-                Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 + 60 * i, 450, 45};
+                Rectangle best_times_rec = {850, (SCREENHEIGHT - 500) / 2 + 60 + 60 * i, 300, 45};
                 const char *best_time_text = formatTime(gs->times[i].time);
                 Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%s", best_time_text), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
                 drawCard(best_times_card);
@@ -1393,12 +1398,17 @@ void drawSearchBestTimes(GameState *gs)
     else
     {
         // player
-        Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2, 450, 45};
-        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\nPlayer"), gs->font1, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+        Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2, 300, 45};
+        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\nPlayer"), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
         drawCard(player_name_card);
 
+        // rank
+        Rectangle rank_rec = {550, (SCREENHEIGHT - 500) / 2 , 250, 45};
+        Card rank_card = {rank_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\nRank"), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -15, 80, -5, 5};
+        drawCard(rank_card);
+
         // time -> Best Time
-        Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2, 450, 45};
+        Rectangle best_times_rec = {850, (SCREENHEIGHT - 500) / 2, 300, 45};
         Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\nTime"), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
         drawCard(best_times_card);
     }
@@ -1449,12 +1459,18 @@ void drawSearchHighScores(GameState *gs)
             else
             {
                 // player
-                Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 + 60 * i, 450, 45};
+                Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2 + 60 + 60 * i, 300, 45};
                 Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\n%s", gs->scores[j].player_name), gs->font1, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
                 drawCard(player_name_card);
 
-                // score -> Best Time
-                Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2 + 60 + 60 * i, 450, 45};
+                // rank
+                Rectangle rank_rec = {550, (SCREENHEIGHT - 500) / 2 + 60 + 60 * i, 250, 45};
+                Card rank_card = {rank_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%d", j + 1), gs->font1, GetColor(0xffe2b8ff), 25, 1, -15, 80, -5, 5};
+                drawCard(rank_card);
+
+
+                // score
+                Rectangle best_times_rec = {850, (SCREENHEIGHT - 500) / 2 + 60 + 60 * i, 300, 45};
                 const char *best_time_text = TextFormat("%03d", gs->scores[j].score);
                 Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\n%s", best_time_text), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
                 drawCard(best_times_card);
@@ -1490,12 +1506,17 @@ void drawSearchHighScores(GameState *gs)
     else
     {
         // player
-        Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2, 450, 45};
-        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\nPlayer"), gs->font1, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
+        Rectangle player_name_rec = {200, (SCREENHEIGHT - 500) / 2, 300, 45};
+        Card player_name_card = {player_name_rec, GetColor(0xffe2b8ff), 0, WHITE, TextFormat("\nPlayer"), gs->btn_font, GetColor(0x053d3aff), 25, 1, -15, 80, -5, 5};
         drawCard(player_name_card);
 
+        // rank
+        Rectangle rank_rec = {550, (SCREENHEIGHT - 500) / 2 , 250, 45};
+        Card rank_card = {rank_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\nRank"), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -15, 80, -5, 5};
+        drawCard(rank_card);
+
         // score -> Best Time
-        Rectangle best_times_rec = {700, (SCREENHEIGHT - 500) / 2, 450, 45};
+        Rectangle best_times_rec = {850, (SCREENHEIGHT - 500) / 2, 300, 45};
         Card best_times_card = {best_times_rec, GetColor(0x053d3aff), 0, WHITE, TextFormat("\nScores"), gs->btn_font, GetColor(0xffe2b8ff), 25, 1, -17, 80, 5, 5};
         drawCard(best_times_card);
     }
