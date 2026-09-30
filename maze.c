@@ -100,29 +100,6 @@ bool isCellValid(Maze maze, int x, int y)
     return ((x >= 0 && x <= maze.width - 1) && (y >= 0 && y <= maze.height - 1));
 }
 
-bool isWall(Maze maze, Cell cell1, Cell cell2)
-{
-    if (cell1.x == cell2.x)
-    {
-        if (cell1.y - cell2.y == 1)
-            return cell1.up_wall;
-
-        else if (cell2.y - cell1.y == 1)
-            return cell2.up_wall;
-    }
-
-    else if (cell1.y == cell2.y)
-    {
-        if (cell1.x - cell2.x == 1)
-            return cell1.left_wall;
-
-        else if (cell2.x - cell1.x == 1)
-            return cell2.left_wall;
-    }
-
-    return true;
-}
-
 void breakWall(Maze *maze, Cell *cell1, Cell *cell2)
 {
     if (cell1->x == cell2->x)
