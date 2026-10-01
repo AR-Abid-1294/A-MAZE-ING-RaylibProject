@@ -1653,7 +1653,6 @@ void updateGameplay(GameState *gs)
             Cell cell_new = gs->maze.cells[y][x];
             if (isCellAllowed(cell_old, cell_new))
             {
-                gs->maze.cells[y][x].cellState = CROSSED;
                 gs->player.x = x;
                 gs->player.y = y;
                 PlaySound(gs->movement_sound);

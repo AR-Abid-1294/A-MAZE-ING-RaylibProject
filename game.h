@@ -33,9 +33,7 @@ typedef enum GameMode
     MULTIVERSE,
     DARK_NIGHT,
     TIME_RUNS_OUT,
-    INFINITY_WAR,
-    GRAVITY_GRAVE,
-    ENDGAME
+    INFINITY_WAR
 } GameMode;
 
 typedef enum Info
